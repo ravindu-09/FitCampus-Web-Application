@@ -67,14 +67,14 @@ FitCampus-Web-Application/
 │   │   │
 │   │   └── roles/                    # Actor-specific Stylesheets
 │   │       ├── auth.css              # Login & Multi-step registration forms
-│   │       ├── student.css           # Student dashboard, workouts, calorie tracking
+│   │       ├── member.css            # Member dashboard, workouts, calorie tracking
 │   │       ├── captain.css           # Slot bookings, roster grids, session planner
 │   │       ├── instructor.css        # Kiosk check-in, inventory, workout builder
 │   │       └── admin.css             # Verification tables, approvals, analytics
 │   │
 │   ├── js/                           # Pure Vanilla JavaScript Handlers
 │   │   ├── auth/                     # Auth Flow Scripts (auth.js, register-wizard.js)
-│   │   ├── student/                  # Student Scripts (calorie-calculator.js, workout-timer.js)
+│   │   ├── member/                   # Member Scripts (calorie-calculator.js, workout-timer.js)
 │   │   ├── captain/                  # Team & Booking Scripts (slot-booking.js, roster-filter.js)
 │   │   ├── instructor/               # Staff Management Scripts (kiosk-scanner.js, inventory-manager.js)
 │   │   ├── admin/                    # Admin Dashboard Scripts (user-approval.js, analytics-charts.js)
@@ -83,21 +83,21 @@ FitCampus-Web-Application/
 │   └── images/                       # Static UI Visuals & Crests (uoc-logo.png, etc.)
 │
 ├── includes/                         # Reusable PHP Partials & Database Drivers
-│   ├── headers/                      # Role-specific HTML Heads (header_auth, student, etc.)
-│   ├── sidebars/                     # Dynamic Navigation Sidebars
+│   ├── headers/                      # Role-specific HTML Heads (header_auth, header_member, etc.)
+│   ├── sidebars/                     # Dynamic Navigation Sidebars (sidebar_member.php, etc.)
 │   ├── footers/                      # Common Footers & Script Injections
 │   └── db_connection.php             # PDO-based MySQL Database Connection
 │
 ├── backend/                          # Server-side Request Handlers & Business Logic
 │   ├── auth/                         # Authentication Logic (login_process, register_process, logout)
-│   ├── student/                      # Student Operations (log_calories, update_goals)
+│   ├── member/                       # Member Operations (log_calories, update_goals)
 │   ├── captain/                      # Team Operations (book_slot, update_roster)
 │   ├── instructor/                   # Staff Operations (add_inventory, create_workout)
 │   └── admin/                        # Administrative Operations (approve_user, update_role)
 │
 ├── views/                            # Frontend View Templates (Semantic HTML)
 │   ├── auth/                         # Login & Registration Wizard Views
-│   ├── student/                      # Student Member Views
+│   ├── member/                       # General Gym Member Views
 │   ├── captain/                      # Team Captain Console Views
 │   ├── instructor/                   # Instructor Console Views
 │   └── admin/                        # Executive Admin Dashboard Views
@@ -108,7 +108,7 @@ FitCampus-Web-Application/
 ├── README.md                         # Project Documentation
 └── .gitignore                        # Git Exclusion Rules
 
-
+---
 
 ```markdown
 ## ⚙️ Local Development Setup Guide
@@ -162,7 +162,7 @@ http://localhost/FitCampus-Web-Application/views/auth/login.php
 
 ```
 
-
+---
 
 ## 📐 Developer Team Guidelines & Coding Rules
 
