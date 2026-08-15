@@ -50,10 +50,10 @@ FitCampus is an all-in-one web-based fitness and facility management platform de
 * **Database:** MySQL Relational Database (Prepared Statements / PDO)
 * **UI Design Standard:** Hanken Grotesk & JetBrains Mono Typography, Custom Design Token System
 
-```text
 
 ## 📂 Project Directory Basic Structure
 
+```text
 FitCampus-Web-Application/
 │
 ├── index.php                         # Public Landing Page & Route Dispatcher
@@ -107,7 +107,6 @@ FitCampus-Web-Application/
 │
 ├── README.md                         # Project Documentation
 └── .gitignore                        # Git Exclusion Rules
-
 ```
 
 ```markdown
