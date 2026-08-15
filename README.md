@@ -50,7 +50,7 @@ FitCampus is an all-in-one web-based fitness and facility management platform de
 * **Database:** MySQL Relational Database (Prepared Statements / PDO)
 * **UI Design Standard:** Hanken Grotesk & JetBrains Mono Typography, Custom Design Token System
 
----
+```text
 
 ## 📂 Project Directory Basic Structure
 
@@ -108,7 +108,7 @@ FitCampus-Web-Application/
 ├── README.md                         # Project Documentation
 └── .gitignore                        # Git Exclusion Rules
 
----
+```
 
 ```markdown
 ## ⚙️ Local Development Setup Guide
@@ -206,7 +206,3 @@ git commit -m "feat(student): implement calorie calculation form and controller"
 
 
 * **Pull Requests:** Push your feature branch and open a Pull Request against `dev` for review before merging.
-
-```
-
-```
