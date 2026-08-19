@@ -1,3 +1,5 @@
+-- all the test data for the database is inserted here
+
 USE `fitcampus_db`;
 
 -- ============================================================
