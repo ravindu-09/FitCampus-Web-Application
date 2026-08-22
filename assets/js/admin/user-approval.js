@@ -1,10 +1,11 @@
-
 document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('verificationModal');
     const closeBtn = document.getElementById('modalCloseBtn');
     const rejectToggleBtn = document.getElementById('btnRejectToggle');
     const approveBtn = document.getElementById('btnApproveAction');
     const searchInput = document.getElementById('userSearchInput');
+    const dateFilter = document.getElementById('dateFilterSelect');
+    const tableRows = document.querySelectorAll('.verification-table-row');
 
     // 1. Inspect Document Modal Triggers
     document.querySelectorAll('.btn-inspect-trigger').forEach(btn => {
@@ -37,17 +38,52 @@ document.addEventListener('DOMContentLoaded', () => {
         approveBtn.addEventListener('click', () => submitDecision('approve'));
     }
 
-    // 5. Live Search Filter
-    if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase().trim();
-            const rows = document.querySelectorAll('.verification-table-row');
+    // 5. Unified Live Search & Date Filter Handler
+    function applyCombinedFilters() {
+        const query = (searchInput?.value || '').toLowerCase().trim();
+        const filterRange = dateFilter?.value || 'all';
 
-            rows.forEach(row => {
-                const searchData = row.getAttribute('data-search') || '';
-                row.style.display = searchData.includes(query) ? '' : 'none';
-            });
+        const now = new Date();
+        const todayYear = now.getFullYear();
+        const todayMonth = now.getMonth();
+        const todayDate = now.getDate();
+
+        tableRows.forEach(row => {
+            const searchData = (row.getAttribute('data-search') || '').toLowerCase();
+            const dateStr = row.getAttribute('data-date'); // Format: YYYY-MM-DD
+            
+            // Search text condition
+            const matchesSearch = !query || searchData.includes(query);
+
+            // Date condition
+            let matchesDate = true;
+            if (dateStr && filterRange !== 'all') {
+                const [rYear, rMonth, rDay] = dateStr.split('-').map(Number);
+                const rowDate = new Date(rYear, rMonth - 1, rDay);
+                const todayObj = new Date(todayYear, todayMonth, todayDate);
+
+                const diffTime = todayObj.getTime() - rowDate.getTime();
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+                if (filterRange === 'today') {
+                    matchesDate = (diffDays === 0);
+                } else if (filterRange === '7days') {
+                    matchesDate = (diffDays >= 0 && diffDays <= 7);
+                } else if (filterRange === '30days') {
+                    matchesDate = (diffDays >= 0 && diffDays <= 30);
+                }
+            }
+
+            row.style.display = (matchesSearch && matchesDate) ? '' : 'none';
         });
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener('input', applyCombinedFilters);
+    }
+
+    if (dateFilter) {
+        dateFilter.addEventListener('change', applyCombinedFilters);
     }
 });
 
@@ -64,8 +100,8 @@ function openVerificationModal(user) {
     document.getElementById('modalRegNo').textContent = user.reg_no || 'UOC-Pending';
     document.getElementById('modalEmail').textContent = user.email || 'N/A';
     
-    // Database schema: emergency_contact mapping
-    document.getElementById('modalPhone').textContent = user.emergency_contact || user.contact_no || '+94 7X XXX XXXX';
+    // Emergency contact mapping
+    document.getElementById('modalPhone').textContent = user.emergency_contact || '+94 7X XXX XXXX';
     document.getElementById('modalDate').textContent = user.created_at || 'Just Now';
 
     // Set Avatar & Documents

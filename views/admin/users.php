@@ -4,9 +4,21 @@ require_once '../../includes/db_connection.php';
 require_once '../../includes/headers/header_admin.php';
 
 try {
-    $stmt = $pdo->query("SELECT user_id, full_name, email, reg_no, faculty, role, is_captain FROM users ORDER BY user_id DESC");
-    $users = $stmt->fetchAll();
+    $stmt = $pdo->query("
+        SELECT 
+            u.User_ID AS user_id, 
+            CONCAT(u.First_Name, ' ', u.Last_Name) AS full_name, 
+            u.Email AS email, 
+            u.Role AS role, 
+            s.Faculty AS faculty,
+            (SELECT COUNT(*) FROM `TEAM_MEMBER` tm WHERE tm.User_ID = u.User_ID AND tm.Role_In_Team = 'Captain') AS is_captain
+        FROM `USER` u
+        LEFT JOIN `UNIVERSITY_STUDENT` s ON u.User_ID = s.User_ID 
+        ORDER BY u.User_ID DESC
+    ");
+    $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (\PDOException $e) {
+    error_log("Users Roster Error: " . $e->getMessage());
     $users = [];
 }
 ?>
@@ -56,7 +68,7 @@ try {
                                     <td><?php echo htmlspecialchars($row['faculty'] ?? 'N/A', ENT_QUOTES, 'UTF-8'); ?></td>
                                     <td>
                                         <span class="badge-tag"><?php echo strtoupper($row['role']); ?></span>
-                                        <?php if ($row['is_captain']): ?>
+                                        <?php if ((int)$row['is_captain'] > 0): ?>
                                             <span class="badge-status badge-captain">CAPTAIN</span>
                                         <?php endif; ?>
                                     </td>

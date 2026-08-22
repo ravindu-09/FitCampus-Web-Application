@@ -1,14 +1,13 @@
 <?php
+// backend/auth/login_process.php
 session_start();
 require_once '../../includes/db_connection.php';
 
-// Form submission check
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header("Location: ../../views/auth/login.php");
     exit();
 }
 
-// Clear any old registration success flash messages upon new login attempts
 if (isset($_SESSION['registration_success'])) {
     unset($_SESSION['registration_success']);
 }
@@ -23,11 +22,19 @@ if (empty($identifier) || empty($password)) {
 }
 
 try {
-    // Lookup user by institutional email or reg_no
+    // Lookup user by Email or Registration Number with Captain status check
     $stmt = $pdo->prepare("
-        SELECT user_id, full_name, email, password_hash, role, status, is_captain 
-        FROM users 
-        WHERE email = :id_email OR reg_no = :id_reg
+        SELECT 
+            u.User_ID, 
+            CONCAT(u.First_Name, ' ', u.Last_Name) AS full_name, 
+            u.Email, 
+            u.Password, 
+            u.Role, 
+            s.Status AS student_status,
+            (SELECT COUNT(*) FROM `TEAM_MEMBER` tm WHERE tm.User_ID = u.User_ID AND tm.Role_In_Team = 'Captain') AS is_captain
+        FROM `USER` u
+        LEFT JOIN `UNIVERSITY_STUDENT` s ON u.User_ID = s.User_ID
+        WHERE u.Email = :id_email OR s.Registration_Number = :id_reg
         LIMIT 1
     ");
     $stmt->execute([
@@ -35,35 +42,40 @@ try {
         ':id_reg'   => $identifier
     ]);
     
-    $user = $stmt->fetch();
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($user && password_verify($password, $user['password_hash'])) {
+    if ($user && password_verify($password, $user['Password'])) {
         
-        // Account verification check
-        if ($user['status'] === 'pending') {
-            $_SESSION['error'] = "Your registration is currently under review by the Administrator. You will be notified via email once approved.";
-            header("Location: ../../views/auth/login.php");
-            exit();
-        }
+        // Status checks for Students
+        if ($user['Role'] === 'Student') {
+            if ($user['student_status'] === 'pending') {
+                $_SESSION['error'] = "Your registration is currently under review by the Administrator. You will be notified via email once approved.";
+                header("Location: ../../views/auth/login.php");
+                exit();
+            }
 
-        if ($user['status'] === 'rejected') {
-            $_SESSION['error'] = "Your registration request was declined. Please check your email for further instructions or contact support.";
-            header("Location: ../../views/auth/login.php");
-            exit();
+            if ($user['student_status'] === 'suspended') {
+                $_SESSION['error'] = "Your student membership has been suspended. Please contact the Physical Education Department.";
+                header("Location: ../../views/auth/login.php");
+                exit();
+            }
         }
 
         // Prevent session fixation
         session_unset();
         session_regenerate_id(true);
 
-        $_SESSION['user_id']    = $user['user_id'];
+        $_SESSION['user_id']    = $user['User_ID'];
         $_SESSION['full_name']  = $user['full_name'];
-        $_SESSION['email']      = $user['email'];
-        $_SESSION['role']       = $user['role'];
-        $_SESSION['is_captain'] = (bool)$user['is_captain'];
+        $_SESSION['email']      = $user['Email'];
+        
+        // Standardize internal session roles to lowercase
+        $role_lower = strtolower($user['Role']);
+        $_SESSION['role']       = ($role_lower === 'student') ? 'member' : $role_lower; // member, admin, instructor
+        $_SESSION['is_captain'] = ((int)$user['is_captain'] > 0) ? 1 : 0;
 
         // Role-based redirection
-        switch ($user['role']) {
+        switch ($_SESSION['role']) {
             case 'admin':
                 header("Location: ../../views/admin/analytics.php");
                 break;

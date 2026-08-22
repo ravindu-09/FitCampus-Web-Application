@@ -2,11 +2,19 @@
 
 session_start();
 
-// Active session check
+// Active session check (Role-specific redirection)
 if (isset($_SESSION['user_id']) && isset($_SESSION['role'])) {
     $role = $_SESSION['role'];
-    header("Location: ../$role/dashboard.php");
-    exit();
+    if ($role === 'admin') {
+        header("Location: ../admin/analytics.php");
+        exit();
+    } elseif ($role === 'member') {
+        header("Location: ../member/dashboard.php");
+        exit();
+    } elseif ($role === 'instructor') {
+        header("Location: ../instructor/dashboard.php");
+        exit();
+    }
 }
 
 $page_title = "FitCampus - Institutional Portal Login";

@@ -2,26 +2,35 @@
 // views/admin/verification.php
 require_once '../../includes/db_connection.php';
 
-// 1. Header Configurations & Global Admin Header Inclusion
 $page_title = "User Verification Console - FitCampus";
 require_once '../../includes/headers/header_admin.php';
 
-// 2. Fetch Pending Applicants and Dynamic Telemetry
 try {
-    // Database schema: emergency_contact (instead of contact_no)
+    // 1. Fetch Pending Applicants
     $stmt = $pdo->query("
-        SELECT user_id, full_name, email, reg_no, faculty, emergency_contact, profile_image, id_front_image, id_back_image, created_at 
-        FROM users 
-        WHERE status = 'pending' 
-        ORDER BY created_at ASC
+        SELECT 
+            u.User_ID AS user_id, 
+            CONCAT(u.First_Name, ' ', u.Last_Name) AS full_name, 
+            u.Email AS email, 
+            s.Registration_Number AS reg_no, 
+            s.Faculty AS faculty, 
+            s.Emergency_Contact AS emergency_contact, 
+            s.Profile_Image AS profile_image, 
+            s.Student_ID_Front AS id_front_image, 
+            s.Student_ID_Back AS id_back_image, 
+            s.Created_At AS created_at 
+        FROM `USER` u
+        INNER JOIN `UNIVERSITY_STUDENT` s ON u.User_ID = s.User_ID 
+        WHERE s.Status = 'pending' 
+        ORDER BY s.Created_At ASC
     ");
     $pending_users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Dynamic Summary Card Counts
+    // 2. Telemetry Counts
     $count_pending = count($pending_users);
-    $count_approved = $pdo->query("SELECT COUNT(*) FROM users WHERE status = 'active' AND role = 'member'")->fetchColumn() ?: 0;
-    $count_declined = $pdo->query("SELECT COUNT(*) FROM users WHERE status = 'suspended'")->fetchColumn() ?: 0;
-    $count_total_members = $pdo->query("SELECT COUNT(*) FROM users WHERE role = 'member'")->fetchColumn() ?: 0;
+    $count_approved = $pdo->query("SELECT COUNT(*) FROM `UNIVERSITY_STUDENT` WHERE `Status` = 'active'")->fetchColumn() ?: 0;
+    $count_declined = $pdo->query("SELECT COUNT(*) FROM `UNIVERSITY_STUDENT` WHERE `Status` = 'suspended'")->fetchColumn() ?: 0;
+    $count_total_members = $pdo->query("SELECT COUNT(*) FROM `UNIVERSITY_STUDENT`")->fetchColumn() ?: 0;
 
 } catch (\PDOException $e) {
     error_log("Verification Fetch Error: " . $e->getMessage());
@@ -34,13 +43,10 @@ try {
 ?>
 
     <div class="admin-viewport-wrapper">
-        <!-- Modular Desktop & Mobile Sidebar -->
         <?php include_once '../../includes/sidebars/sidebar_admin.php'; ?>
 
-        <!-- Main Workspace Canvas -->
         <main class="admin-main-canvas">
             
-            <!-- Toast Feedback Messages -->
             <?php if (isset($_SESSION['success'])): ?>
                 <div class="alert-success">
                     <span class="material-symbols-outlined">check_circle</span>
@@ -55,7 +61,6 @@ try {
                 </div>
             <?php endif; ?>
 
-            <!-- Header Section & Live Search Filters -->
             <div class="content-header-row">
                 <div>
                     <h2 class="page-main-heading">User Verification Console</h2>
@@ -79,7 +84,6 @@ try {
                 </div>
             </div>
 
-            <!-- Stats & Telemetry Bento Grid -->
             <div class="verification-stats-grid">
                 <div class="glass-card stat-summary-box">
                     <div class="stat-top-row">
@@ -114,7 +118,6 @@ try {
                 </div>
             </div>
 
-            <!-- Main Verification Table Panel -->
             <div class="glass-card p-0 overflow-hidden">
                 <?php if (empty($pending_users)): ?>
                     <div class="empty-state-box">
@@ -135,7 +138,9 @@ try {
                             </thead>
                             <tbody>
                                 <?php foreach ($pending_users as $user): ?>
-                                    <tr class="verification-table-row" data-search="<?php echo htmlspecialchars(strtolower($user['full_name'] . ' ' . ($user['reg_no'] ?? '')), ENT_QUOTES, 'UTF-8'); ?>">
+                                    <tr class="verification-table-row" 
+                                        data-search="<?php echo htmlspecialchars(strtolower($user['full_name'] . ' ' . ($user['reg_no'] ?? '')), ENT_QUOTES, 'UTF-8'); ?>"
+                                        data-date="<?php echo date('Y-m-d', strtotime($user['created_at'])); ?>">
                                         <td>
                                             <div class="user-meta-cell">
                                                 <div class="user-avatar-circle">
@@ -183,7 +188,7 @@ try {
         </main>
     </div>
 
-    <!-- Verification Inspector Modal Dialog -->
+    <!-- Inspector Modal -->
     <div id="verificationModal" class="modal-overlay hidden">
         <div class="modal-dialog-inspector">
             

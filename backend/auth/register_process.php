@@ -11,7 +11,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // STEP 1 HANDLER
-
 if ($step == '1') {
     $full_name = trim($_POST['full_name'] ?? '');
     $reg_no    = trim($_POST['reg_no'] ?? '');
@@ -24,7 +23,14 @@ if ($step == '1') {
         exit();
     }
 
-    $stmt = $pdo->prepare("SELECT user_id FROM users WHERE email = :email OR reg_no = :reg_no LIMIT 1");
+    // Check duplicate in USER or UNIVERSITY_STUDENT
+    $stmt = $pdo->prepare("
+        SELECT u.User_ID 
+        FROM `USER` u 
+        LEFT JOIN `UNIVERSITY_STUDENT` s ON u.User_ID = s.User_ID 
+        WHERE u.Email = :email OR s.Registration_Number = :reg_no 
+        LIMIT 1
+    ");
     $stmt->execute([':email' => $email, ':reg_no' => $reg_no]);
     if ($stmt->fetch()) {
         $_SESSION['error'] = "An account with this Email or Registration Number already exists.";
@@ -44,7 +50,6 @@ if ($step == '1') {
 }
 
 // STEP 2 HANDLER
-
 if ($step == '2') {
     $dob               = trim($_POST['dob'] ?? '');
     $gender            = trim($_POST['gender'] ?? '');
@@ -82,7 +87,6 @@ if ($step == '2') {
 }
 
 // STEP 3 HANDLER
-
 if ($step == '3') {
     if (!isset($_SESSION['reg_step1']) || !isset($_SESSION['reg_step2'])) {
         header("Location: ../../views/auth/register_step1.php");
@@ -126,28 +130,50 @@ if ($step == '3') {
     }
 
     try {
+        $pdo->beginTransaction();
+
+        // Split Full Name into First Name & Last Name
+        $name_parts = explode(' ', $_SESSION['reg_step1']['full_name'], 2);
+        $first_name = $name_parts[0];
+        $last_name  = $name_parts[1] ?? '.';
+
         $hashed_pwd = password_hash($_SESSION['reg_step2']['password'], PASSWORD_BCRYPT);
 
-        $sql = "INSERT INTO users 
-                (reg_no, email, password_hash, full_name, faculty, nic, dob, gender, emergency_contact, profile_image, id_front_image, id_back_image, role, status) 
-                VALUES 
-                (:reg_no, :email, :pwd, :name, :faculty, :nic, :dob, :gender, :emergency, :avatar, :id_f, :id_b, 'member', 'pending')";
+        // 1. Insert into USER table
+        $stmt1 = $pdo->prepare("
+            INSERT INTO `USER` (`First_Name`, `Last_Name`, `Email`, `Password`, `Role`) 
+            VALUES (:fname, :lname, :email, :pwd, 'Student')
+        ");
+        $stmt1->execute([
+            ':fname' => $first_name,
+            ':lname' => $last_name,
+            ':email' => $_SESSION['reg_step1']['email'],
+            ':pwd'   => $hashed_pwd
+        ]);
 
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
+        $user_id = $pdo->lastInsertId();
+
+        // 2. Insert into UNIVERSITY_STUDENT table
+        $stmt2 = $pdo->prepare("
+            INSERT INTO `UNIVERSITY_STUDENT` 
+            (`User_ID`, `Registration_Number`, `NIC`, `DOB`, `Faculty`, `Gender`, `Emergency_Contact`, `Profile_Image`, `Student_ID_Front`, `Student_ID_Back`, `Status`) 
+            VALUES 
+            (:id, :reg_no, :nic, :dob, :faculty, :gender, :emergency, :avatar, :id_f, :id_b, 'pending')
+        ");
+        $stmt2->execute([
+            ':id'        => $user_id,
             ':reg_no'    => $_SESSION['reg_step1']['reg_no'],
-            ':email'     => $_SESSION['reg_step1']['email'],
-            ':pwd'       => $hashed_pwd,
-            ':name'      => $_SESSION['reg_step1']['full_name'],
-            ':faculty'   => $_SESSION['reg_step1']['faculty'],
             ':nic'       => $nic,
             ':dob'       => $_SESSION['reg_step2']['dob'],
+            ':faculty'   => $_SESSION['reg_step1']['faculty'],
             ':gender'    => $_SESSION['reg_step2']['gender'],
             ':emergency' => $_SESSION['reg_step2']['emergency_contact'],
             ':avatar'    => $profile_image,
             ':id_f'      => $id_front,
             ':id_b'      => $id_back
         ]);
+
+        $pdo->commit();
 
         unset($_SESSION['reg_step1']);
         unset($_SESSION['reg_step2']);
@@ -157,6 +183,9 @@ if ($step == '3') {
         exit();
 
     } catch (\PDOException $e) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
         error_log("Registration DB Error: " . $e->getMessage());
         $_SESSION['error'] = "An error occurred during account registration. Please try again.";
         header("Location: ../../views/auth/register_step3.php");

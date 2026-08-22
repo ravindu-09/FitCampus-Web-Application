@@ -19,31 +19,43 @@ $is_captain   = !empty($_SESSION['is_captain']) && $_SESSION['is_captain'] == 1;
     </div>
 
     <nav class="sidebar-nav-list">
-        <!-- 1. Common Links -->
-        <a href="dashboard.php" class="sidebar-nav-item <?php echo ($current_page == 'dashboard.php') ? 'active' : ''; ?>">
+        <!-- 1. Common Member Links (views/member/) -->
+        <a href="../member/dashboard.php" class="sidebar-nav-item <?php echo ($current_page == 'dashboard.php') ? 'active' : ''; ?>">
             <span class="material-symbols-outlined">dashboard</span>
             <span>Dashboard</span>
         </a>
-        <a href="facilities.php" class="sidebar-nav-item <?php echo ($current_page == 'goals.php') ? 'active' : ''; ?>">
-            <span class="material-symbols-outlined">sports_gymnastics</span>
+        <a href="../member/goals.php" class="sidebar-nav-item <?php echo ($current_page == 'goals.php') ? 'active' : ''; ?>">
+            <span class="material-symbols-outlined">track_changes</span>
             <span>Goals</span>
         </a>
-        <a href="my_bookings.php" class="sidebar-nav-item <?php echo ($current_page == 'leaderboard.php') ? 'active' : ''; ?>">
-            <span class="material-symbols-outlined">event_available</span>
+        <a href="../member/leaderboard.php" class="sidebar-nav-item <?php echo ($current_page == 'leaderboard.php') ? 'active' : ''; ?>">
+            <span class="material-symbols-outlined">leaderboard</span>
             <span>Leaderboard</span>
         </a>
+        <a href="../member/workouts.php" class="sidebar-nav-item <?php echo ($current_page == 'workouts.php') ? 'active' : ''; ?>">
+            <span class="material-symbols-outlined">fitness_center</span>
+            <span>Workouts</span>
+        </a>
+        <a href="../member/calories.php" class="sidebar-nav-item <?php echo ($current_page == 'calories.php') ? 'active' : ''; ?>">
+            <span class="material-symbols-outlined">local_fire_department</span>
+            <span>Calories</span>
+        </a>
 
-        <!-- 2. Captain Special Features -->
+        <!-- 2. Captain Special Features (views/captain/) -->
         <?php if ($is_captain): ?>
             <div class="sidebar-section-divider">Captain Portal</div>
             
-            <a href="team_roster.php" class="sidebar-nav-item captain-feature <?php echo ($current_page == 'roster.php') ? 'active' : ''; ?>">
+            <a href="../captain/roaster.php" class="sidebar-nav-item captain-feature <?php echo ($current_page == 'roaster.php') ? 'active' : ''; ?>">
                 <span class="material-symbols-outlined">groups</span>
                 <span>Team Roster</span>
             </a>
-            <a href="team_reservations.php" class="sidebar-nav-item captain-feature <?php echo ($current_page == 'booking.php') ? 'active' : ''; ?>">
+            <a href="../captain/booking.php" class="sidebar-nav-item captain-feature <?php echo ($current_page == 'booking.php') ? 'active' : ''; ?>">
                 <span class="material-symbols-outlined">event_seat</span>
                 <span>Team Bookings</span>
+            </a>
+            <a href="../captain/planner.php" class="sidebar-nav-item captain-feature <?php echo ($current_page == 'planner.php') ? 'active' : ''; ?>">
+                <span class="material-symbols-outlined">event_note</span>
+                <span>Workout Planner</span>
             </a>
         <?php endif; ?>
     </nav>
@@ -59,26 +71,26 @@ $is_captain   = !empty($_SESSION['is_captain']) && $_SESSION['is_captain'] == 1;
 <!-- Mobile Bottom Navigation Bar -->
 <nav class="member-mobile-nav">
     <!-- Common Mobile Items -->
-    <a href="dashboard.php" class="mobile-nav-item <?php echo ($current_page == 'dashboard.php') ? 'active' : ''; ?>">
+    <a href="../member/dashboard.php" class="mobile-nav-item <?php echo ($current_page == 'dashboard.php') ? 'active' : ''; ?>">
         <span class="material-symbols-outlined">dashboard</span>
         <span>Home</span>
     </a>
-    <a href="facilities.php" class="mobile-nav-item <?php echo ($current_page == 'goals.php') ? 'active' : ''; ?>">
-        <span class="material-symbols-outlined">sports_gymnastics</span>
+    <a href="../member/goals.php" class="mobile-nav-item <?php echo ($current_page == 'goals.php') ? 'active' : ''; ?>">
+        <span class="material-symbols-outlined">track_changes</span>
         <span>Goals</span>
     </a>
-    <a href="my_bookings.php" class="mobile-nav-item <?php echo ($current_page == 'leaderboard.php') ? 'active' : ''; ?>">
-        <span class="material-symbols-outlined">event_available</span>
-        <span>Leaderboard</span>
+    <a href="../member/leaderboard.php" class="mobile-nav-item <?php echo ($current_page == 'leaderboard.php') ? 'active' : ''; ?>">
+        <span class="material-symbols-outlined">leaderboard</span>
+        <span>Board</span>
     </a>
 
     <!-- Captain Exclusive Mobile Items -->
     <?php if ($is_captain): ?>
-        <a href="team_roster.php" class="mobile-nav-item <?php echo ($current_page == 'roster.php') ? 'active' : ''; ?>">
+        <a href="../captain/roaster.php" class="mobile-nav-item <?php echo ($current_page == 'roaster.php') ? 'active' : ''; ?>">
             <span class="material-symbols-outlined">groups</span>
-            <span>Team</span>
+            <span>Roster</span>
         </a>
-        <a href="team_reservations.php" class="mobile-nav-item <?php echo ($current_page == 'booking.php') ? 'active' : ''; ?>">
+        <a href="../captain/booking.php" class="mobile-nav-item <?php echo ($current_page == 'booking.php') ? 'active' : ''; ?>">
             <span class="material-symbols-outlined">event_seat</span>
             <span>Booking</span>
         </a>
