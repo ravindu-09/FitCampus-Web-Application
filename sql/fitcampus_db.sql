@@ -1,3 +1,43 @@
+-- ============================================================
+-- FITCAMPUS DATABASE SETUP
+-- ============================================================
+
+CREATE DATABASE IF NOT EXISTS `fitcampus_db`
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
+
+USE `fitcampus_db`;
+
+-- Allow tables to be recreated safely
+SET FOREIGN_KEY_CHECKS = 0;
+
+DROP TABLE IF EXISTS
+    `team_workout_exercise`,
+    `team_workout`,
+    `personal_workout_exercise`,
+    `personal_workout`,
+    `common_workout_exercise`,
+    `common_workout`,
+    `gym_rule`,
+    `penalty`,
+    `feedback`,
+    `goal`,
+    `calorie_log`,
+    `attendance`,
+    `booking`,
+    `team_member`,
+    `team`,
+    `facility_equipment`,
+    `exercise`,
+    `university_student`,
+    `announcement`,
+    `instructor`,
+    `admin`,
+    `facility`,
+    `user`;
+
+SET FOREIGN_KEY_CHECKS = 1;
+
 -- phpMyAdmin SQL Dump
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
