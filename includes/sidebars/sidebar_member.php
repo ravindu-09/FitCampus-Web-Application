@@ -1,98 +1,74 @@
 <?php
 // includes/sidebars/sidebar_member.php
-$current_page = basename($_SERVER['PHP_SELF']);
-$is_captain   = !empty($_SESSION['is_captain']) && $_SESSION['is_captain'] == 1;
-?>
+$current_script = basename($_SERVER['PHP_SELF']);
+$user_display_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Student Member';
+$user_reg_no = isset($_SESSION['reg_no']) ? $_SESSION['reg_no'] : 'Student';
 
-<!-- Desktop Sidebar -->
-<aside class="member-sidebar">
-    <div class="sidebar-header-card">
-        <div class="sidebar-avatar">
-            <span class="material-symbols-outlined" style="font-size: 24px; color: var(--primary);">
-                <?php echo $is_captain ? 'military_tech' : 'person'; ?>
-            </span>
-        </div>
-        <div class="sidebar-meta">
-            <span class="meta-title"><?php echo $is_captain ? 'Varsity Captain' : 'Student Member'; ?></span>
-            <span class="meta-sub">Univ. of Colombo</span>
-        </div>
+// Uploaded Avatar path check
+$profile_img_name = isset($_SESSION['profile_image']) ? $_SESSION['profile_image'] : 'default_avatar.png';
+$has_custom_avatar = !empty($profile_img_name) && $profile_img_name !== 'default_avatar.png' && file_exists('../../assets/images/uploads/' . $profile_img_name);
+$avatar_url = '../../assets/images/uploads/' . htmlspecialchars($profile_img_name);
+?>
+<!-- Sidebar Drawer Navigation -->
+<aside id="memberSidebar" class="member-sidebar">
+    <div class="sidebar-brand-header">
+        <h1 class="brand-heading">FitCampus</h1>
+        <button id="closeSidebarBtn" class="close-sidebar-btn" type="button" aria-label="Close Sidebar">
+            <span class="material-symbols-outlined">close</span>
+        </button>
     </div>
 
     <nav class="sidebar-nav-list">
-        <!-- 1. Common Member Links (views/member/) -->
-        <a href="../member/dashboard.php" class="sidebar-nav-item <?php echo ($current_page == 'dashboard.php') ? 'active' : ''; ?>">
+        <a class="side-nav-item <?php echo ($current_script === 'dashboard.php') ? 'active' : ''; ?>" href="dashboard.php">
             <span class="material-symbols-outlined">dashboard</span>
             <span>Dashboard</span>
         </a>
-        <a href="../member/goals.php" class="sidebar-nav-item <?php echo ($current_page == 'goals.php') ? 'active' : ''; ?>">
-            <span class="material-symbols-outlined">track_changes</span>
-            <span>Goals</span>
+        <a class="side-nav-item <?php echo ($current_script === 'workouts.php') ? 'active' : ''; ?>" href="workouts.php">
+            <span class="material-symbols-outlined">fitness_center</span>
+            <span>Workout Plan</span>
         </a>
-        <a href="../member/leaderboard.php" class="sidebar-nav-item <?php echo ($current_page == 'leaderboard.php') ? 'active' : ''; ?>">
+        <a class="side-nav-item <?php echo ($current_script === 'calories.php') ? 'active' : ''; ?>" href="calories.php">
+            <span class="material-symbols-outlined">local_fire_department</span>
+            <span>Calorie Track</span>
+        </a>
+        <a class="side-nav-item <?php echo ($current_script === 'goals.php') ? 'active' : ''; ?>" href="goals.php">
+            <span class="material-symbols-outlined">flag</span>
+            <span>My Goals</span>
+        </a>
+        <a class="side-nav-item <?php echo ($current_script === 'leaderboard.php') ? 'active' : ''; ?>" href="leaderboard.php">
             <span class="material-symbols-outlined">leaderboard</span>
             <span>Leaderboard</span>
         </a>
-        <a href="../member/workouts.php" class="sidebar-nav-item <?php echo ($current_page == 'workouts.php') ? 'active' : ''; ?>">
-            <span class="material-symbols-outlined">fitness_center</span>
-            <span>Workouts</span>
+        <a class="side-nav-item <?php echo ($current_script === 'teams.php') ? 'active' : ''; ?>" href="teams.php">
+            <span class="material-symbols-outlined">groups</span>
+            <span>Team</span>
         </a>
-        <a href="../member/calories.php" class="sidebar-nav-item <?php echo ($current_page == 'calories.php') ? 'active' : ''; ?>">
-            <span class="material-symbols-outlined">local_fire_department</span>
-            <span>Calories</span>
-        </a>
-
-        <!-- 2. Captain Special Features (views/captain/) -->
-        <?php if ($is_captain): ?>
-            <div class="sidebar-section-divider">Captain Portal</div>
-            
-            <a href="../captain/roaster.php" class="sidebar-nav-item captain-feature <?php echo ($current_page == 'roaster.php') ? 'active' : ''; ?>">
-                <span class="material-symbols-outlined">groups</span>
-                <span>Team Roster</span>
-            </a>
-            <a href="../captain/booking.php" class="sidebar-nav-item captain-feature <?php echo ($current_page == 'booking.php') ? 'active' : ''; ?>">
-                <span class="material-symbols-outlined">event_seat</span>
-                <span>Team Bookings</span>
-            </a>
-            <a href="../captain/planner.php" class="sidebar-nav-item captain-feature <?php echo ($current_page == 'planner.php') ? 'active' : ''; ?>">
-                <span class="material-symbols-outlined">event_note</span>
-                <span>Workout Planner</span>
-            </a>
-        <?php endif; ?>
     </nav>
 
+    <!-- Sidebar Bottom Profile & Settings -->
     <div class="sidebar-footer">
-        <a href="../../backend/auth/logout.php" class="btn-sidebar-logout">
-            <span class="material-symbols-outlined">logout</span>
-            <span>Sign Out</span>
+        <div class="sidebar-profile-card">
+            <div class="sidebar-profile-content">
+                <div class="profile-icon-circle">
+                    <?php if ($has_custom_avatar): ?>
+                        <img src="<?php echo $avatar_url; ?>" alt="Profile Photo" class="sidebar-avatar-img">
+                    <?php else: ?>
+                        <span class="material-symbols-outlined">person</span>
+                    <?php endif; ?>
+                </div>
+                <div class="profile-text-wrap">
+                    <p class="profile-name"><?php echo htmlspecialchars($user_display_name); ?></p>
+                    <p class="profile-role"><?php echo htmlspecialchars($user_reg_no); ?></p>
+                </div>
+            </div>
+        </div>
+
+        <a class="sidebar-settings-link <?php echo ($current_script === 'settings.php') ? 'active' : ''; ?>" href="settings.php">
+            <span class="material-symbols-outlined">settings</span>
+            <span>Settings</span>
         </a>
     </div>
 </aside>
 
-<!-- Mobile Bottom Navigation Bar -->
-<nav class="member-mobile-nav">
-    <!-- Common Mobile Items -->
-    <a href="../member/dashboard.php" class="mobile-nav-item <?php echo ($current_page == 'dashboard.php') ? 'active' : ''; ?>">
-        <span class="material-symbols-outlined">dashboard</span>
-        <span>Home</span>
-    </a>
-    <a href="../member/goals.php" class="mobile-nav-item <?php echo ($current_page == 'goals.php') ? 'active' : ''; ?>">
-        <span class="material-symbols-outlined">track_changes</span>
-        <span>Goals</span>
-    </a>
-    <a href="../member/leaderboard.php" class="mobile-nav-item <?php echo ($current_page == 'leaderboard.php') ? 'active' : ''; ?>">
-        <span class="material-symbols-outlined">leaderboard</span>
-        <span>Board</span>
-    </a>
-
-    <!-- Captain Exclusive Mobile Items -->
-    <?php if ($is_captain): ?>
-        <a href="../captain/roaster.php" class="mobile-nav-item <?php echo ($current_page == 'roaster.php') ? 'active' : ''; ?>">
-            <span class="material-symbols-outlined">groups</span>
-            <span>Roster</span>
-        </a>
-        <a href="../captain/booking.php" class="mobile-nav-item <?php echo ($current_page == 'booking.php') ? 'active' : ''; ?>">
-            <span class="material-symbols-outlined">event_seat</span>
-            <span>Booking</span>
-        </a>
-    <?php endif; ?>
-</nav>
+<!-- Independent Global Backdrop Overlay -->
+<div id="sidebarOverlay" class="sidebar-overlay"></div>

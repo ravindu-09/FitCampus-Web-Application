@@ -36,17 +36,18 @@ if ($target_user_id <= 0 || !in_array($action, ['approve', 'reject'])) {
 }
 
 try {
-    // 1. Fetch Target Applicant Details
+    // 1. Fetch Target Applicant Details (including Registration_Photo)
     $stmt = $pdo->prepare("
         SELECT 
             u.User_ID, 
             CONCAT(u.First_Name, ' ', u.Last_Name) AS full_name, 
             u.Email, 
             s.Profile_Image AS profile_image, 
+            s.Registration_Photo AS reg_photo,
             s.Student_ID_Front AS id_front_image, 
             s.Student_ID_Back AS id_back_image 
-        FROM `USER` u
-        INNER JOIN `UNIVERSITY_STUDENT` s ON u.User_ID = s.User_ID 
+        FROM `user` u
+        INNER JOIN `university_student` s ON u.User_ID = s.User_ID 
         WHERE u.User_ID = :id AND s.Status = 'pending' 
         LIMIT 1
     ");
@@ -64,7 +65,7 @@ try {
 
     // ACTION 1: APPROVE USER
     if ($action === 'approve') {
-        $update_stmt = $pdo->prepare("UPDATE `UNIVERSITY_STUDENT` SET `Status` = 'active' WHERE `User_ID` = :id");
+        $update_stmt = $pdo->prepare("UPDATE `university_student` SET `Status` = 'active' WHERE `User_ID` = :id");
         $update_stmt->execute([':id' => $target_user_id]);
 
         $subject = "FitCampus - Registration Approved!";
@@ -83,9 +84,15 @@ try {
     } elseif ($action === 'reject') {
         $upload_dir = '../../assets/images/uploads/';
 
+        // Delete profile image if uploaded
         if (!empty($target_user['profile_image']) && $target_user['profile_image'] !== 'default_avatar.png' && file_exists($upload_dir . $target_user['profile_image'])) {
             @unlink($upload_dir . $target_user['profile_image']);
         }
+        // Delete registration photo if distinct
+        if (!empty($target_user['reg_photo']) && $target_user['reg_photo'] !== $target_user['profile_image'] && file_exists($upload_dir . $target_user['reg_photo'])) {
+            @unlink($upload_dir . $target_user['reg_photo']);
+        }
+        // Delete ID cards
         if (!empty($target_user['id_front_image']) && file_exists($upload_dir . $target_user['id_front_image'])) {
             @unlink($upload_dir . $target_user['id_front_image']);
         }
@@ -93,7 +100,7 @@ try {
             @unlink($upload_dir . $target_user['id_back_image']);
         }
 
-        $delete_stmt = $pdo->prepare("DELETE FROM `USER` WHERE `User_ID` = :id");
+        $delete_stmt = $pdo->prepare("DELETE FROM `user` WHERE `User_ID` = :id");
         $delete_stmt->execute([':id' => $target_user_id]);
 
         $subject = "FitCampus - Registration Request Update";
@@ -127,16 +134,14 @@ function sendFitCampusEmail($recipient_email, $recipient_name, $subject, $plain_
     $mail = new PHPMailer(true);
 
     try {
-        // SMTP Server Configuration
         $mail->isSMTP();
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
         $mail->Username   = 'fitcampus.physicaledu.uoc.fake@gmail.com';
-        $mail->Password   = 'xrjmcrphjdsxombh'; // 16-digit App Password without spaces
+        $mail->Password   = 'xrjmcrphjdsxombh';
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 587;
 
-        // Bypass Localhost SSL Certificate Verification
         $mail->SMTPOptions = [
             'ssl' => [
                 'verify_peer'       => false,
@@ -145,11 +150,9 @@ function sendFitCampusEmail($recipient_email, $recipient_name, $subject, $plain_
             ]
         ];
 
-        // Sender & Recipient Details
         $mail->setFrom('fitcampus.physicaledu.uoc.fake@gmail.com', 'FitCampus Physical Education');
         $mail->addAddress($recipient_email, $recipient_name);
 
-        // Content
         $mail->isHTML(false);
         $mail->Subject = $subject;
         $mail->Body    = $plain_body;

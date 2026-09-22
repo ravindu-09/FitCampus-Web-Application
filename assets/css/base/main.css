@@ -14,6 +14,8 @@
   
   --secondary: #4ae176;
   --on-secondary: #003915;
+
+  --tertiary: #f7be1d;
   
   --on-background: #e5e2e1;
   --on-surface: #e5e2e1;
@@ -48,6 +50,34 @@ body {
   position: relative;
 }
 
+/* Visibility Control */
+.mobile-only { display: none; }
+.desktop-only { display: flex; }
+
+@media (max-width: 1024px) {
+  .mobile-only { display: flex; }
+  .desktop-only { display: none; }
+}
+
+/* Color & Typography Utilities */
+.text-color-primary { color: var(--primary); }
+.text-color-secondary { color: var(--secondary); }
+.text-color-tertiary { color: var(--tertiary); }
+.text-dimmed-sub { color: rgba(207, 194, 212, 0.4); }
+.text-regular-sub { color: rgba(207, 194, 212, 0.8); }
+
+/* Grid Layout Utilities */
+.grid-2-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 600px) {
+  .grid-2-col { grid-template-columns: 1fr; }
+}
+
+/* Icon & Font Face */
 .material-symbols-outlined {
   font-family: 'Material Symbols Outlined';
   font-weight: normal;

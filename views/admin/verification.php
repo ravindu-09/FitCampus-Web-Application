@@ -6,7 +6,7 @@ $page_title = "User Verification Console - FitCampus";
 require_once '../../includes/headers/header_admin.php';
 
 try {
-    // 1. Fetch Pending Applicants
+    // 1. Fetch Pending Applicants (Using Registration_Photo with fallback to Profile_Image)
     $stmt = $pdo->query("
         SELECT 
             u.User_ID AS user_id, 
@@ -15,12 +15,12 @@ try {
             s.Registration_Number AS reg_no, 
             s.Faculty AS faculty, 
             s.Emergency_Contact AS emergency_contact, 
-            s.Profile_Image AS profile_image, 
+            COALESCE(s.Registration_Photo, s.Profile_Image) AS profile_image, 
             s.Student_ID_Front AS id_front_image, 
             s.Student_ID_Back AS id_back_image, 
             s.Created_At AS created_at 
-        FROM `USER` u
-        INNER JOIN `UNIVERSITY_STUDENT` s ON u.User_ID = s.User_ID 
+        FROM `user` u
+        INNER JOIN `university_student` s ON u.User_ID = s.User_ID 
         WHERE s.Status = 'pending' 
         ORDER BY s.Created_At ASC
     ");
@@ -28,9 +28,9 @@ try {
 
     // 2. Telemetry Counts
     $count_pending = count($pending_users);
-    $count_approved = $pdo->query("SELECT COUNT(*) FROM `UNIVERSITY_STUDENT` WHERE `Status` = 'active'")->fetchColumn() ?: 0;
-    $count_declined = $pdo->query("SELECT COUNT(*) FROM `UNIVERSITY_STUDENT` WHERE `Status` = 'suspended'")->fetchColumn() ?: 0;
-    $count_total_members = $pdo->query("SELECT COUNT(*) FROM `UNIVERSITY_STUDENT`")->fetchColumn() ?: 0;
+    $count_approved = $pdo->query("SELECT COUNT(*) FROM `university_student` WHERE `Status` = 'active'")->fetchColumn() ?: 0;
+    $count_declined = $pdo->query("SELECT COUNT(*) FROM `university_student` WHERE `Status` = 'suspended'")->fetchColumn() ?: 0;
+    $count_total_members = $pdo->query("SELECT COUNT(*) FROM `university_student`")->fetchColumn() ?: 0;
 
 } catch (\PDOException $e) {
     error_log("Verification Fetch Error: " . $e->getMessage());
