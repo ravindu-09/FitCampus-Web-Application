@@ -1,0 +1,171 @@
+/* ==========================================================================
+   CAPTAIN ROLE STYLES (Pure CSS, Modular)
+   FitCampus Web Application
+   ========================================================================== */
+
+/* ==========================================================================
+   [SECTION 1] CAPTAIN BOTTOM BAR DROPDOWNS
+   ========================================================================== */
+.mob-nav-item-group { position: relative; flex: 1; display: flex; align-items: center; justify-content: center; }
+.captain-dropdown-menu { position: absolute; bottom: calc(100% + 10px); right: 10px; background-color: #1A1A1A; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 8px; min-width: 180px; display: none; flex-direction: column; gap: 4px; box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8); z-index: 1000; }
+.captain-dropdown-menu.show { display: flex; animation: slideUpFade 0.2s ease-out; }
+@keyframes slideUpFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.capt-drop-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: var(--on-surface-variant); text-decoration: none; border-radius: 12px; font-size: 13px; font-weight: 600; transition: all 0.2s; }
+.capt-drop-item:hover, .capt-drop-item.active { background-color: rgba(223, 183, 255, 0.1); color: var(--primary); }
+
+/* ==========================================================================
+   [SECTION 2] BOOKING GRID & LAYOUT (MOBILE RESPONSIVE)
+   ========================================================================== */
+.grid-layout-booking { display: grid; grid-template-columns: 1fr; gap: 24px; }
+@media (min-width: 1024px) { .grid-layout-booking { grid-template-columns: 2fr 1fr; } }
+.sticky-form { position: sticky; top: 90px; }
+
+.booking-toggles { display: flex; gap: 16px; flex-wrap: wrap; }
+.toggle-group { display: flex; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); padding: 4px; border-radius: 12px; }
+.toggle-btn { padding: 8px 16px; border: none; background: transparent; color: var(--on-surface-variant); font-size: 12px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+.toggle-btn:hover:not(.active) { color: var(--on-surface); background: rgba(255,255,255,0.05); }
+.toggle-btn.active { background: rgba(223, 183, 255, 0.2); color: var(--primary); }
+
+.date-navigator { display: inline-flex; align-items: center; gap: 16px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
+.nav-arrow { background: transparent; border: none; color: var(--on-surface); cursor: pointer; padding: 4px; border-radius: 8px; display: flex; align-items: center; }
+.nav-arrow:hover { background: rgba(255,255,255,0.1); }
+
+/* Smooth Mobile Horizontal Scroll */
+.grid-table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 12px; }
+.grid-table-wrapper::-webkit-scrollbar { height: 6px; }
+.grid-table-wrapper::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); border-radius: 4px; }
+.grid-table-wrapper::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+.grid-table-inner { min-width: 760px; }
+.calendar-grid-header, .calendar-grid-row { display: grid; grid-template-columns: 60px repeat(7, 1fr); gap: 8px; align-items: center; }
+.calendar-grid-header { border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 16px; margin-bottom: 12px; }
+.calendar-grid-row { padding: 6px 0; border-bottom: 1px dashed rgba(255,255,255,0.05); }
+
+/* Sticky Left Time Column (Mobile friendly) */
+.sticky-col { font-size: 11px; color: rgba(207, 194, 212, 0.5); text-transform: uppercase; letter-spacing: 0.1em; display: flex; align-items: center; font-family: var(--font-mono); }
+@media (max-width: 768px) {
+    .sticky-col { position: sticky; left: 0; background-color: #1a1a1a; z-index: 5; padding: 4px 8px 4px 0; }
+    .calendar-grid-header .sticky-col { background-color: transparent; }
+}
+
+.grid-day-head { text-align: center; }
+.grid-day-head p { font-size: 10px; color: rgba(207, 194, 212, 0.6); margin: 0; font-family: var(--font-mono); }
+.grid-day-head p.date { font-size: 16px; font-weight: bold; color: var(--primary); }
+.grid-body-rows { display: flex; flex-direction: column; }
+
+/* ==========================================================================
+   [SECTION 3] SLOT STATES & STATUS LEGEND
+   ========================================================================== */
+.slot-cell { padding: 0; }
+.slot-box { height: 54px; border-radius: 10px; border: 1px solid; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; }
+.slot-box .material-symbols-outlined { font-size: 18px; margin-bottom: 2px; }
+.slot-box span.txt { font-size: 10px; font-weight: bold; }
+.slot-box:hover { transform: scale(1.03); }
+
+.slot-available { background: rgba(74, 225, 118, 0.05); border-color: rgba(74, 225, 118, 0.2); color: var(--secondary); }
+.slot-available:hover { background: rgba(74, 225, 118, 0.15); }
+.slot-moderate { background: rgba(247, 190, 29, 0.05); border-color: rgba(247, 190, 29, 0.2); color: var(--tertiary); }
+.slot-moderate:hover { background: rgba(247, 190, 29, 0.15); }
+.slot-high { background: rgba(255, 180, 171, 0.05); border-color: rgba(255, 180, 171, 0.2); color: var(--error); }
+.slot-high:hover { background: rgba(255, 180, 171, 0.15); }
+.slot-full { background: rgba(53, 53, 52, 0.3); border-color: rgba(255,255,255,0.05); color: var(--on-surface-variant); opacity: 0.5; cursor: not-allowed; }
+.slot-full:hover { transform: none; }
+.slot-pending-state { background: rgba(255, 180, 171, 0.1); border-color: rgba(255, 180, 171, 0.2); color: #ffb4ab; opacity: 0.8; cursor: pointer; }
+.slot-selected { background: rgba(223, 183, 255, 0.15) !important; border-color: var(--primary) !important; color: var(--primary) !important; box-shadow: 0 0 0 2px rgba(223, 183, 255, 0.3); }
+
+.status-legend { display: flex; flex-wrap: wrap; gap: 24px; align-items: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 24px; }
+.legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--on-surface-variant); font-family: var(--font-mono); }
+.legend-item .dot { width: 12px; height: 12px; border-radius: 50%; }
+.legend-item .outline-dot { background: var(--surface-variant); border: 1px solid rgba(255,255,255,0.1); }
+.legend-item .pending-dot { background: rgba(255, 180, 171, 0.5); border: 1px solid rgba(255, 180, 171, 0.5); }
+
+/* ==========================================================================
+   [SECTION 4] FORM FIELD OVERRIDES (Tailwind Defaults Wenuwata)
+   ========================================================================== */
+.gl-lbl-accent { display: block; font-size: 10px; font-weight: 700; color: var(--on-surface-variant); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+.cal-input-field { width: 100%; background-color: var(--surface-container-high, #2a2a2a); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 12px 16px; color: var(--on-surface, #e5e2e1); font-size: 14px; font-family: inherit; transition: all 0.3s ease; box-sizing: border-box; }
+.cal-input-field:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(223, 183, 255, 0.2); }
+.cal-input-field:disabled, .cal-input-field[readonly] { opacity: 0.6; cursor: not-allowed; background-color: rgba(255,255,255,0.02); }
+
+.gl-select { appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23cfc2d4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 40px; }
+
+.gl-btn-gradient { background: linear-gradient(135deg, var(--primary) 0%, #b373f2 100%); color: #4a007f; border: none; border-radius: 12px; cursor: pointer; display: flex; transition: transform 0.2s, box-shadow 0.2s, background 0.3s; }
+.gl-btn-gradient:disabled { background: rgba(255,255,255,0.1); color: var(--on-surface-variant); cursor: not-allowed; }
+.gl-btn-gradient:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(223, 183, 255, 0.3); }
+
+.checkbox-wrapper { display: flex; align-items: center; gap: 10px; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
+.custom-checkbox { cursor: pointer; accent-color: var(--primary); width: 16px; height: 16px; margin: 0; }
+
+/* ==========================================================================
+   [SECTION 5] UTILITY CLASSES (Tailwind Replacements)
+   ========================================================================== */
+.cal-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.bk-main-container { padding-top: 90px; padding-bottom: 96px; }
+@media (min-width: 1024px) { .bk-main-container { padding-bottom: 48px; } }
+.bk-card-pad { padding: 24px; }
+
+.flex-between { display: flex; justify-content: space-between; align-items: center; }
+.flex-items-center { display: flex; align-items: center; }
+.justify-center { justify-content: center; }
+
+.border-dim { border: 1px solid rgba(255, 255, 255, 0.05); }
+.border-b-dim { border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+.border-t-dim { border-top: 1px solid rgba(255, 255, 255, 0.05); }
+.divide-y-dim > * + * { border-top: 1px solid rgba(255, 255, 255, 0.05); }
+
+.bg-dim { background-color: rgba(255, 255, 255, 0.05); }
+.hover-bg-dim:hover { background-color: rgba(255, 255, 255, 0.05); }
+.bg-secondary-dim { background-color: rgba(74, 225, 118, 0.2); }
+.bg-tertiary-dim { background-color: rgba(247, 190, 29, 0.2); }
+.bg-pending { background-color: #ffb4ab; }
+.bg-pending-dim { background-color: rgba(255, 180, 171, 0.1); border-color: rgba(255, 180, 171, 0.2); }
+.badge-bg-primary { background: rgba(223, 183, 255, 0.2); }
+
+.txt-white { color: #e5e2e1; }
+.txt-muted { color: var(--on-surface-variant); }
+.txt-error { color: var(--error); }
+.hover-txt-error:hover { color: var(--error); }
+.txt-primary { color: var(--primary); }
+.txt-green { color: var(--secondary); }
+.txt-tertiary { color: var(--tertiary); }
+.txt-pending { color: #ffb4ab; }
+
+.font-xs { font-size: 10px; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+.tracking-wide { letter-spacing: 0.1em; }
+.uppercase { text-transform: uppercase; }
+.text-center { text-align: center; }
+
+.m-0 { margin: 0 !important; }
+.bk-mb-xs { margin-bottom: 6px; }
+.bk-mb-sm { margin-bottom: 12px; }
+.bk-mb-md { margin-bottom: 16px; }
+.bk-mb-lg { margin-bottom: 24px; }
+.bk-mt-xs { margin-top: 6px; }
+.bk-mt-sm { margin-top: 12px; }
+.bk-mt-md { margin-top: 16px; }
+.bk-mt-lg { margin-top: 24px; }
+.bk-pb-sm { padding-bottom: 16px; }
+.bk-pt-lg { padding-top: 24px; }
+.space-y-xs > * + * { margin-top: 6px; }
+.space-y-md > * + * { margin-top: 20px; }
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 12px; }
+
+.hidden { display: none !important; }
+.cursor-pointer { cursor: pointer; }
+.select-none { user-select: none; }
+.italic { font-style: italic; }
+
+@keyframes spin { 100% { transform: rotate(360deg); } }
+.animate-spin { animation: spin 1s linear infinite; display: inline-block; }
+
+.opacity-0 { opacity: 0; }
+.scale-95 { transform: scale(0.95); }
+.transition-opacity { transition: opacity 0.3s ease; }
+.transition-transform { transition: transform 0.3s ease; }
+.transition-colors { transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
+.max-w-sm { max-width: 384px; }
+.z-100 { z-index: 100; }

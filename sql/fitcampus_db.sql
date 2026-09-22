@@ -1,49 +1,9 @@
--- ============================================================
--- FITCAMPUS DATABASE SETUP
--- ============================================================
-
-CREATE DATABASE IF NOT EXISTS `fitcampus_db`
-    CHARACTER SET utf8mb4
-    COLLATE utf8mb4_unicode_ci;
-
-USE `fitcampus_db`;
-
--- Allow tables to be recreated safely
-SET FOREIGN_KEY_CHECKS = 0;
-
-DROP TABLE IF EXISTS
-    `team_workout_exercise`,
-    `team_workout`,
-    `personal_workout_exercise`,
-    `personal_workout`,
-    `common_workout_exercise`,
-    `common_workout`,
-    `gym_rule`,
-    `penalty`,
-    `feedback`,
-    `goal`,
-    `calorie_log`,
-    `attendance`,
-    `booking`,
-    `team_member`,
-    `team`,
-    `facility_equipment`,
-    `exercise`,
-    `university_student`,
-    `announcement`,
-    `instructor`,
-    `admin`,
-    `facility`,
-    `user`;
-
-SET FOREIGN_KEY_CHECKS = 1;
-
 -- phpMyAdmin SQL Dump
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 22, 2026 at 07:20 PM
+-- Generation Time: Sep 21, 2026 at 07:43 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -67,6 +27,7 @@ SET time_zone = "+00:00";
 -- Table structure for table `admin`
 --
 
+DROP TABLE IF EXISTS `admin`;
 CREATE TABLE `admin` (
   `Admin_ID` int(10) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -84,6 +45,7 @@ INSERT INTO `admin` (`Admin_ID`) VALUES
 -- Table structure for table `announcement`
 --
 
+DROP TABLE IF EXISTS `announcement`;
 CREATE TABLE `announcement` (
   `Announcement_ID` int(10) UNSIGNED NOT NULL,
   `Admin_ID` int(10) UNSIGNED NOT NULL,
@@ -98,6 +60,7 @@ CREATE TABLE `announcement` (
 -- Table structure for table `attendance`
 --
 
+DROP TABLE IF EXISTS `attendance`;
 CREATE TABLE `attendance` (
   `Attendance_ID` int(10) UNSIGNED NOT NULL,
   `User_ID` int(10) UNSIGNED NOT NULL,
@@ -107,7 +70,7 @@ CREATE TABLE `attendance` (
   `Check_In_Method` varchar(30) DEFAULT NULL,
   `Check_Out_Method` varchar(30) DEFAULT NULL,
   `Active_Status` tinyint(1) NOT NULL DEFAULT 1
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -115,6 +78,7 @@ CREATE TABLE `attendance` (
 -- Table structure for table `booking`
 --
 
+DROP TABLE IF EXISTS `booking`;
 CREATE TABLE `booking` (
   `Booking_ID` int(10) UNSIGNED NOT NULL,
   `Team_ID` int(10) UNSIGNED NOT NULL,
@@ -127,7 +91,29 @@ CREATE TABLE `booking` (
   `End_Time` time NOT NULL,
   `Status` enum('Pending','Approved','Rejected','Cancelled') NOT NULL DEFAULT 'Pending',
   `Exception_Reason` text DEFAULT NULL
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `calorie_details`
+--
+
+DROP TABLE IF EXISTS `calorie_details`;
+CREATE TABLE `calorie_details` (
+  `Detail_ID` int(10) UNSIGNED NOT NULL,
+  `User_ID` int(10) UNSIGNED NOT NULL,
+  `Date` date NOT NULL,
+  `Type` enum('intake','burned') NOT NULL,
+  `Item_Name` varchar(150) NOT NULL,
+  `Category` varchar(50) DEFAULT NULL,
+  `Portion_Or_Duration` varchar(50) DEFAULT NULL,
+  `Calories` decimal(8,2) NOT NULL DEFAULT 0.00,
+  `Carbs` decimal(6,2) DEFAULT 0.00,
+  `Protein` decimal(6,2) DEFAULT 0.00,
+  `Fat` decimal(6,2) DEFAULT 0.00,
+  `Created_At` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -135,12 +121,13 @@ CREATE TABLE `booking` (
 -- Table structure for table `calorie_log`
 --
 
+DROP TABLE IF EXISTS `calorie_log`;
 CREATE TABLE `calorie_log` (
   `User_ID` int(10) UNSIGNED NOT NULL,
   `Date` date NOT NULL,
   `Calories_In` decimal(8,2) DEFAULT 0.00,
   `Calories_Out` decimal(8,2) DEFAULT 0.00
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -148,6 +135,7 @@ CREATE TABLE `calorie_log` (
 -- Table structure for table `common_workout`
 --
 
+DROP TABLE IF EXISTS `common_workout`;
 CREATE TABLE `common_workout` (
   `Common_Workout_ID` int(10) UNSIGNED NOT NULL,
   `Instructor_ID` int(10) UNSIGNED NOT NULL,
@@ -162,6 +150,7 @@ CREATE TABLE `common_workout` (
 -- Table structure for table `common_workout_exercise`
 --
 
+DROP TABLE IF EXISTS `common_workout_exercise`;
 CREATE TABLE `common_workout_exercise` (
   `Common_Workout_ID` int(10) UNSIGNED NOT NULL,
   `Exercise_ID` int(10) UNSIGNED NOT NULL,
@@ -175,6 +164,7 @@ CREATE TABLE `common_workout_exercise` (
 -- Table structure for table `exercise`
 --
 
+DROP TABLE IF EXISTS `exercise`;
 CREATE TABLE `exercise` (
   `Exercise_ID` int(10) UNSIGNED NOT NULL,
   `Exercise_Name` varchar(100) NOT NULL,
@@ -189,6 +179,7 @@ CREATE TABLE `exercise` (
 -- Table structure for table `facility`
 --
 
+DROP TABLE IF EXISTS `facility`;
 CREATE TABLE `facility` (
   `Facility_ID` int(10) UNSIGNED NOT NULL,
   `Facility_Name` varchar(100) NOT NULL,
@@ -196,7 +187,7 @@ CREATE TABLE `facility` (
   `Capacity` int(10) UNSIGNED NOT NULL,
   `Open_Time` time NOT NULL,
   `Close_Time` time NOT NULL
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -204,12 +195,13 @@ CREATE TABLE `facility` (
 -- Table structure for table `facility_equipment`
 --
 
+DROP TABLE IF EXISTS `facility_equipment`;
 CREATE TABLE `facility_equipment` (
   `Equipment_ID` int(10) UNSIGNED NOT NULL,
   `Facility_ID` int(10) UNSIGNED NOT NULL,
   `Equipment_Name` varchar(100) NOT NULL,
   `Quantity` int(10) UNSIGNED NOT NULL DEFAULT 0
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -217,6 +209,7 @@ CREATE TABLE `facility_equipment` (
 -- Table structure for table `feedback`
 --
 
+DROP TABLE IF EXISTS `feedback`;
 CREATE TABLE `feedback` (
   `Feedback_ID` int(10) UNSIGNED NOT NULL,
   `User_ID` int(10) UNSIGNED NOT NULL,
@@ -235,6 +228,7 @@ CREATE TABLE `feedback` (
 -- Table structure for table `goal`
 --
 
+DROP TABLE IF EXISTS `goal`;
 CREATE TABLE `goal` (
   `Goal_ID` int(10) UNSIGNED NOT NULL,
   `User_ID` int(10) UNSIGNED NOT NULL,
@@ -243,7 +237,7 @@ CREATE TABLE `goal` (
   `Start_Date` date DEFAULT NULL,
   `End_Date` date DEFAULT NULL,
   `Status` varchar(30) DEFAULT NULL
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -251,6 +245,7 @@ CREATE TABLE `goal` (
 -- Table structure for table `gym_rule`
 --
 
+DROP TABLE IF EXISTS `gym_rule`;
 CREATE TABLE `gym_rule` (
   `Rule_No` int(10) UNSIGNED NOT NULL,
   `Rule` text NOT NULL,
@@ -264,6 +259,7 @@ CREATE TABLE `gym_rule` (
 -- Table structure for table `instructor`
 --
 
+DROP TABLE IF EXISTS `instructor`;
 CREATE TABLE `instructor` (
   `Instructor_ID` int(10) UNSIGNED NOT NULL,
   `Facility_ID` int(10) UNSIGNED DEFAULT NULL
@@ -282,6 +278,7 @@ INSERT INTO `instructor` (`Instructor_ID`, `Facility_ID`) VALUES
 -- Table structure for table `penalty`
 --
 
+DROP TABLE IF EXISTS `penalty`;
 CREATE TABLE `penalty` (
   `Penalty_ID` int(10) UNSIGNED NOT NULL,
   `User_ID` int(10) UNSIGNED NOT NULL,
@@ -298,6 +295,7 @@ CREATE TABLE `penalty` (
 -- Table structure for table `personal_workout`
 --
 
+DROP TABLE IF EXISTS `personal_workout`;
 CREATE TABLE `personal_workout` (
   `Personal_Workout_ID` int(10) UNSIGNED NOT NULL,
   `User_ID` int(10) UNSIGNED NOT NULL,
@@ -311,6 +309,7 @@ CREATE TABLE `personal_workout` (
 -- Table structure for table `personal_workout_exercise`
 --
 
+DROP TABLE IF EXISTS `personal_workout_exercise`;
 CREATE TABLE `personal_workout_exercise` (
   `Personal_Workout_ID` int(10) UNSIGNED NOT NULL,
   `Exercise_ID` int(10) UNSIGNED NOT NULL,
@@ -324,6 +323,7 @@ CREATE TABLE `personal_workout_exercise` (
 -- Table structure for table `team`
 --
 
+DROP TABLE IF EXISTS `team`;
 CREATE TABLE `team` (
   `Team_ID` int(10) UNSIGNED NOT NULL,
   `Team_Name` varchar(100) NOT NULL,
@@ -344,6 +344,7 @@ INSERT INTO `team` (`Team_ID`, `Team_Name`, `Sport`, `Sport_Gender`) VALUES
 -- Table structure for table `team_member`
 --
 
+DROP TABLE IF EXISTS `team_member`;
 CREATE TABLE `team_member` (
   `Team_ID` int(10) UNSIGNED NOT NULL,
   `User_ID` int(10) UNSIGNED NOT NULL,
@@ -364,6 +365,7 @@ INSERT INTO `team_member` (`Team_ID`, `User_ID`, `Role_In_Team`) VALUES
 -- Table structure for table `team_workout`
 --
 
+DROP TABLE IF EXISTS `team_workout`;
 CREATE TABLE `team_workout` (
   `Workout_ID` int(10) UNSIGNED NOT NULL,
   `Team_ID` int(10) UNSIGNED NOT NULL,
@@ -379,6 +381,7 @@ CREATE TABLE `team_workout` (
 -- Table structure for table `team_workout_exercise`
 --
 
+DROP TABLE IF EXISTS `team_workout_exercise`;
 CREATE TABLE `team_workout_exercise` (
   `Workout_ID` int(10) UNSIGNED NOT NULL,
   `Exercise_ID` int(10) UNSIGNED NOT NULL,
@@ -392,6 +395,7 @@ CREATE TABLE `team_workout_exercise` (
 -- Table structure for table `university_student`
 --
 
+DROP TABLE IF EXISTS `university_student`;
 CREATE TABLE `university_student` (
   `User_ID` int(10) UNSIGNED NOT NULL,
   `Registration_Number` varchar(50) NOT NULL,
@@ -401,7 +405,9 @@ CREATE TABLE `university_student` (
   `QR_Token` varchar(255) DEFAULT NULL,
   `Gender` varchar(30) DEFAULT NULL,
   `Profile_Image` varchar(255) DEFAULT 'default_avatar.png',
+  `Registration_Photo` varchar(255) DEFAULT NULL,
   `Status` enum('active','pending','suspended') NOT NULL DEFAULT 'active',
+  `Life_Percentage` tinyint(3) UNSIGNED NOT NULL DEFAULT 100,
   `Created_At` timestamp NOT NULL DEFAULT current_timestamp(),
   `Emergency_Contact` varchar(150) DEFAULT NULL,
   `Student_ID_Front` varchar(255) DEFAULT NULL,
@@ -413,9 +419,10 @@ CREATE TABLE `university_student` (
 -- Dumping data for table `university_student`
 --
 
-INSERT INTO `university_student` (`User_ID`, `Registration_Number`, `NIC`, `DOB`, `Faculty`, `QR_Token`, `Gender`, `Profile_Image`, `Status`, `Created_At`, `Emergency_Contact`, `Student_ID_Front`, `Student_ID_Back`, `Date_of_Final_Exam`) VALUES
-(1, '2022CS001', '200112345678', '2001-05-15', 'Computing', NULL, NULL, 'default_avatar.png', 'active', '2026-08-17 11:20:44', NULL, NULL, NULL, NULL),
-(2, '2022CS002', '200187654321', '2001-08-20', 'Computing', NULL, NULL, 'default_avatar.png', 'active', '2026-08-17 11:20:44', NULL, NULL, NULL, NULL);
+INSERT INTO `university_student` (`User_ID`, `Registration_Number`, `NIC`, `DOB`, `Faculty`, `QR_Token`, `Gender`, `Profile_Image`, `Registration_Photo`, `Status`, `Life_Percentage`, `Created_At`, `Emergency_Contact`, `Student_ID_Front`, `Student_ID_Back`, `Date_of_Final_Exam`) VALUES
+(1, '2022CS001', '200112345678', '2001-05-15', 'Computing', NULL, NULL, 'avatar_1_1789585265.jpeg', NULL, 'active', 100, '2026-08-17 11:20:44', NULL, NULL, NULL, NULL),
+(2, '2022CS002', '200187654321', '2001-08-20', 'Computing', NULL, NULL, NULL, NULL, 'active', 100, '2026-08-17 11:20:44', NULL, NULL, NULL, NULL),
+(10, '2024cs107', '200334400460', '2003-12-09', 'School of Computing', NULL, 'male', 'avatar_10_1789592884.jpeg', 'avatar_6aab01406ecd0.jpg', 'active', 80, '2026-09-16 20:51:12', '0765414600', 'id_f_6aab01406de0c.jpg', 'id_b_6aab01406e54a.jpg', NULL);
 
 -- --------------------------------------------------------
 
@@ -423,6 +430,7 @@ INSERT INTO `university_student` (`User_ID`, `Registration_Number`, `NIC`, `DOB`
 -- Table structure for table `user`
 --
 
+DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
   `User_ID` int(10) UNSIGNED NOT NULL,
   `First_Name` varchar(50) NOT NULL,
@@ -437,10 +445,11 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`User_ID`, `First_Name`, `Last_Name`, `Email`, `Password`, `Role`) VALUES
-(1, 'Kasun', 'Perera', 'member@stu.cmb.ac.lk', '$2y$10$YcUbwJRQy3fTsfCpHFntkuJOZoSNLb6Lt21ZOjlxAV69FIaBn.JZ6', 'Student'),
+(1, 'Kasun', 'Perera', 'member@stu.cmb.ac.lk', '$2y$10$djFRCs4cYVX0s/3g0eCHkOGCbQ.z0anvCp4hGDF1361E2NlXOSnbK', 'Student'),
 (2, 'Ravindu', 'Lochana', 'captain@stu.cmb.ac.lk', '$2y$10$YcUbwJRQy3fTsfCpHFntkuJOZoSNLb6Lt21ZOjlxAV69FIaBn.JZ6', 'Student'),
 (3, 'Coach', 'Nuwan', 'instructor@cmb.ac.lk', '$2y$10$YcUbwJRQy3fTsfCpHFntkuJOZoSNLb6Lt21ZOjlxAV69FIaBn.JZ6', 'Instructor'),
-(4, 'System', 'Admin', 'admin@cmb.ac.lk', '$2y$10$YcUbwJRQy3fTsfCpHFntkuJOZoSNLb6Lt21ZOjlxAV69FIaBn.JZ6', 'Admin');
+(4, 'System', 'Admin', 'admin@cmb.ac.lk', '$2y$10$YcUbwJRQy3fTsfCpHFntkuJOZoSNLb6Lt21ZOjlxAV69FIaBn.JZ6', 'Admin'),
+(10, 'Kulathunga', 'R.L.W.', 'ravindukulathunga8@gmail.com', '$2y$10$0h.CpOUvCaNo15P/3zE.FuCrACyTnu1K7EjwIxYGn.eJckBL3pU6O', 'Student');
 
 --
 -- Indexes for dumped tables
@@ -476,6 +485,14 @@ ALTER TABLE `booking`
   ADD KEY `fk_booking_requested_by` (`Requested_By`),
   ADD KEY `fk_booking_facility` (`Facility_ID`),
   ADD KEY `fk_booking_approved_by` (`Approved_By`);
+
+--
+-- Indexes for table `calorie_details`
+--
+ALTER TABLE `calorie_details`
+  ADD PRIMARY KEY (`Detail_ID`),
+  ADD KEY `fk_calorie_details_user` (`User_ID`),
+  ADD KEY `idx_user_date` (`User_ID`,`Date`);
 
 --
 -- Indexes for table `calorie_log`
@@ -636,6 +653,12 @@ ALTER TABLE `booking`
   MODIFY `Booking_ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `calorie_details`
+--
+ALTER TABLE `calorie_details`
+  MODIFY `Detail_ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `common_workout`
 --
 ALTER TABLE `common_workout`
@@ -705,7 +728,7 @@ ALTER TABLE `team_workout`
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `User_ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `User_ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- Constraints for dumped tables
@@ -738,6 +761,12 @@ ALTER TABLE `booking`
   ADD CONSTRAINT `fk_booking_facility` FOREIGN KEY (`Facility_ID`) REFERENCES `facility` (`Facility_ID`) ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_booking_requested_by` FOREIGN KEY (`Requested_By`) REFERENCES `user` (`User_ID`) ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_booking_team` FOREIGN KEY (`Team_ID`) REFERENCES `team` (`Team_ID`) ON UPDATE CASCADE;
+
+--
+-- Constraints for table `calorie_details`
+--
+ALTER TABLE `calorie_details`
+  ADD CONSTRAINT `fk_calorie_details_user` FOREIGN KEY (`User_ID`) REFERENCES `user` (`User_ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `calorie_log`

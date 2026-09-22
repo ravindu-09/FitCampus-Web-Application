@@ -23,11 +23,11 @@ if ($step == '1') {
         exit();
     }
 
-    // Check duplicate in USER or UNIVERSITY_STUDENT
+    // Check duplicate in user or university_student
     $stmt = $pdo->prepare("
         SELECT u.User_ID 
-        FROM `USER` u 
-        LEFT JOIN `UNIVERSITY_STUDENT` s ON u.User_ID = s.User_ID 
+        FROM `user` u 
+        LEFT JOIN `university_student` s ON u.User_ID = s.User_ID 
         WHERE u.Email = :email OR s.Registration_Number = :reg_no 
         LIMIT 1
     ");
@@ -139,9 +139,9 @@ if ($step == '3') {
 
         $hashed_pwd = password_hash($_SESSION['reg_step2']['password'], PASSWORD_BCRYPT);
 
-        // 1. Insert into USER table
+        // 1. Insert into user table
         $stmt1 = $pdo->prepare("
-            INSERT INTO `USER` (`First_Name`, `Last_Name`, `Email`, `Password`, `Role`) 
+            INSERT INTO `user` (`First_Name`, `Last_Name`, `Email`, `Password`, `Role`) 
             VALUES (:fname, :lname, :email, :pwd, 'Student')
         ");
         $stmt1->execute([
@@ -153,12 +153,12 @@ if ($step == '3') {
 
         $user_id = $pdo->lastInsertId();
 
-        // 2. Insert into UNIVERSITY_STUDENT table
+        // 2. Insert into university_student table (with Registration_Photo and Life_Percentage = 100)
         $stmt2 = $pdo->prepare("
-            INSERT INTO `UNIVERSITY_STUDENT` 
-            (`User_ID`, `Registration_Number`, `NIC`, `DOB`, `Faculty`, `Gender`, `Emergency_Contact`, `Profile_Image`, `Student_ID_Front`, `Student_ID_Back`, `Status`) 
+            INSERT INTO `university_student` 
+            (`User_ID`, `Registration_Number`, `NIC`, `DOB`, `Faculty`, `Gender`, `Emergency_Contact`, `Profile_Image`, `Registration_Photo`, `Life_Percentage`, `Student_ID_Front`, `Student_ID_Back`, `Status`) 
             VALUES 
-            (:id, :reg_no, :nic, :dob, :faculty, :gender, :emergency, :avatar, :id_f, :id_b, 'pending')
+            (:id, :reg_no, :nic, :dob, :faculty, :gender, :emergency, :avatar, :reg_photo, 100, :id_f, :id_b, 'pending')
         ");
         $stmt2->execute([
             ':id'        => $user_id,
@@ -169,6 +169,7 @@ if ($step == '3') {
             ':gender'    => $_SESSION['reg_step2']['gender'],
             ':emergency' => $_SESSION['reg_step2']['emergency_contact'],
             ':avatar'    => $profile_image,
+            ':reg_photo' => $profile_image,
             ':id_f'      => $id_front,
             ':id_b'      => $id_back
         ]);

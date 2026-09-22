@@ -1,9 +1,6 @@
-/**
- * FitCampus - Universal DOM Utility Handlers
- */
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Universal Alert Auto-dismiss (5 seconds)
+    // 1. Alerts Auto-dismiss
     const alerts = document.querySelectorAll('.alert-success, .alert-error');
     if (alerts.length > 0) {
         setTimeout(() => {

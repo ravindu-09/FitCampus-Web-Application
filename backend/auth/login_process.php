@@ -22,18 +22,23 @@ if (empty($identifier) || empty($password)) {
 }
 
 try {
-    // Lookup user by Email or Registration Number with Captain status check
+    // Select First_Name, Last_Name, Registration_Number, Profile_Image, and Life_Percentage
     $stmt = $pdo->prepare("
         SELECT 
             u.User_ID, 
+            u.First_Name,
+            u.Last_Name,
             CONCAT(u.First_Name, ' ', u.Last_Name) AS full_name, 
             u.Email, 
             u.Password, 
             u.Role, 
+            s.Registration_Number,
+            s.Profile_Image,
+            s.Life_Percentage,
             s.Status AS student_status,
-            (SELECT COUNT(*) FROM `TEAM_MEMBER` tm WHERE tm.User_ID = u.User_ID AND tm.Role_In_Team = 'Captain') AS is_captain
-        FROM `USER` u
-        LEFT JOIN `UNIVERSITY_STUDENT` s ON u.User_ID = s.User_ID
+            (SELECT COUNT(*) FROM `team_member` tm WHERE tm.User_ID = u.User_ID AND tm.Role_In_Team = 'Captain') AS is_captain
+        FROM `user` u
+        LEFT JOIN `university_student` s ON u.User_ID = s.User_ID
         WHERE u.Email = :id_email OR s.Registration_Number = :id_reg
         LIMIT 1
     ");
@@ -65,13 +70,19 @@ try {
         session_unset();
         session_regenerate_id(true);
 
-        $_SESSION['user_id']    = $user['User_ID'];
-        $_SESSION['full_name']  = $user['full_name'];
-        $_SESSION['email']      = $user['Email'];
+        // Session variables set for Header, Sidebar, and Profile
+        $_SESSION['user_id']         = $user['User_ID'];
+        $_SESSION['first_name']      = $user['First_Name'];
+        $_SESSION['user_name']       = $user['full_name'];
+        $_SESSION['full_name']       = $user['full_name'];
+        $_SESSION['email']           = $user['Email'];
+        $_SESSION['reg_no']          = $user['Registration_Number'] ?? 'Student';
+        $_SESSION['profile_image']   = $user['Profile_Image'] ?? 'default_avatar.png';
+        $_SESSION['life_percentage'] = (int)($user['Life_Percentage'] ?? 100);
         
         // Standardize internal session roles to lowercase
         $role_lower = strtolower($user['Role']);
-        $_SESSION['role']       = ($role_lower === 'student') ? 'member' : $role_lower; // member, admin, instructor
+        $_SESSION['role']       = ($role_lower === 'student') ? 'member' : $role_lower;
         $_SESSION['is_captain'] = ((int)$user['is_captain'] > 0) ? 1 : 0;
 
         // Role-based redirection

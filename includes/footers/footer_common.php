@@ -1,6 +1,4 @@
-<?php
-?>
-    <!-- Universal Modular Footer -->
+<!-- Universal Modular Footer -->
     <footer class="global-footer">
         <div class="footer-nav">
             <a href="#">Privacy Policy</a>
@@ -10,10 +8,17 @@
         <p class="copyright">FITCAMPUS &copy; UNIVERSITY OF COLOMBO</p>
     </footer>
 
-    <!-- Universal & Page Specific Script Drivers -->
+    <!-- Universal Driver -->
     <script src="../../assets/js/main.js"></script>
-    <?php if (isset($extra_js)): ?>
-        <script src="../../assets/js/<?php echo htmlspecialchars($extra_js, ENT_QUOTES, 'UTF-8'); ?>"></script>
+
+    <!-- Page Specific Script Driver (Supports String or Array) -->
+    <?php if (!empty($extra_js)): ?>
+        <?php 
+        $scripts = is_array($extra_js) ? $extra_js : [$extra_js]; 
+        foreach ($scripts as $script_file): 
+        ?>
+            <script src="../../assets/js/<?php echo htmlspecialchars($script_file, ENT_QUOTES, 'UTF-8'); ?>"></script>
+        <?php endforeach; ?>
     <?php endif; ?>
 
 </body>
