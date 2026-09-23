@@ -9,7 +9,8 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-$user_id = $_SESSION['user_id'];$page_title = "Facilities Booking | FitCampus Captain Portal";
+$user_id = $_SESSION['user_id'];
+$page_title = "Facilities Booking | FitCampus";
 
 $extra_js = [
     "member/dashboard.js",
@@ -20,12 +21,10 @@ require_once '../../includes/db_connection.php';
 require_once '../../includes/headers/header_member.php';
 require_once '../../includes/sidebars/sidebar_captain.php';
 
-// ===================================================================================
-// FETCH CAPTAIN'S TEAMS FROM `team` & `team_member` TABLES
-// ===================================================================================
+// FETCH CAPTAIN'S TEAMS
 $captain_teams = [];
 try {
-    $stmt =$pdo->prepare("
+    $stmt = $pdo->prepare("
         SELECT t.Team_ID, t.Team_Name, t.Sport, 
                (SELECT COUNT(*) FROM team_member WHERE Team_ID = t.Team_ID) as Member_Count 
         FROM team t 
@@ -33,9 +32,9 @@ try {
         WHERE tm.User_ID = ? AND tm.Role_In_Team = 'Captain'
     ");
     $stmt->execute([$user_id]);
-    $captain_teams =$stmt->fetchAll(PDO::FETCH_ASSOC);
+    $captain_teams = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-    // Database Error Handling
+    // Handling error silently
 }
 ?>
 
@@ -53,7 +52,6 @@ try {
                         </div>
                         <div class="booking-toggles">
                             <div class="toggle-group" id="gym-toggle-container">
-                                <!-- Facility IDs should match your `facility` table -->
                                 <button class="toggle-btn active" id="btn-gym-01" type="button">Main Gym</button>
                                 <button class="toggle-btn" id="btn-gym-02" type="button">Badminton Court</button>
                             </div>
@@ -70,6 +68,11 @@ try {
                         <button class="nav-arrow" id="btn-next-week" type="button"><span class="material-symbols-outlined">chevron_right</span></button>
                     </div>
 
+                    <!-- Swipe Hint specifically for Mobile Screens -->
+                    <div class="mobile-swipe-hint">
+                        <span class="material-symbols-outlined" style="font-size: 14px;">swipe</span> Swipe horizontally to see more
+                    </div>
+
                     <div class="grid-table-wrapper custom-scrollbar">
                         <div class="grid-table-inner">
                             <div class="calendar-grid-header border-b-dim bk-pb-sm bk-mb-sm" id="calendar-grid-header"></div>
@@ -77,7 +80,7 @@ try {
                         </div>
                     </div>
 
-                    <div class="status-legend bk-mt-lg bk-pt-lg border-t-dim">
+                    <div class="status-legend">
                         <div class="legend-item"><span class="dot bg-secondary"></span>Available (0%)</div>
                         <div class="legend-item"><span class="dot bg-tertiary"></span>Moderate (1-90%)</div>
                         <div class="legend-item"><span class="dot bg-error"></span>High (&gt; 90%)</div>
@@ -135,7 +138,7 @@ try {
                             <select class="cal-input-field gl-select" id="team-select">
                                 <option disabled selected value="">Select Your Team</option>
                                 <?php if (!empty($captain_teams)): ?>
-                                    <?php foreach ($captain_teams as$team): ?>
+                                    <?php foreach ($captain_teams as $team): ?>
                                         <option value="<?= $team['Team_ID'] ?>" data-size="<?= $team['Member_Count'] ?>">
                                             <?= htmlspecialchars($team['Team_Name']) ?> (<?= htmlspecialchars($team['Sport']) ?>)
                                         </option>
@@ -183,7 +186,6 @@ try {
     <?php require_once '../../includes/footers/footer_common.php'; ?>
 </div>
 
-<!-- Modal Structure remains the same -->
 <div class="wk-modal-overlay flex-items-center justify-center p-4 transition-opacity hidden" id="confirmation-modal" style="z-index: 100;">
     <div class="glass-card shadow-2xl p-8 border-dim max-w-sm w-full transform transition-transform text-center scale-95" id="modal-box-inner">
         <div id="modal-icon-bg" class="w-16 h-16 rounded-full flex-items-center justify-center mx-auto mb-6 bg-secondary-dim txt-green">
