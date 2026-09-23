@@ -24,7 +24,6 @@ if ($action === 'get_schedule') {
         ['06:00:00', '07:00:00', '08:00:00', '09:00:00', '10:00:00', '11:00:00'] : 
         ['12:00:00', '13:00:00', '14:00:00', '15:00:00', '16:00:00', '17:00:00'];
 
-    // Fetch Max Capacity from Facility table
     $stmtCap = $pdo->prepare("SELECT Capacity FROM facility WHERE Facility_ID = ?");
     $stmtCap->execute([$facility_id]);
     $capacity = $stmtCap->fetchColumn() ?: 50;
@@ -39,16 +38,15 @@ if ($action === 'get_schedule') {
             $current_date = date('Y-m-d', strtotime($start_date . " +$i days"));
             
             try {
-                // Calculate Total Booked Capacity based on team member counts
+                // Safely calculate total booked capacity with COALESCE to prevent NULL errors
                 $stmtBooked = $pdo->prepare("
-                    SELECT SUM((SELECT COUNT(*) FROM team_member WHERE Team_ID = b.Team_ID)) as total_booked 
+                    SELECT COALESCE(SUM((SELECT COUNT(*) FROM team_member WHERE Team_ID = b.Team_ID)), 0) as total_booked 
                     FROM booking b 
                     WHERE b.Facility_ID = ? AND b.Reserve_Date = ? AND b.Start_Time = ? AND b.Status = 'Approved'
                 ");
                 $stmtBooked->execute([$facility_id, $current_date, $time]);
-                $total_booked = $stmtBooked->fetchColumn() ?: 0;
+                $total_booked = $stmtBooked->fetchColumn();
                 
-                // Check if any pending requests exist
                 $stmtPending = $pdo->prepare("SELECT COUNT(*) FROM booking WHERE Facility_ID = ? AND Reserve_Date = ? AND Start_Time = ? AND Status = 'Pending'");
                 $stmtPending->execute([$facility_id, $current_date, $time]);
                 $has_pending = $stmtPending->fetchColumn() > 0;
@@ -76,14 +74,13 @@ if ($action === 'get_schedule') {
 if ($action === 'create_booking') {
     $facility_id = isset($_POST['facility_id']) ? (int)$_POST['facility_id'] : 1;
     $date = trim($_POST['date'] ?? '');
-    $time = trim($_POST['time'] ?? '') . ':00'; // Make it SQL TIME format
+    $time = trim($_POST['time'] ?? '') . ':00';
     $duration = isset($_POST['duration']) ? (int)$_POST['duration'] : 1;
     $team_id = isset($_POST['team_id']) ? (int)$_POST['team_id'] : 0;
-    $team_size_input = isset($_POST['team_size']) ? (int)$_POST['team_size'] : 0; // Only for validation
+    $team_size_input = isset($_POST['team_size']) ? (int)$_POST['team_size'] : 0; 
     $reason = trim($_POST['reason'] ?? '');
     $is_special = isset($_POST['is_special']) && $_POST['is_special'] === 'true';
 
-    // End time calculation
     $end_time = date('H:i:s', strtotime($time) + ($duration * 3600));
 
     if (!$team_id) {
@@ -91,13 +88,11 @@ if ($action === 'create_booking') {
         exit;
     }
 
-    // Get Facility Capacity
     $stmtCap = $pdo->prepare("SELECT Capacity FROM facility WHERE Facility_ID = ?");
     $stmtCap->execute([$facility_id]);
     $max_capacity = $stmtCap->fetchColumn() ?: 50;
 
     try {
-        // A. Weekly Limit Check (Mon-Sun)
         $week_start = date('Y-m-d', strtotime('monday this week', strtotime($date)));
         $week_end = date('Y-m-d', strtotime('sunday this week', strtotime($date)));
         
@@ -105,19 +100,17 @@ if ($action === 'create_booking') {
         $stmtLimit->execute([$user_id, $week_start, $week_end]);
         $current_week_bookings = $stmtLimit->fetchColumn();
 
-        // B. Check Current Booked Capacity
         $stmtCapCheck = $pdo->prepare("
             SELECT COALESCE(SUM((SELECT COUNT(*) FROM team_member WHERE Team_ID = b.Team_ID)), 0) 
             FROM booking b 
             WHERE b.Facility_ID = ? AND b.Reserve_Date = ? AND b.Start_Time = ? AND b.Status = 'Approved'
         ");
         $stmtCapCheck->execute([$facility_id, $date, $time]);
-        $current_booked = $stmtCapCheck->fetchColumn() ?: 0;
+        $current_booked = $stmtCapCheck->fetchColumn();
         
         $projected_capacity = $current_booked + $team_size_input;
 
         if (!$is_special) {
-            // Standard Booking Validation
             if ($current_week_bookings >= 3) {
                 echo json_encode(['success' => false, 'error' => 'Weekly limit (3) exceeded. Submit as Special Request.']);
                 exit;
@@ -128,7 +121,6 @@ if ($action === 'create_booking') {
             }
             $status = 'Approved';
         } else {
-            // Special Request Validation
             if (empty($reason)) {
                 echo json_encode(['success' => false, 'error' => 'Reason is required for Special Requests.']);
                 exit;
@@ -136,7 +128,6 @@ if ($action === 'create_booking') {
             $status = 'Pending';
         }
 
-        // C. Insert into Booking Table
         $stmt = $pdo->prepare("
             INSERT INTO booking (Team_ID, Requested_By, Facility_ID, Booking_Time, Reserve_Date, Start_Time, End_Time, Status, Exception_Reason) 
             VALUES (?, ?, ?, NOW(), ?, ?, ?, ?, ?)
