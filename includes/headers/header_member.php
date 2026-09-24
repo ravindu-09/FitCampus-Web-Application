@@ -19,8 +19,6 @@ $page_title = isset($page_title) ? $page_title : $default_title;
 $display_first_name = isset($_SESSION['first_name']) ? $_SESSION['first_name'] : 'Member';
 $display_life = isset($_SESSION['life_percentage']) ? (int)$_SESSION['life_percentage'] : 100;
 
-// Dynamic Greeting
-$greeting_word = $is_captain ? 'Morning,' : 'Hello,';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -59,7 +57,7 @@ $greeting_word = $is_captain ? 'Morning,' : 'Hello,';
             <div class="divider-vertical desktop-only"></div>
 
             <div class="user-greeting desktop-only">
-                <span class="greeting-heading"><?php echo $greeting_word; ?> <?php echo htmlspecialchars($display_first_name); ?></span>
+                <span class="greeting-heading">Hello, <?php echo htmlspecialchars($display_first_name); ?></span>
                 <span class="greeting-sub">Ready to crush your goals today?</span>
             </div>
         </div>

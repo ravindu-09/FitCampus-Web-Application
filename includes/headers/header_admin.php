@@ -11,14 +11,21 @@ if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id']) || ($_SESSION['r
     exit();
 }
 
-$admin_name = htmlspecialchars($_SESSION['full_name'] ?? 'Admin User', ENT_QUOTES, 'UTF-8');
+$admin_name = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Admin User';
+// Extract first name for the greeting
+$display_first_name = explode(' ', $admin_name)[0];
+
+// Dynamic Page Title
+$default_title = 'FitCampus - Admin Console';
+$page_title = isset($page_title) ? $page_title : $default_title;
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $page_title ?? 'FitCampus Admin Console'; ?></title>
+    <title><?php echo htmlspecialchars($page_title, ENT_QUOTES, 'UTF-8'); ?></title>
     
     <!-- Base & Role CSS Stack -->
     <link rel="stylesheet" href="../../assets/css/base/main.css">
@@ -31,8 +38,21 @@ $admin_name = htmlspecialchars($_SESSION['full_name'] ?? 'Admin User', ENT_QUOTE
     <!-- Top Appbar -->
     <header class="admin-topbar">
         <div class="topbar-left">
-            <span class="material-symbols-outlined topbar-logo-icon fill">fitness_center</span>
+            <!-- Sidebar Toggle Button[cite: 2] -->
+            <button id="sidebarToggleBtn" class="menu-toggle-btn" type="button" aria-label="Toggle Sidebar">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+
             <h1 class="topbar-brand-title">FitCampus <span>Admin</span></h1>
+
+            <!-- Vertical Divider[cite: 2] -->
+            <div class="divider-vertical desktop-only"></div>
+
+            <!-- Dynamic Admin Greeting[cite: 2] -->
+            <div class="user-greeting desktop-only">
+                <span class="greeting-heading">Hello, <?php echo htmlspecialchars($display_first_name, ENT_QUOTES, 'UTF-8'); ?></span>
+                <span class="greeting-sub">Ready to manage the system today?</span>
+            </div>
         </div>
 
         <div class="topbar-right">
@@ -42,11 +62,13 @@ $admin_name = htmlspecialchars($_SESSION['full_name'] ?? 'Admin User', ENT_QUOTE
             </a>
 
             <div class="topbar-profile-pill">
+                
                 <div class="topbar-avatar-wrapper">
-                    <span class="material-symbols-outlined">person</span>
+                    <span class="material-symbols-outlined" style="color: var(--primary);">admin_panel_settings</span>
                 </div>
+                
                 <div class="topbar-admin-meta">
-                    <span class="admin-name"><?php echo $admin_name; ?></span>
+                    <span class="admin-name"><?php echo htmlspecialchars($admin_name, ENT_QUOTES, 'UTF-8'); ?></span>
                     <span class="admin-role">System Manager</span>
                 </div>
             </div>

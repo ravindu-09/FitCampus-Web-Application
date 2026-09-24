@@ -12,11 +12,6 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 $page_title = "Notifications | FitCampus";
 
-// JS specific to dashboard layout
-$extra_js = [
-    "member/dashboard.js"
-];
-
 require_once '../../includes/db_connection.php';
 require_once '../../includes/headers/header_member.php';
 

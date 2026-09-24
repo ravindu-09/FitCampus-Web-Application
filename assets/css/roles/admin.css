@@ -8,6 +8,14 @@
   --surface-bright: #393939;
 }
 
+/* ==========================================================================
+   [SECTION 1] COMMON ADMIN LAYOUT & NAVIGATION
+   - Base Body & Viewport
+   - Topbar, Brand Header & Greetings 
+   - Sidebar Drawer (Desktop & Mobile Push Drawer)
+   - Mobile Bottom Navigation
+   ========================================================================== */
+
 /* Base Body & Viewport */
 .admin-layout-body {
   background-color: var(--bg-color);
@@ -33,16 +41,16 @@
   flex-direction: column;
   gap: 24px;
   overflow-y: auto;
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@media (min-width: 768px) {
-  .admin-main-canvas {
-    margin-left: 260px;
-    padding: 32px;
+@media (min-width: 1025px) {
+  body.sidebar-open .admin-main-canvas {
+    margin-left: 280px;
   }
 }
 
-/* --- Topbar Styles (Missing Part Fixed) --- */
+/* --- Topbar Styles --- */
 .admin-topbar {
   position: fixed;
   top: 0;
@@ -57,13 +65,47 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 24px;
-  z-index: 50;
+  z-index: 40;
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (min-width: 1025px) {
+  body.sidebar-open .admin-topbar {
+    left: 280px;
+    width: calc(100% - 280px);
+  }
 }
 
 .topbar-left {
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+/* Sidebar Toggle Button */
+.menu-toggle-btn {
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.menu-toggle-btn:hover {
+  background-color: rgba(128, 128, 128, 0.15);
+}
+
+.menu-toggle-btn:active {
+  transform: scale(0.95);
+}
+
+.menu-toggle-btn .material-symbols-outlined {
+  font-size: 24px;
 }
 
 .topbar-logo-icon {
@@ -81,6 +123,41 @@
 .topbar-brand-title span {
   color: var(--primary);
   font-weight: 400;
+}
+
+/* Vertical Divider */
+.divider-vertical {
+  width: 2px;
+  height: 32px;
+  background-color: rgba(128, 128, 128, 0.25);
+  margin: 0 16px;
+  border-radius: 2px;
+}
+
+/* User Greeting Section */
+.user-greeting {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.greeting-heading {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.greeting-sub {
+  font-size: 0.85rem;
+  color: #6b7280; 
+  margin-top: 2px;
+}
+
+/* Responsive Hide */
+@media (max-width: 768px) {
+  .desktop-only {
+      display: none !important;
+  }
 }
 
 .topbar-right {
@@ -162,162 +239,258 @@
   color: var(--on-surface-variant);
 }
 
-/* --- Sidebar Drawer (Missing Part Fixed) --- */
-.admin-sidebar {
+/* --- Admin Sidebar Drawer Base --- */
+.member-sidebar {
   position: fixed;
-  top: 70px;
   left: 0;
-  width: 260px;
-  height: calc(100vh - 70px);
+  top: 0;
+  bottom: 0;
+  width: 280px;
   background-color: var(--surface-container);
   border-right: 1px solid rgba(255, 255, 255, 0.08);
-  display: none;
+  display: flex;
   flex-direction: column;
-  padding: 24px 16px;
-  z-index: 40;
+  z-index: 55;
+  transform: translateX(-100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 10px 0 40px rgba(0, 0, 0, 0.6);
 }
 
-@media (min-width: 768px) {
-  .admin-sidebar {
-    display: flex;
-  }
+.member-sidebar.active {
+  transform: translateX(0);
 }
 
-.sidebar-header-card {
+.sidebar-brand-header {
+  height: 70px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding-bottom: 20px;
-  margin-bottom: 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  justify-content: space-between;
+  padding: 0 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  flex-shrink: 0;
 }
 
-.sidebar-avatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background-color: var(--surface-low);
-  border: 1px solid rgba(223, 183, 255, 0.3);
+.brand-heading {
+  font-size: 20px;
+  letter-spacing: -0.01em;
+  font-weight: 700;
+  color: var(--on-surface);
+}
+
+.close-sidebar-btn {
+  background: transparent;
+  border: none;
+  color: var(--on-surface-variant);
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+  border-radius: 50%;
+  transition: background-color 0.2s, color 0.2s;
 }
 
-.sidebar-meta {
-  display: flex;
-  flex-direction: column;
-}
-
-.meta-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--primary);
-}
-
-.meta-sub {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--on-surface-variant);
+.close-sidebar-btn:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: var(--on-surface);
 }
 
 .sidebar-nav-list {
+  flex: 1;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  flex: 1;
+  gap: 8px;
   overflow-y: auto;
 }
 
-.sidebar-nav-item {
+.side-nav-item {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 12px 16px;
-  border-radius: 8px;
-  color: var(--on-surface-variant);
+  gap: 16px;
+  padding: 12px;
+  border-radius: 12px;
   text-decoration: none;
-  font-size: 14px;
   font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.sidebar-nav-item:hover {
-  background-color: var(--surface-highest);
-  color: #ffffff;
-}
-
-.sidebar-nav-item.active {
-  background-color: rgba(107, 33, 168, 0.25);
-  color: var(--primary);
-  border-left: 3px solid var(--primary);
-  font-weight: 600;
-}
-
-.sidebar-footer {
-  padding-top: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.btn-sidebar-logout {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  padding: 10px;
-  border-radius: 8px;
-  background-color: transparent;
-  border: 1px solid var(--primary);
-  color: var(--primary);
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 15px;
+  color: var(--on-surface-variant);
   transition: all 0.2s;
 }
 
-.btn-sidebar-logout:hover {
+.side-nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--on-surface);
+}
+
+.side-nav-item.active {
   background-color: rgba(223, 183, 255, 0.1);
+  color: var(--primary);
 }
 
-/* --- Mobile Navigation --- */
-.admin-mobile-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 64px;
-  background-color: rgba(28, 27, 27, 0.95);
-  backdrop-filter: blur(16px);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+.sidebar-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  margin-top: auto;
+  flex-shrink: 0;
   display: flex;
-  justify-content: space-around;
-  align-items: center;
-  z-index: 50;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
 }
 
-@media (min-width: 768px) {
-  .admin-mobile-nav {
-    display: none;
+@media (max-width: 1024px) {
+  .sidebar-footer {
+    padding-bottom: 85px; /* Space for mobile nav */
   }
 }
 
-.mobile-nav-item {
+.sidebar-profile-card {
+  width: 100%;
+}
+
+.sidebar-profile-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background-color: var(--surface-high);
+  border-radius: 14px;
+}
+
+.profile-icon-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(223, 183, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.profile-text-wrap {
+  min-width: 0;
+  flex: 1;
+}
+
+.profile-name {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--on-surface);
+}
+
+.profile-role {
+  font-size: 10px;
+  color: var(--on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.sidebar-settings-link {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--on-surface-variant);
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.sidebar-settings-link:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--primary);
+}
+
+/* Sidebar Overlay Backdrop: Mobile Screens Only */
+.sidebar-overlay {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 50;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .sidebar-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+/* Fixed Mobile Bottom Navigation */
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 68px;
+  background-color: rgba(19, 19, 19, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 8px;
+  z-index: 500;
+  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.6);
+}
+
+@media (min-width: 1025px) {
+  .mobile-bottom-nav { 
+    display: none !important; 
+  }
+}
+
+.mob-nav-item {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: var(--on-surface-variant);
+  gap: 4px;
   text-decoration: none;
-  font-size: 10px;
-  font-family: var(--font-mono);
-  gap: 2px;
+  color: rgba(207, 194, 212, 0.5);
+  font-size: 11px;
+  font-family: var(--font-main);
+  flex: 1;
+  padding: 6px 0;
+  transition: color 0.2s ease;
 }
 
-.mobile-nav-item.active {
-  color: var(--primary);
-  font-weight: 700;
+.mob-nav-item .material-symbols-outlined {
+  font-size: 22px;
 }
+
+.mob-nav-item.active {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+
+/* ==========================================================================
+   [SECTION 2] PAGE HEADERS & FILTER CONTROLS (Views: verification, analytics)
+   - Common Page Headings
+   - Search & Filter Elements
+   ========================================================================== */
 
 /* Header & Filter Controls */
 .content-header-row {
@@ -376,6 +549,13 @@
   cursor: pointer;
 }
 
+
+/* ==========================================================================
+   [SECTION 3] METRICS & STATS WIDGETS (Views: analytics, verification)
+   - KPI/Stats Grid Layouts
+   - Stat Summary Boxes
+   ========================================================================== */
+
 /* Stats Bento Grid */
 .verification-stats-grid {
   display: grid;
@@ -418,6 +598,14 @@
   line-height: 1;
   margin-top: 8px;
 }
+
+
+/* ==========================================================================
+   [SECTION 4] DATA TABLES & USER LISTS (Views: users, bookings, analytics, verification)
+   - Admin Tables & Containers
+   - User Meta Cells & Avatars
+   - Badges & Status Indicators
+   ========================================================================== */
 
 /* Verification Table & Cards */
 .admin-table-container {
@@ -525,6 +713,13 @@
   50% { opacity: 0.4; transform: scale(0.8); }
 }
 
+
+/* ==========================================================================
+   [SECTION 5] ACTION BUTTONS & CONTROLS (Views: verification, bookings, alerts)
+   - Quick Action Buttons (Approve/Decline)
+   - State-based Buttons
+   ========================================================================== */
+
 /* Action Buttons */
 .action-btn-group {
   display: flex;
@@ -567,6 +762,14 @@
   background-color: rgba(255, 180, 171, 0.2);
   transform: scale(1.05);
 }
+
+
+/* ==========================================================================
+   [SECTION 6] MODALS & OVERLAYS (Views: verification)
+   - Inspector Dialog & Overlays
+   - ID Previews & Zoom
+   - Credentials Grid
+   ========================================================================== */
 
 /* Inspector Modal Architecture */
 .modal-dialog-inspector {
@@ -808,6 +1011,12 @@
   background-color: #38ca63;
 }
 
+
+/* ==========================================================================
+   [SECTION 7] UTILITIES & OVERRIDES
+   - Colors, Spacing, Displays
+   ========================================================================== */
+
 .glowing-secondary {
   box-shadow: 0 0 15px rgba(74, 225, 118, 0.3);
 }
@@ -823,3 +1032,51 @@
 .overflow-hidden { overflow: hidden !important; }
 .hidden { display: none !important; }
 .flex { display: flex !important; }
+
+/* --- Settings Layout Extensions --- */
+.settings-header-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.settings-main-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--on-surface);
+  margin-bottom: 4px;
+}
+.settings-grid-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+@media (max-width: 900px) {
+  .settings-grid-layout { grid-template-columns: 1fr; }
+}
+.settings-card { padding: 24px; border-radius: 16px; }
+.full-span-card { grid-column: 1 / -1; }
+.actions-group-row { display: flex; justify-content: flex-end; margin-top: 16px; }
+.border-left-secondary { border-left: 4px solid var(--secondary); }
+.border-left-tertiary { border-left: 4px solid var(--tertiary); }
+.mb-4 { margin-bottom: 16px; }
+.auth-box {
+  background: rgba(147, 0, 10, 0.1); 
+  border: 1px solid rgba(255, 180, 171, 0.3); 
+  border-radius: 8px;
+}
+
+/* --- Facility Grid Responsive Fix --- */
+.facility-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 768px) {
+  .facility-grid-3 {
+    grid-template-columns: 1fr;
+  }
+}

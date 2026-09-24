@@ -1,33 +1,40 @@
 // assets/js/member/calories.js
 document.addEventListener('DOMContentLoaded', () => {
+    // State variables for tracking the viewed month and the currently selected date
     let currentDate = new Date();
     let selectedDate = new Date();
 
+    // DOM Element References for calendar navigation and display
     const monthDisplay = document.getElementById('month-display');
     const calendarDays = document.getElementById('calendar-days-container');
     const btnPrevMonth = document.getElementById('btnPrevMonth');
     const btnNextMonth = document.getElementById('btnNextMonth');
     const btnResetDate = document.getElementById('btn-reset-date');
 
+    // DOM Element References for summary dashboard
     const summaryDate = document.getElementById('summary-date');
     const summaryIntake = document.getElementById('summary-intake-val');
     const summaryBurned = document.getElementById('summary-burned-val');
     const consumptionTitle = document.querySelector('#consumption-section .cal-table-header h3');
     const activityTitle = document.querySelector('#activity-section .cal-table-header h3');
 
+    // DOM Element References for data tables
     const intakeTableBody = document.getElementById('intake-table-body');
     const intakeTableFoot = document.getElementById('intake-table-foot');
     const burnedTableBody = document.getElementById('burned-table-body');
     const burnedTableFoot = document.getElementById('burned-table-foot');
 
+    // Hidden input fields for tracking selected date in forms
     const intakeHiddenDate = document.getElementById('intake-hidden-date');
     const burnedHiddenDate = document.getElementById('burned-hidden-date');
 
+    // Array mapping month indices to month names
     const monthNames = [
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
     ];
 
+    // Helper function to format a Date object into a 'YYYY-MM-DD' string
     function formatDateKey(dateObj) {
         const y = dateObj.getFullYear();
         const m = String(dateObj.getMonth() + 1).padStart(2, '0');
@@ -35,21 +42,24 @@ document.addEventListener('DOMContentLoaded', () => {
         return `${y}-${m}-${d}`;
     }
 
+    // Function to generate and render the calendar UI for the current month
     function renderCalendar() {
         if (!calendarDays || !monthDisplay) return;
 
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
 
+        // Update the month and year header
         monthDisplay.innerText = `${monthNames[month]} ${year}`;
         calendarDays.innerHTML = '';
 
+        // Calculate days to determine calendar layout
         const firstDayIndex = new Date(year, month, 1).getDay();
         const adjustedFirstDay = (firstDayIndex === 0) ? 6 : firstDayIndex - 1;
         const totalDays = new Date(year, month + 1, 0).getDate();
         const prevMonthLastDate = new Date(year, month, 0).getDate();
 
-        // Padding days
+        // Render padding days from the previous month
         for (let i = adjustedFirstDay; i > 0; i--) {
             const padCell = document.createElement('div');
             padCell.className = 'cal-day-box inactive-day';
@@ -57,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
             calendarDays.appendChild(padCell);
         }
 
-        // Active month days
+        // Render the actual days of the active month
         for (let day = 1; day <= totalDays; day++) {
             const thisDate = new Date(year, month, day);
             const dateStr = formatDateKey(thisDate);
@@ -67,10 +77,12 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.className = 'cal-day-box';
             btn.dataset.date = dateStr;
 
+            // Highlight the currently selected date
             if (formatDateKey(selectedDate) === dateStr) {
                 btn.classList.add('active');
             }
 
+            // Create inner HTML for the day button including indicator dots
             btn.innerHTML = `
                 <span class="day-num">${day}</span>
                 <div class="day-dots">
@@ -79,11 +91,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
 
+            // Event listener for selecting a specific date
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
+                // Remove active class from all days and apply to the clicked one
                 document.querySelectorAll('.cal-day-box').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 selectedDate = thisDate;
+                // Fetch new data for the selected date
                 loadDateData(dateStr);
             });
 
@@ -91,6 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Helper function to map food/activity categories to UI icons and color classes
     function getIconDetails(category) {
         const cat = category.toLowerCase();
         if (cat === 'breakfast') return { icon: 'egg', colorClass: 'bg-orange' };
@@ -100,17 +116,21 @@ document.addEventListener('DOMContentLoaded', () => {
         return { icon: 'directions_walk', colorClass: 'bg-green' };
     }
 
+    // Function to fetch and display calorie data (intake and burned) for a specific date
     function loadDateData(dateStr) {
         const dObj = new Date(dateStr + 'T00:00:00');
         const formattedDateText = dObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
+        // Update UI headers with the formatted date
         if (summaryDate) summaryDate.innerText = formattedDateText;
         if (consumptionTitle) consumptionTitle.innerText = `${formattedDateText} Consumption`;
         if (activityTitle) activityTitle.innerText = `${formattedDateText} Activity`;
 
+        // Update hidden date fields for form submission
         if (intakeHiddenDate) intakeHiddenDate.value = dateStr;
         if (burnedHiddenDate) burnedHiddenDate.value = dateStr;
 
+        // Fetch data from the backend via AJAX
         fetch(`../../backend/member/calorie_action.php?action=get_date_data&date=${dateStr}`)
             .then(res => res.json())
             .then(data => {
@@ -119,10 +139,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const inCals = Math.round(data.totals.intake_cals);
                 const outCals = Math.round(data.totals.burned_cals);
 
+                // Update summary dashboard values
                 if (summaryIntake) summaryIntake.innerHTML = `${inCals.toLocaleString()} <span class="unit">kcal</span>`;
                 if (summaryBurned) summaryBurned.innerHTML = `${outCals.toLocaleString()} <span class="unit">kcal</span>`;
 
-                // Render Intake Table
+                // Render Intake Table body
                 if (intakeTableBody) {
                     if (data.intake.length === 0) {
                         intakeTableBody.innerHTML = `<tr><td colspan="5" class="empty-row">No food items logged.</td></tr>`;
@@ -157,6 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
 
+                // Render Intake Table footer with macro totals
                 if (intakeTableFoot) {
                     intakeTableFoot.innerHTML = `
                         <tr>
@@ -172,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     `;
                 }
 
-                // Render Burned Table
+                // Render Burned Table body
                 if (burnedTableBody) {
                     if (data.burned.length === 0) {
                         burnedTableBody.innerHTML = `<tr><td colspan="4" class="empty-row">No activities recorded.</td></tr>`;
@@ -202,6 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
 
+                // Render Burned Table footer
                 if (burnedTableFoot) {
                     burnedTableFoot.innerHTML = `
                         <tr>
@@ -214,14 +237,16 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(err => console.error('Error:', err));
     }
 
+    // Helper function to sanitize strings to prevent XSS attacks
     function escapeHtml(str) {
         return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
+    // Event listeners for navigating between previous and next months
     if (btnPrevMonth) btnPrevMonth.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); });
     if (btnNextMonth) btnNextMonth.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); });
 
-    // Handle Reset Button
+    // Event listener for the reset button to clear all logged data for the selected date
     if (btnResetDate) {
         btnResetDate.addEventListener('click', () => {
             const dateStr = formatDateKey(selectedDate);
@@ -233,6 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 fetch('../../backend/member/calorie_action.php', { method: 'POST', body: formData })
                 .then(res => res.json())
                 .then(data => {
+                    // Reload data if reset was successful
                     if (data && data.success) loadDateData(dateStr);
                     else alert('Failed to reset data.');
                 })
@@ -241,6 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Initial execution calls to render the calendar and load data for today on page load
     renderCalendar();
     loadDateData(formatDateKey(selectedDate));
 });

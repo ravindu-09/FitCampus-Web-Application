@@ -86,6 +86,11 @@ $avatar_url = '../../assets/images/uploads/' . htmlspecialchars($profile_img_nam
             </div>
         </div>
 
+        <a class="sidebar-settings-link" href="../../backend/auth/logout.php">
+            <span class="material-symbols-outlined">logout</span>
+            <span>Sign Out</span>
+        </a>
+
         <a class="sidebar-settings-link <?php echo ($current_script === 'settings.php') ? 'active' : ''; ?>" href="<?php echo $member_prefix; ?>settings.php">
             <span class="material-symbols-outlined">settings</span>
             <span>Settings</span>

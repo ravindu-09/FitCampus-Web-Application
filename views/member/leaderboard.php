@@ -14,7 +14,6 @@ $page_title = "Leaderboard | FitCampus";
 
 // JS file linked directly to leaderboard.js
 $extra_js = [
-    "member/dashboard.js",
     "member/leaderboard.js"
 ];
 
