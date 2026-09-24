@@ -1,70 +1,65 @@
 <?php
 // includes/sidebars/sidebar_admin.php
-$current_page = basename($_SERVER['PHP_SELF']);
+$current_script = basename($_SERVER['PHP_SELF']);
+$admin_name = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Admin User';
 ?>
-<!-- Desktop Sidebar -->
-<aside class="admin-sidebar">
-    <div class="sidebar-header-card">
-        <div class="sidebar-avatar">
-            <span class="material-symbols-outlined" style="font-size: 24px; color: var(--primary);">admin_panel_settings</span>
-        </div>
-        <div class="sidebar-meta">
-            <span class="meta-title">FitCampus Admin</span>
-            <span class="meta-sub">Univ. of Colombo</span>
-        </div>
+<!-- Sidebar Drawer Navigation -->
+<aside id="memberSidebar" class="member-sidebar">
+    <div class="sidebar-brand-header">
+        <h1 class="brand-heading">FitCampus</h1>
+        <button id="closeSidebarBtn" class="close-sidebar-btn" type="button" aria-label="Close Sidebar">
+            <span class="material-symbols-outlined">close</span>
+        </button>
     </div>
 
     <nav class="sidebar-nav-list">
-        <a href="analytics.php" class="sidebar-nav-item <?php echo ($current_page == 'analytics.php') ? 'active' : ''; ?>">
+        <a class="side-nav-item <?php echo ($current_script === 'analytics.php') ? 'active' : ''; ?>" href="analytics.php">
             <span class="material-symbols-outlined">analytics</span>
             <span>Analytics</span>
         </a>
-        <a href="bookings.php" class="sidebar-nav-item <?php echo ($current_page == 'bookings.php') ? 'active' : ''; ?>">
+        <a class="side-nav-item <?php echo ($current_script === 'bookings.php') ? 'active' : ''; ?>" href="bookings.php">
             <span class="material-symbols-outlined">calendar_month</span>
             <span>Bookings</span>
         </a>
-        <a href="verification.php" class="sidebar-nav-item <?php echo ($current_page == 'verification.php') ? 'active' : ''; ?>">
+        <a class="side-nav-item <?php echo ($current_script === 'verification.php') ? 'active' : ''; ?>" href="verification.php">
             <span class="material-symbols-outlined">verified_user</span>
             <span>Verification</span>
         </a>
-        <a href="users.php" class="sidebar-nav-item <?php echo ($current_page == 'users.php') ? 'active' : ''; ?>">
+        <a class="side-nav-item <?php echo ($current_script === 'users.php') ? 'active' : ''; ?>" href="users.php">
             <span class="material-symbols-outlined">group</span>
-            <span>Users</span>
+            <span>Users Hub</span>
         </a>
-        <a href="alerts.php" class="sidebar-nav-item <?php echo ($current_page == 'alerts.php') ? 'active' : ''; ?>">
+        <a class="side-nav-item <?php echo ($current_script === 'alerts.php') ? 'active' : ''; ?>" href="alerts.php">
             <span class="material-symbols-outlined">campaign</span>
             <span>Alerts</span>
         </a>
     </nav>
 
+    <!-- Sidebar Bottom Profile & Settings -->
     <div class="sidebar-footer">
-        <a href="../../backend/auth/logout.php" class="btn-sidebar-logout">
+        <div class="sidebar-profile-card">
+            <div class="sidebar-profile-content">
+                <div class="profile-icon-circle">
+                    <span class="material-symbols-outlined" style="color: var(--primary);">admin_panel_settings</span>
+                </div>
+                <div class="profile-text-wrap">
+                    <p class="profile-name"><?php echo htmlspecialchars($admin_name, ENT_QUOTES, 'UTF-8'); ?></p>
+                    <p class="profile-role">System Manager</p>
+                </div>
+            </div>
+        </div>
+
+        <a class="sidebar-settings-link" href="../../backend/auth/logout.php">
             <span class="material-symbols-outlined">logout</span>
             <span>Sign Out</span>
+        </a>
+
+        <a class="sidebar-settings-link <?php echo ($current_script === 'settings.php') ? 'active' : ''; ?>" href="settings.php">
+            <span class="material-symbols-outlined">settings</span>
+            <span>Settings</span>
         </a>
     </div>
 </aside>
 
-<!-- Mobile Bottom Navigation Bar -->
-<nav class="admin-mobile-nav">
-    <a href="analytics.php" class="mobile-nav-item <?php echo ($current_page == 'analytics.php') ? 'active' : ''; ?>">
-        <span class="material-symbols-outlined">analytics</span>
-        <span>Analytics</span>
-    </a>
-    <a href="bookings.php" class="mobile-nav-item <?php echo ($current_page == 'bookings.php') ? 'active' : ''; ?>">
-        <span class="material-symbols-outlined">calendar_month</span>
-        <span>Bookings</span>
-    </a>
-    <a href="verification.php" class="mobile-nav-item <?php echo ($current_page == 'verification.php') ? 'active' : ''; ?>">
-        <span class="material-symbols-outlined">verified_user</span>
-        <span>Verification</span>
-    </a>
-    <a href="users.php" class="mobile-nav-item <?php echo ($current_page == 'users.php') ? 'active' : ''; ?>">
-        <span class="material-symbols-outlined">group</span>
-        <span>Users</span>
-    </a>
-    <a href="alerts.php" class="mobile-nav-item <?php echo ($current_page == 'alerts.php') ? 'active' : ''; ?>">
-        <span class="material-symbols-outlined">campaign</span>
-        <span>Alerts</span>
-    </a>
-</nav>
+<!-- Independent Global Backdrop Overlay -->
+<div id="sidebarOverlay" class="sidebar-overlay"></div>

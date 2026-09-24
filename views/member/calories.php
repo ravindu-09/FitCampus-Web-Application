@@ -13,7 +13,6 @@ $user_id = $_SESSION['user_id'];
 $page_title = "Nutrition & Activity Tracker | FitCampus";
 
 $extra_js = [
-    "member/dashboard.js",
     "member/calories.js"
 ];
 

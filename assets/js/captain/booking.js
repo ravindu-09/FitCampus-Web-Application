@@ -1,12 +1,13 @@
 // assets/js/captain/booking.js
 document.addEventListener('DOMContentLoaded', () => {
     
-    // Default Facility IDs (Make sure these match your Database Facility_ID)
-    let currentGymId = 1; // 1 = Main Gym
+    // --- State Variables ---
+    let currentGymId = 1; 
     let currentShift = 'morning';
     let selectedSlot = null;
     let facilityCapacity = 50;
     
+    // --- Date Initialization (Set to Monday of the current week) ---
     let currentDate = new Date();
     let currentWeekStart = new Date(currentDate);
     let dayOfWeek = currentWeekStart.getDay();
@@ -15,6 +16,17 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let currentDayNames = []; 
 
+    // --- Initialize Facility Selection ---
+    const gymToggleContainer = document.getElementById('gym-toggle-container');
+    if (gymToggleContainer) {
+        const firstBtn = gymToggleContainer.querySelector('.toggle-btn');
+        if (firstBtn && firstBtn.dataset.facilityId) {
+            currentGymId = parseInt(firstBtn.dataset.facilityId);
+        }
+    }
+
+    // --- Calendar Header Generation ---
+    // Generates the days of the week and dates for the top row of the grid
     function updateCalendarHeaders() {
         const headerContainer = document.getElementById('calendar-grid-header');
         const weekRangeDisplay = document.getElementById('week-range-display');
@@ -27,6 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let weekEnd = new Date(currentWeekStart);
         weekEnd.setDate(weekEnd.getDate() + 6);
 
+        // Update the date range display at the top
         const options = { month: 'short', day: 'numeric' };
         weekRangeDisplay.textContent = `${currentWeekStart.toLocaleDateString('en-US', options)} - ${weekEnd.toLocaleDateString('en-US', options)}, ${currentWeekStart.getFullYear()}`;
 
@@ -39,6 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const fullDateStr = `${monthShort} ${dateNum}`;
             currentDayNames.push(fullDateStr);
 
+            // Highlight today's date in green
             const isToday = (d.toDateString() === new Date().toDateString()) ? 'txt-green' : 'txt-primary';
 
             headerHTML += `
@@ -50,20 +64,36 @@ document.addEventListener('DOMContentLoaded', () => {
         headerContainer.innerHTML = headerHTML;
     }
 
+    // --- Week Navigation Listeners ---
     document.getElementById('btn-prev-week')?.addEventListener('click', () => {
         currentWeekStart.setDate(currentWeekStart.getDate() - 7);
         updateCalendarHeaders();
         selectedSlot = null;
-        fetchAndRenderGrid();
+        fetchAndResetForm();
     });
 
     document.getElementById('btn-next-week')?.addEventListener('click', () => {
         currentWeekStart.setDate(currentWeekStart.getDate() + 7);
         updateCalendarHeaders();
         selectedSlot = null;
-        fetchAndRenderGrid();
+        fetchAndResetForm();
     });
 
+    // --- Form & Grid Reset ---
+    // Clears the selected slot and disables the booking form until a new slot is chosen
+    function fetchAndResetForm() {
+        selectedSlot = null;
+        document.getElementById('capacity-info-container').classList.add('hidden');
+        document.getElementById('selected-date-display').textContent = 'Select a slot';
+        const timeSelect = document.getElementById('start-time-select');
+        timeSelect.innerHTML = `<option value="">--:--</option>`;
+        timeSelect.disabled = true;
+        document.getElementById('submit-booking-btn').disabled = true;
+        fetchAndRenderGrid();
+    }
+
+    // --- Fetch Schedule Data ---
+    // Fetches the weekly schedule from the backend using AJAX
     function fetchAndRenderGrid() {
         const gridBody = document.getElementById('schedule-grid-body');
         if (!gridBody) return;
@@ -88,19 +118,24 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     }
 
+    // --- Render Grid ---
+    // Builds the HTML for the slots based on fetched occupancy data
     function renderGrid(gridData) {
         const gridBody = document.getElementById('schedule-grid-body');
         let html = '';
         
         gridData.forEach(row => {
-            const time = row[0];
+            const time = row[0]; 
             html += `<div class="calendar-grid-row">`;
             html += `<div class="sticky-col txt-muted font-xs tracking-wide">${time}</div>`;
             
             for (let i = 1; i <= 7; i++) {
-                const occupancy = row[i];
-                let isPending = occupancy === 'pending';
-                let occVal = isPending ? 0 : parseInt(occupancy);
+                // Parse format (e.g. "pending_45" or "45")
+                const cellData = String(row[i]);
+                let isPending = cellData.startsWith('pending');
+                let occVal = isPending ? parseInt(cellData.split('_')[1] || 0) : parseInt(cellData);
+                
+                // Calculate remaining spaces
                 const availableSpaces = Math.floor(facilityCapacity * (1 - (occVal / 100)));
                 
                 let styleClass = '';
@@ -108,6 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 let isSelectable = false;
                 let textDisplay = '';
                 
+                // Determine styling and selectability based on occupancy/status
                 if (isPending) {
                     styleClass = 'slot-pending-state';
                     icon = 'hourglass_empty';
@@ -117,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     styleClass = 'slot-full';
                     icon = 'block';
                     textDisplay = 'Full';
-                    isSelectable = true; 
+                    isSelectable = false; 
                 } else {
                     isSelectable = true;
                     textDisplay = occVal + '%';
@@ -133,11 +169,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
                 
+                // Generate precise date string for the database
                 let tempD = new Date(currentWeekStart);
                 tempD.setDate(tempD.getDate() + (i - 1));
                 const exactDbDate = `${tempD.getFullYear()}-${String(tempD.getMonth() + 1).padStart(2, '0')}-${String(tempD.getDate()).padStart(2, '0')}`;
 
-                let dataAttrs = `data-time="${time}" data-day="${currentDayNames[i-1]}" data-dbdate="${exactDbDate}" data-available="${availableSpaces}" data-occupancy="${occVal}"`;
+                let dataAttrs = `data-time="${time}:00" data-day="${currentDayNames[i-1]}" data-dbdate="${exactDbDate}" data-available="${availableSpaces}" data-occupancy="${occVal}"`;
                 if(isSelectable) dataAttrs += ` data-selectable="true"`;
 
                 html += `
@@ -153,23 +190,15 @@ document.addEventListener('DOMContentLoaded', () => {
         
         gridBody.innerHTML = html;
         attachSlotListeners();
+        
+        // Re-highlight if the user already had a slot selected before reloading the grid
+        if (selectedSlot) highlightSelectedSlots();
     }
 
+    // --- Slot Selection Logic ---
     function attachSlotListeners() {
         document.querySelectorAll('.calendar-grid-row [data-selectable="true"]').forEach(slot => {
             slot.addEventListener('click', function() {
-                document.querySelectorAll('.calendar-grid-row [data-selectable="true"]').forEach(s => {
-                    if (s.getAttribute('data-selected') === 'true') {
-                        s.removeAttribute('data-selected');
-                        s.classList.remove('slot-selected');
-                        s.querySelector('.material-symbols-outlined').textContent = s.classList.contains('slot-full') ? 'block' : (s.classList.contains('slot-pending-state') ? 'hourglass_empty' : 'add_circle');
-                    }
-                });
-
-                this.setAttribute('data-selected', 'true');
-                this.classList.add('slot-selected');
-                this.querySelector('.material-symbols-outlined').textContent = 'check_circle';
-                
                 selectedSlot = {
                     time: this.getAttribute('data-time'),
                     day: this.getAttribute('data-day'),
@@ -182,21 +211,82 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Utility function to calculate the next hour for multi-hour durations
+    function addOneHour(timeStr) {
+        let [hours, minutes, seconds] = timeStr.split(':').map(Number);
+        hours = (hours + 1) % 24;
+        return String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+    }
+
+    // Visually highlights the selected slot and any subsequent slots based on duration
+    function highlightSelectedSlots() {
+        // Remove previous highlights
+        document.querySelectorAll('.slot-box').forEach(s => {
+            s.classList.remove('slot-selected');
+            const iconSpan = s.querySelector('.material-symbols-outlined');
+            if (iconSpan) {
+                if (s.classList.contains('slot-full')) iconSpan.textContent = 'block';
+                else if (s.classList.contains('slot-pending-state')) iconSpan.textContent = 'hourglass_empty';
+                else iconSpan.textContent = 'add_circle';
+            }
+        });
+
+        if (!selectedSlot) return;
+
+        const duration = parseInt(document.getElementById('duration-select').value) || 1;
+        let currentTime = selectedSlot.time;
+        let minAvailable = selectedSlot.available;
+
+        // Apply highlights for the given duration
+        for (let d = 0; d < duration; d++) {
+            const targetCell = document.querySelector(`.slot-box[data-dbdate="${selectedSlot.dbdate}"][data-time="${currentTime}"]`);
+            if (targetCell) {
+                if (targetCell.getAttribute('data-selectable') === 'true') {
+                    targetCell.classList.add('slot-selected');
+                    const iconSpan = targetCell.querySelector('.material-symbols-outlined');
+                    if (iconSpan) iconSpan.textContent = 'check_circle';
+                    
+                    // Track the bottleneck (lowest available capacity) across the duration
+                    const slotAvail = parseInt(targetCell.getAttribute('data-available')) || 0;
+                    if (slotAvail < minAvailable) {
+                        minAvailable = slotAvail;
+                    }
+                } else {
+                    break;
+                }
+            }
+            currentTime = addOneHour(currentTime);
+        }
+
+        selectedSlot.effectiveAvailable = minAvailable;
+    }
+
+    // Update slots if user changes the duration dropdown
+    document.getElementById('duration-select')?.addEventListener('change', () => {
+        if (selectedSlot) {
+            updateFormUI();
+        }
+    });
+
+    // --- Update Sidebar Form ---
     function updateFormUI() {
         if (selectedSlot) {
             document.getElementById('selected-date-display').textContent = selectedSlot.day + `, ${currentWeekStart.getFullYear()}`;
             
             const timeSelect = document.getElementById('start-time-select');
-            timeSelect.innerHTML = `<option value="${selectedSlot.time}">${selectedSlot.time}</option>`;
+            timeSelect.innerHTML = `<option value="${selectedSlot.time}">${selectedSlot.time.substring(0,5)}</option>`;
             timeSelect.disabled = false;
             
+            highlightSelectedSlots();
+
             document.getElementById('capacity-info-container').classList.remove('hidden');
             const remainingVal = document.getElementById('remaining-capacity-val');
-            remainingVal.textContent = selectedSlot.available;
+            remainingVal.textContent = selectedSlot.effectiveAvailable;
             
-            if (selectedSlot.available > Math.floor(facilityCapacity * 0.3)) {
+            // Adjust remaining capacity text color
+            if (selectedSlot.effectiveAvailable > Math.floor(facilityCapacity * 0.3)) {
                 remainingVal.className = 'txt-green font-bold text-sm';
-            } else if (selectedSlot.available > Math.floor(facilityCapacity * 0.1)) {
+            } else if (selectedSlot.effectiveAvailable > Math.floor(facilityCapacity * 0.1)) {
                 remainingVal.className = 'txt-tertiary font-bold text-sm';
             } else {
                 remainingVal.className = 'txt-error font-bold text-sm';
@@ -206,19 +296,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Dynamic Team Size Fill & Validation ---
+    // --- Capacity & Limit Validation ---
     const teamSelect = document.getElementById('team-select');
     const teamSizeInput = document.getElementById('team-size-input');
+    let maxAllowedSize = 0;
 
+    // Detect team changes to set max allowable size
     if (teamSelect) {
         teamSelect.addEventListener('change', function() {
             const selectedOption = this.options[this.selectedIndex];
-            const size = selectedOption.getAttribute('data-size');
-            teamSizeInput.value = size; // Auto fill the real member count from DB
+            maxAllowedSize = parseInt(selectedOption.getAttribute('data-size')) || 0;
+            teamSizeInput.value = maxAllowedSize; 
             validateFrontendLimits();
         });
     }
 
+    // Validate if user manually types in the team size input
+    teamSizeInput?.addEventListener('input', () => {
+        validateFrontendLimits();
+    });
+
+    // Main validation logic (Checks limits, enables/disables submit button)
     function validateFrontendLimits() {
         const errorMsg = document.getElementById('capacity-error-msg');
         const submitBtn = document.getElementById('submit-booking-btn');
@@ -230,16 +328,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const teamSize = parseInt(teamSizeInput.value) || 0;
-        
         errorMsg.classList.add('hidden');
         errorMsg.textContent = '';
         teamSizeInput.style.borderColor = '';
 
+        // Block submission if entered size exceeds assigned team count
+        if (teamSize > maxAllowedSize) {
+            errorMsg.textContent = `Team size cannot exceed your assigned team member count (${maxAllowedSize}).`;
+            errorMsg.classList.remove('hidden');
+            submitBtn.disabled = true;
+            teamSizeInput.style.borderColor = 'var(--error)';
+            return;
+        }
+
         if (teamSize > 0) {
             submitBtn.disabled = false;
-            
-            if (teamSize > selectedSlot.available && !limitToggle.checked) {
-                errorMsg.textContent = `Capacity Exceeded! Tick "Special Request" to proceed.`;
+            // Warn if booking exceeds facility capacity (unless special request is checked)
+            if (teamSize > selectedSlot.effectiveAvailable && !limitToggle.checked) {
+                errorMsg.textContent = `Capacity Exceeded in selected duration slots! Tick "Special Request" to proceed.`;
                 errorMsg.classList.remove('hidden');
                 submitBtn.disabled = true;
                 teamSizeInput.style.borderColor = 'var(--error)';
@@ -249,40 +355,36 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function setupToggle(btnId, type, idVal) {
-        const btn = document.getElementById(btnId);
-        if(btn) {
-            btn.addEventListener('click', function() {
-                if(type === 'gym') {
-                    currentGymId = idVal;
-                    document.getElementById('btn-gym-01').classList.remove('active');
-                    document.getElementById('btn-gym-02').classList.remove('active');
-                } else {
-                    currentShift = idVal;
-                    document.getElementById('btn-morning').classList.remove('active');
-                    document.getElementById('btn-evening').classList.remove('active');
-                }
-                this.classList.add('active');
-                selectedSlot = null;
-                fetchAndRenderGrid();
-            });
-        }
-    }
-    
-    // IMPORTANT: Facility ID should match `facility` table in your DB
-    setupToggle('btn-gym-01', 'gym', 1);
-    setupToggle('btn-gym-02', 'gym', 2);
-    setupToggle('btn-morning', 'shift', 'morning');
-    setupToggle('btn-evening', 'shift', 'evening');
+    // --- UI Toggles (Facilities and Shifts) ---
+    document.querySelectorAll('#gym-toggle-container .toggle-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('#gym-toggle-container .toggle-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentGymId = parseInt(this.getAttribute('data-facility-id'));
+            fetchAndResetForm();
+        });
+    });
 
+    document.querySelectorAll('#time-toggle-container .toggle-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('#time-toggle-container .toggle-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentShift = this.id === 'btn-morning' ? 'morning' : 'evening';
+            fetchAndResetForm();
+        });
+    });
+
+    // Initialization calls
     updateCalendarHeaders();
     fetchAndRenderGrid();
 
+    // --- Form Submission & Modals ---
     const limitToggle = document.getElementById('limit-toggle');
     const specialRequestField = document.getElementById('special-request-field');
     const submitBtn = document.getElementById('submit-booking-btn');
     const modal = document.getElementById('confirmation-modal');
     
+    // Toggle UI state when "Special Request" checkbox is clicked
     if (limitToggle) {
         limitToggle.addEventListener('change', (e) => {
             const btnText = document.getElementById('btn-text');
@@ -308,18 +410,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Submit booking request via AJAX
     if (submitBtn) {
         submitBtn.addEventListener('click', () => {
             if (submitBtn.disabled) return;
             const errorMsg = document.getElementById('capacity-error-msg');
             
+            // Build the data payload
             const formData = new FormData();
             formData.append('action', 'create_booking');
             formData.append('facility_id', currentGymId);
             formData.append('date', selectedSlot.dbdate); 
             formData.append('time', selectedSlot.time);
             formData.append('duration', document.getElementById('duration-select').value);
-            formData.append('team_id', teamSelect.value); // Sending Team_ID for the DB
+            formData.append('team_id', teamSelect.value); 
             formData.append('team_size', teamSizeInput.value);
             formData.append('is_special', limitToggle.checked);
             
@@ -327,6 +431,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 formData.append('reason', document.getElementById('reason-input').value);
             }
 
+            // Set button to loading state
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="material-symbols-outlined text-[20px] animate-spin">sync</span> Processing...';
 
@@ -339,14 +444,40 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (data.success) {
                     showSuccessModal(data.status);
                     
+                    // Reset form fields
                     document.getElementById('facility-booking-form').reset();
                     if(limitToggle.checked) limitToggle.click();
-                    document.getElementById('selected-date-display').textContent = 'Select a slot';
-                    document.getElementById('capacity-info-container').classList.add('hidden');
-                    errorMsg.classList.add('hidden');
                     
-                    fetchAndRenderGrid(); 
+                    // Refresh the grid slots dynamically
+                    fetchAndResetForm(); 
+
+                    // Dynamically prepend the new booking to the history table without reloading
+                    const tbody = document.querySelector('.admin-data-table tbody');
+                    if (tbody) {
+                        const emptyRow = tbody.querySelector('td[colspan="5"]');
+                        if (emptyRow) emptyRow.parentElement.remove();
+
+                        const b = data.new_booking;
+                        let badgeStyle = '';
+                        if (b.Status === 'Approved') {
+                            badgeStyle = 'background: rgba(74,225,118,0.1); border-color: rgba(74,225,118,0.3); color: var(--secondary);';
+                        } else {
+                            badgeStyle = 'background: rgba(247,190,29,0.1); border-color: rgba(247,190,29,0.3); color: var(--tertiary);';
+                        }
+
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td><strong>${b.Facility_Name}</strong></td>
+                            <td>${b.Team_Name}</td>
+                            <td><span class="mono">${b.Reserve_Date}</span></td>
+                            <td><span class="mono">${b.Time_Slot}</span></td>
+                            <td><span class="badge-status" style="${badgeStyle}">${b.Status}</span></td>
+                        `;
+                        tbody.prepend(tr);
+                    }
+
                 } else {
+                    // Show backend error (e.g. duplicate booking)
                     errorMsg.textContent = data.error;
                     errorMsg.classList.remove('hidden');
                 }
@@ -356,6 +487,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 errorMsg.classList.remove('hidden');
             })
             .finally(() => {
+                // Restore button state
                 submitBtn.disabled = false;
                 const isSpec = limitToggle.checked;
                 submitBtn.innerHTML = `<span class="material-symbols-outlined text-[20px]" id="btn-icon">${isSpec ? 'send' : 'check_circle'}</span> <span id="btn-text">${isSpec ? 'Submit Special Request' : 'Confirm Selection'}</span>`;
@@ -363,6 +495,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Configure and trigger the appropriate modal UI based on status
     function showSuccessModal(status) {
         modal.classList.remove('hidden');
         setTimeout(() => {
@@ -388,11 +521,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Modal dismissal logic
     document.querySelectorAll('.close-modal-action').forEach(btn => {
         btn.addEventListener('click', () => {
             modal.classList.add('opacity-0');
             document.getElementById('modal-box-inner').classList.add('scale-95');
-            setTimeout(() => modal.classList.add('hidden'), 300);
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
         });
     });
 });

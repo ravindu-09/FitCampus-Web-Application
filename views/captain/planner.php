@@ -13,7 +13,6 @@ if (!isset($_SESSION['user_id'])) {
 $page_title = "Workout Planner | FitCampus";
 
 $extra_js = [
-    "member/dashboard.js",
     "captain/planner.js" // UI logic and future AJAX calls
 ];
 

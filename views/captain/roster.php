@@ -12,7 +12,6 @@ if (!isset($_SESSION['user_id'])) {
 $page_title = "Team Roster | FitCampus";
 
 $extra_js = [
-    "member/dashboard.js", // Required for sidebar functionality
     "captain/roster.js"
 ];
 

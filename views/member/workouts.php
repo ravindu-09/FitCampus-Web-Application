@@ -13,7 +13,6 @@ $user_id = $_SESSION['user_id'];
 $page_title = "Workout Builder | FitCampus";
 
 $extra_js = [
-    "member/dashboard.js",
     "member/workouts.js"
 ];
 

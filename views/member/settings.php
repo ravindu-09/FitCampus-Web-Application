@@ -12,7 +12,6 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];$page_title = "Account Settings | FitCampus";
 
 $extra_js = [
-    "member/dashboard.js",
     "member/settings.js"
 ];
 
