@@ -1,0 +1,73 @@
+/* ==========================================================================
+   COMMON NOTIFICATIONS STYLES
+   ========================================================================== */
+.nt-mobile-header { display: none; }
+@media (max-width: 1024px) {
+  .nt-mobile-header { display: block; margin-bottom: 24px; }
+}
+
+.nt-container {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  max-width: 900px;
+}
+
+.nt-category-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.nt-category-title {
+  font-size: 11px;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: 4px;
+  margin-top: 0;
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+
+.nt-card {
+  display: flex;
+  gap: 16px;
+  padding: 24px;
+  align-items: flex-start;
+  transition: transform 0.3s ease;
+  border-radius: 16px;
+  background-color: var(--surface-high);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+.nt-card:hover { transform: scale(1.01); }
+
+.nt-border-tertiary { border-left: 4px solid var(--tertiary); }
+.nt-border-primary { border-left: 4px solid var(--primary); }
+.nt-border-secondary { border-left: 4px solid var(--secondary); }
+
+.nt-icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid;
+}
+
+.bg-tertiary-dim { background-color: rgba(247, 190, 29, 0.1); }
+.border-tertiary-dim { border-color: rgba(247, 190, 29, 0.2); }
+.text-tertiary { color: var(--tertiary); }
+
+.bg-primary-dim { background-color: rgba(223, 183, 255, 0.1); }
+.border-primary-dim { border-color: rgba(223, 183, 255, 0.2); }
+.text-primary { color: var(--primary); }
+
+.nt-content { flex: 1; }
+.nt-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+.nt-title { font-size: 18px; font-weight: 600; color: var(--on-surface); margin: 0; }
+.nt-time { font-size: 11px; color: rgba(207, 194, 212, 0.5); font-family: var(--font-mono); }
+.nt-desc { font-size: 14px; line-height: 1.6; color: var(--on-surface-variant); margin: 0; }
+.nt-actions { margin-top: 16px; display: flex; gap: 8px; }

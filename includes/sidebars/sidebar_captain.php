@@ -6,8 +6,8 @@ $user_reg_no = isset($_SESSION['reg_no']) ? $_SESSION['reg_no'] : 'Captain';
 
 // Dynamic path prefixing based on current directory (member vs captain)
 $current_dir = basename(dirname($_SERVER['PHP_SELF']));
-$member_prefix = ($current_dir === 'captain') ? '../member/' : '';
-$captain_prefix = ($current_dir === 'captain') ? '' : '../captain/';
+$member_prefix = ($current_dir === 'captain' || $current_dir === 'common') ? '../member/' : '';
+$captain_prefix = ($current_dir === 'member' || $current_dir === 'common') ? '../captain/' : '';
 
 // Uploaded Avatar path check
 $profile_img_name = isset($_SESSION['profile_image']) ? $_SESSION['profile_image'] : 'default_avatar.png';

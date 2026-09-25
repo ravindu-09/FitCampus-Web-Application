@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 24, 2026 at 01:28 PM
+-- Generation Time: Sep 25, 2026 at 11:50 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -98,11 +98,29 @@ INSERT INTO `booking` (`Booking_ID`, `Team_ID`, `Requested_By`, `Facility_ID`, `
 (40, 3, 21, 1, 1, NULL, '2026-09-24 16:23:50', '2026-09-24', '07:00:00', '09:00:00', 'Approved', ''),
 (41, 3, 21, 1, 1, NULL, '2026-09-24 16:24:05', '2026-09-24', '08:00:00', '09:00:00', 'Approved', ''),
 (42, 3, 21, 1, 1, NULL, '2026-09-24 16:25:19', '2026-09-26', '08:00:00', '10:00:00', 'Approved', ''),
-(43, 3, 21, 1, 1, NULL, '2026-09-24 16:25:30', '2026-09-26', '09:00:00', '10:00:00', 'Pending', 'hrdzhdh'),
+(43, 3, 21, 1, 1, 4, '2026-09-24 16:25:30', '2026-09-26', '09:00:00', '10:00:00', 'Approved', 'hrdzhdh'),
 (44, 3, 21, 2, 1, NULL, '2026-09-24 16:45:00', '2026-10-01', '14:00:00', '16:00:00', 'Approved', ''),
-(45, 3, 21, 2, 1, NULL, '2026-09-24 16:45:27', '2026-10-01', '15:00:00', '16:00:00', 'Pending', 'sfagag'),
-(46, 3, 21, 2, 1, NULL, '2026-09-24 16:48:01', '2026-10-02', '15:00:00', '16:00:00', 'Pending', 'ssgaf'),
-(47, 3, 21, 2, 1, NULL, '2026-09-24 16:48:19', '2026-10-01', '14:00:00', '15:00:00', 'Pending', 'xcbshsh');
+(45, 3, 21, 2, 1, 4, '2026-09-24 16:45:27', '2026-10-01', '15:00:00', '16:00:00', 'Approved', 'sfagag'),
+(46, 3, 21, 2, 1, 4, '2026-09-24 16:48:01', '2026-10-02', '15:00:00', '16:00:00', 'Rejected', 'Maintenance'),
+(48, 3, 21, 1, 1, NULL, '2026-09-24 17:40:26', '2026-10-07', '14:00:00', '16:00:00', 'Approved', ''),
+(49, 3, 21, 1, 1, 4, '2026-09-24 17:40:58', '2026-10-07', '15:00:00', '16:00:00', 'Approved', 'fbhdndn'),
+(50, 3, 21, 1, 1, NULL, '2026-09-24 17:41:23', '2026-10-10', '15:00:00', '16:00:00', 'Approved', ''),
+(51, 1, 2, 1, 2, NULL, '2026-09-24 18:00:50', '2026-10-09', '15:00:00', '17:00:00', 'Approved', ''),
+(52, 1, 2, 1, 2, NULL, '2026-09-24 18:02:07', '2026-10-07', '15:00:00', '16:00:00', 'Approved', ''),
+(53, 5, 2, 1, 2, NULL, '2026-09-24 18:18:16', '2026-10-07', '17:00:00', '18:00:00', 'Approved', ''),
+(54, 1, 2, 1, 2, NULL, '2026-09-25 10:17:41', '2026-09-25', '17:00:00', '19:00:00', 'Approved', ''),
+(55, 1, 2, 1, 2, 4, '2026-09-25 10:20:02', '2026-09-25', '17:00:00', '18:00:00', 'Rejected', 'ane apita meka denna'),
+(56, 1, 2, 2, 6, NULL, '2026-09-25 11:48:16', '2026-10-01', '15:00:00', '16:00:00', 'Cancelled', 'asfafagwsdgdvsv'),
+(57, 1, 2, 2, 6, 4, '2026-09-25 12:00:13', '2026-10-01', '15:00:00', '16:00:00', 'Rejected', 'nope'),
+(59, 6, 2, 2, 1, 4, '2026-09-25 12:41:28', '2026-10-01', '15:00:00', '16:00:00', 'Approved', 'dfhsfgjfhm'),
+(60, 1, 2, 2, 6, 4, '2026-09-25 12:50:36', '2026-10-01', '15:00:00', '16:00:00', 'Approved', 'dsgshsdjdgj'),
+(61, 1, 2, 2, 6, 4, '2026-09-25 12:55:19', '2026-10-01', '15:00:00', '16:00:00', 'Rejected', 'Maintenance'),
+(62, 1, 2, 2, 6, NULL, '2026-09-25 13:11:59', '2026-10-01', '15:00:00', '16:00:00', 'Pending', 'wehawrhgb'),
+(67, 1, 2, 2, 5, 4, '2026-09-26 01:58:58', '2026-09-25', '08:00:00', '09:00:00', 'Rejected', 'Maintenance'),
+(68, 1, 2, 2, 5, 4, '2026-09-26 02:05:36', '2026-09-23', '10:00:00', '11:00:00', 'Approved', 'please we have special meet'),
+(69, 2, 2, 1, 1, NULL, '2026-09-26 02:36:50', '2026-09-26', '08:00:00', '10:00:00', 'Approved', ''),
+(71, 1, 2, 1, 5, NULL, '2026-09-26 03:14:26', '2026-09-24', '10:00:00', '11:00:00', 'Approved', ''),
+(72, 1, 2, 1, 5, 4, '2026-09-26 03:15:36', '2026-09-23', '07:00:00', '08:00:00', 'Rejected', 'Sorry, cann\'t give access');
 
 -- --------------------------------------------------------
 
@@ -200,7 +218,7 @@ CREATE TABLE `facility` (
 
 INSERT INTO `facility` (`Facility_ID`, `Facility_Name`, `Location`, `Capacity`, `Open_Time`, `Close_Time`) VALUES
 (1, 'Main Gym', 'Pavilion complex', 45, '06:00:00', '18:00:00'),
-(2, 'Gym 2', 'Pavilion complex2', 40, '06:00:00', '18:00:00');
+(2, 'Gym 2', 'Pavilion complex2', 10, '06:00:00', '18:00:00');
 
 -- --------------------------------------------------------
 
@@ -280,6 +298,30 @@ CREATE TABLE `instructor` (
 INSERT INTO `instructor` (`Instructor_ID`, `Facility_ID`) VALUES
 (3, NULL),
 (15, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `notification`
+--
+
+CREATE TABLE `notification` (
+  `Notification_ID` int(10) UNSIGNED NOT NULL,
+  `User_ID` int(10) UNSIGNED DEFAULT NULL,
+  `Team_ID` int(10) UNSIGNED DEFAULT NULL,
+  `Title` varchar(150) NOT NULL,
+  `Message` text NOT NULL,
+  `Created_At` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `notification`
+--
+
+INSERT INTO `notification` (`Notification_ID`, `User_ID`, `Team_ID`, `Title`, `Message`, `Created_At`) VALUES
+(8, NULL, 1, 'Special Request Rejected', 'Your team\'s Special Request was Rejected. Reason: Maintenance', '2026-09-26 02:00:04'),
+(9, 2, NULL, 'Special Request Approved', 'Your Special Request for a facility slot has been Approved.', '2026-09-26 02:06:05'),
+(10, NULL, 1, 'Special Request Rejected', 'Your team \'UOC Track & Field\' special request for 2026-09-23 (07:00 AM - 08:00 AM) was Rejected. Reason: Sorry, cann\'t give access', '2026-09-26 03:16:19');
 
 -- --------------------------------------------------------
 
@@ -365,14 +407,19 @@ CREATE TABLE `team_member` (
 --
 
 INSERT INTO `team_member` (`Team_ID`, `User_ID`, `Role_In_Team`) VALUES
-(1, 1, 'Member'),
 (1, 2, 'Captain'),
+(1, 10, 'Member'),
+(1, 11, 'Member'),
+(1, 21, 'Member'),
+(1, 22, 'Member'),
 (2, 2, 'Captain'),
 (3, 21, 'Captain'),
 (4, 22, 'Captain'),
-(5, 2, 'Captain'),
+(5, 2, 'Member'),
+(5, 21, 'Captain'),
 (5, 22, 'Member'),
-(6, 2, 'Captain');
+(6, 2, 'Member'),
+(6, 21, 'Captain');
 
 -- --------------------------------------------------------
 
@@ -432,12 +479,12 @@ CREATE TABLE `university_student` (
 --
 
 INSERT INTO `university_student` (`User_ID`, `Registration_Number`, `NIC`, `DOB`, `Faculty`, `QR_Token`, `Gender`, `Profile_Image`, `Registration_Photo`, `Status`, `Life_Percentage`, `Created_At`, `Emergency_Contact`, `Student_ID_Front`, `Student_ID_Back`, `Date_of_Final_Exam`) VALUES
-(1, '2022CS001', '200112345678', '2001-05-15', 'Computing', NULL, NULL, 'avatar_1_1789585265.jpeg', NULL, 'active', 100, '2026-08-17 11:20:44', NULL, NULL, NULL, NULL),
-(2, '2022CS002', '200187654321', '2001-08-20', 'Computing', NULL, NULL, NULL, NULL, 'active', 100, '2026-08-17 11:20:44', NULL, NULL, NULL, NULL),
+(2, '2022CS002', '200187654321', '2001-08-20', 'Computing', NULL, NULL, NULL, NULL, 'active', 20, '2026-08-17 11:20:44', NULL, NULL, NULL, NULL),
 (10, '2024cs107', '200334400460', '2003-12-09', 'School of Computing', NULL, 'male', 'avatar_10_1789592884.jpeg', 'avatar_6aab01406ecd0.jpg', 'active', 80, '2026-09-16 20:51:12', '0765414600', 'id_f_6aab01406de0c.jpg', 'id_b_6aab01406e54a.jpg', NULL),
 (11, '20147stu4law', '200444400460', '2005-06-07', 'Faculty of Law', NULL, 'male', 'avatar_6ab40a5a0cd48.jpg', 'avatar_6ab40a5a0cd48.jpg', 'active', 100, '2026-09-23 17:20:26', '0112946861', 'id_f_6ab40a5a0bc0b.jpg', 'id_b_6ab40a5a0c5af.jpg', NULL),
 (21, '2022CS021', '200112300021', '2001-01-10', 'Computing', NULL, NULL, 'default_avatar.png', NULL, 'active', 100, '2026-09-24 09:15:20', NULL, NULL, NULL, NULL),
-(22, '2022CS022', '200112300022', '2001-02-15', 'Computing', NULL, NULL, 'default_avatar.png', NULL, 'active', 100, '2026-09-24 09:15:20', NULL, NULL, NULL, NULL);
+(22, '2022CS022', '200112300022', '2001-02-15', 'Computing', NULL, NULL, 'default_avatar.png', NULL, 'active', 100, '2026-09-24 09:15:20', NULL, NULL, NULL, NULL),
+(23, '2024/cs/083', '200744400460', '2004-07-20', 'Faculty of Arts', NULL, 'male', 'avatar_6ab62a0725a44.jpeg', 'avatar_6ab62a0725a44.jpeg', 'active', 100, '2026-09-25 08:00:07', '0112946861', 'id_f_6ab62a0725161.png', 'id_b_6ab62a0725613.png', NULL);
 
 -- --------------------------------------------------------
 
@@ -459,7 +506,6 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`User_ID`, `First_Name`, `Last_Name`, `Email`, `Password`, `Role`) VALUES
-(1, 'Kasun', 'Perera', 'member@stu.cmb.ac.lk', '$2y$10$djFRCs4cYVX0s/3g0eCHkOGCbQ.z0anvCp4hGDF1361E2NlXOSnbK', 'Student'),
 (2, 'Ravindu', 'Lochana', 'captain@stu.cmb.ac.lk', '$2y$10$YcUbwJRQy3fTsfCpHFntkuJOZoSNLb6Lt21ZOjlxAV69FIaBn.JZ6', 'Student'),
 (3, 'Coach', 'Nuwan', 'instructor@cmb.ac.lk', '$2y$10$YcUbwJRQy3fTsfCpHFntkuJOZoSNLb6Lt21ZOjlxAV69FIaBn.JZ6', 'Instructor'),
 (4, 'System', 'Admin', 'admin@cmb.ac.lk', '$2y$10$YcUbwJRQy3fTsfCpHFntkuJOZoSNLb6Lt21ZOjlxAV69FIaBn.JZ6', 'Admin'),
@@ -467,7 +513,8 @@ INSERT INTO `user` (`User_ID`, `First_Name`, `Last_Name`, `Email`, `Password`, `
 (11, 'sunil', 'kularathna', 'ravindulochana3002@gmail.com', '$2y$10$ipfW/W903EY24pPZ7x6SMORFtdHcVPxVwyRcF.kbhWuFSS5Ge5BAq', 'Student'),
 (15, 'Jagath', 'Perera', 'chandimak188@gmail.com', '$2y$10$vZJPNK9XHq/pRqAxu1d7KuH7tizWkvEfqGtZ0akq1Cfj.Vp56SDji', 'Instructor'),
 (21, 'Sadun', 'Kumara', 'sadun@stu.cmb.ac.lk', '$2y$10$YcUbwJRQy3fTsfCpHFntkuJOZoSNLb6Lt21ZOjlxAV69FIaBn.JZ6', 'Student'),
-(22, 'Amal', 'Fernando', 'amal@stu.cmb.ac.lk', '$2y$10$YcUbwJRQy3fTsfCpHFntkuJOZoSNLb6Lt21ZOjlxAV69FIaBn.JZ6', 'Student');
+(22, 'Amal', 'Fernando', 'amal@stu.cmb.ac.lk', '$2y$10$YcUbwJRQy3fTsfCpHFntkuJOZoSNLb6Lt21ZOjlxAV69FIaBn.JZ6', 'Student'),
+(23, 'Super', 'Nova', 'member@stu2.cmb.ac.lk', '$2y$10$vbDTKD6UKISZ5bdW9U8LY.74RiMBap/Y.07Z7RSf7b4WWLWp1v7de', 'Student');
 
 --
 -- Indexes for dumped tables
@@ -582,6 +629,14 @@ ALTER TABLE `instructor`
   ADD KEY `fk_instructor_facility` (`Facility_ID`);
 
 --
+-- Indexes for table `notification`
+--
+ALTER TABLE `notification`
+  ADD PRIMARY KEY (`Notification_ID`),
+  ADD KEY `fk_notification_user` (`User_ID`),
+  ADD KEY `fk_notification_team` (`Team_ID`);
+
+--
 -- Indexes for table `penalty`
 --
 ALTER TABLE `penalty`
@@ -668,7 +723,7 @@ ALTER TABLE `attendance`
 -- AUTO_INCREMENT for table `booking`
 --
 ALTER TABLE `booking`
-  MODIFY `Booking_ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
+  MODIFY `Booking_ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
 
 --
 -- AUTO_INCREMENT for table `calorie_details`
@@ -719,6 +774,12 @@ ALTER TABLE `gym_rule`
   MODIFY `Rule_No` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `notification`
+--
+ALTER TABLE `notification`
+  MODIFY `Notification_ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
 -- AUTO_INCREMENT for table `penalty`
 --
 ALTER TABLE `penalty`
@@ -746,7 +807,7 @@ ALTER TABLE `team_workout`
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `User_ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `User_ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- Constraints for dumped tables
@@ -836,6 +897,13 @@ ALTER TABLE `gym_rule`
 ALTER TABLE `instructor`
   ADD CONSTRAINT `fk_instructor_facility` FOREIGN KEY (`Facility_ID`) REFERENCES `facility` (`Facility_ID`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_instructor_user` FOREIGN KEY (`Instructor_ID`) REFERENCES `user` (`User_ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `notification`
+--
+ALTER TABLE `notification`
+  ADD CONSTRAINT `fk_notification_team` FOREIGN KEY (`Team_ID`) REFERENCES `team` (`Team_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_notification_user` FOREIGN KEY (`User_ID`) REFERENCES `user` (`User_ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `penalty`

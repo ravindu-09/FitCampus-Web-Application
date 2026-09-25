@@ -1,11 +1,10 @@
+// assets/js/admin/user-approval.js
+
 document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('verificationModal');
     const closeBtn = document.getElementById('modalCloseBtn');
     const rejectToggleBtn = document.getElementById('btnRejectToggle');
     const approveBtn = document.getElementById('btnApproveAction');
-    const searchInput = document.getElementById('userSearchInput');
-    const dateFilter = document.getElementById('dateFilterSelect');
-    const tableRows = document.querySelectorAll('.verification-table-row');
 
     // 1. Inspect Document Modal Triggers
     document.querySelectorAll('.btn-inspect-trigger').forEach(btn => {
@@ -37,54 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (approveBtn) {
         approveBtn.addEventListener('click', () => submitDecision('approve'));
     }
-
-    // 5. Unified Live Search & Date Filter Handler
-    function applyCombinedFilters() {
-        const query = (searchInput?.value || '').toLowerCase().trim();
-        const filterRange = dateFilter?.value || 'all';
-
-        const now = new Date();
-        const todayYear = now.getFullYear();
-        const todayMonth = now.getMonth();
-        const todayDate = now.getDate();
-
-        tableRows.forEach(row => {
-            const searchData = (row.getAttribute('data-search') || '').toLowerCase();
-            const dateStr = row.getAttribute('data-date'); // Format: YYYY-MM-DD
-            
-            // Search text condition
-            const matchesSearch = !query || searchData.includes(query);
-
-            // Date condition
-            let matchesDate = true;
-            if (dateStr && filterRange !== 'all') {
-                const [rYear, rMonth, rDay] = dateStr.split('-').map(Number);
-                const rowDate = new Date(rYear, rMonth - 1, rDay);
-                const todayObj = new Date(todayYear, todayMonth, todayDate);
-
-                const diffTime = todayObj.getTime() - rowDate.getTime();
-                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-
-                if (filterRange === 'today') {
-                    matchesDate = (diffDays === 0);
-                } else if (filterRange === '7days') {
-                    matchesDate = (diffDays >= 0 && diffDays <= 7);
-                } else if (filterRange === '30days') {
-                    matchesDate = (diffDays >= 0 && diffDays <= 30);
-                }
-            }
-
-            row.style.display = (matchesSearch && matchesDate) ? '' : 'none';
-        });
-    }
-
-    if (searchInput) {
-        searchInput.addEventListener('input', applyCombinedFilters);
-    }
-
-    if (dateFilter) {
-        dateFilter.addEventListener('change', applyCombinedFilters);
-    }
 });
 
 /**
@@ -94,15 +45,18 @@ function openVerificationModal(user) {
     const modal = document.getElementById('verificationModal');
     if (!modal) return;
 
+    // Set User Meta Data
     document.getElementById('formUserId').value = user.user_id;
     document.getElementById('modalUserName').textContent = user.full_name;
     document.getElementById('modalUserSubtitle').textContent = (user.faculty || 'Undergraduate') + ' • Member ID: #' + user.user_id;
-    document.getElementById('modalRegNo').textContent = user.reg_no || 'UOC-Pending';
-    document.getElementById('modalEmail').textContent = user.email || 'N/A';
     
-    // Emergency contact mapping
-    document.getElementById('modalPhone').textContent = user.emergency_contact || '+94 7X XXX XXXX';
-    document.getElementById('modalDate').textContent = user.created_at || 'Just Now';
+    // Safely map new fields (DOB, NIC, Gender)
+    document.getElementById('modalRegNo').textContent = user.reg_no || 'N/A';
+    document.getElementById('modalEmail').textContent = user.email || 'N/A';
+    document.getElementById('modalPhone').textContent = user.emergency_contact || 'N/A';
+    document.getElementById('modalDob').textContent = user.dob || 'N/A';
+    document.getElementById('modalNic').textContent = user.nic || 'N/A';
+    document.getElementById('modalGender').textContent = user.gender ? user.gender.charAt(0).toUpperCase() + user.gender.slice(1) : 'N/A';
 
     // Set Avatar & Documents
     document.getElementById('modalAvatar').src = '../../assets/images/uploads/' + (user.profile_image || 'default_avatar.png');
@@ -113,11 +67,12 @@ function openVerificationModal(user) {
     const rejectionGroup = document.getElementById('rejectionGroup');
     if (rejectionGroup) {
         rejectionGroup.classList.add('hidden');
+        rejectionGroup.style.display = 'none';
         document.getElementById('rejectionReasonInput').value = '';
     }
 
     modal.classList.remove('hidden');
-    modal.classList.add('flex');
+    modal.style.display = 'flex';
 }
 
 /**
@@ -127,7 +82,7 @@ function closeVerificationModal() {
     const modal = document.getElementById('verificationModal');
     if (modal) {
         modal.classList.add('hidden');
-        modal.classList.remove('flex');
+        modal.style.display = 'none';
     }
 }
 
@@ -139,8 +94,9 @@ function handleRejectClick() {
     const formAction = document.getElementById('formAction');
     const reasonInput = document.getElementById('rejectionReasonInput');
 
-    if (group.classList.contains('hidden')) {
+    if (group.classList.contains('hidden') || group.style.display === 'none') {
         group.classList.remove('hidden');
+        group.style.display = 'block';
         reasonInput.focus();
         formAction.value = 'reject';
     } else {

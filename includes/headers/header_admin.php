@@ -15,6 +15,10 @@ $admin_name = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Admin Us
 // Extract first name for the greeting
 $display_first_name = explode(' ', $admin_name)[0];
 
+// Dynamic path prefixing based on current directory 
+$current_dir = basename(dirname($_SERVER['PHP_SELF']));
+$common_prefix = ($current_dir === 'common') ? '' : '../common/';
+
 // Dynamic Page Title
 $default_title = 'FitCampus - Admin Console';
 $page_title = isset($page_title) ? $page_title : $default_title;
@@ -38,17 +42,17 @@ $page_title = isset($page_title) ? $page_title : $default_title;
     <!-- Top Appbar -->
     <header class="admin-topbar">
         <div class="topbar-left">
-            <!-- Sidebar Toggle Button[cite: 2] -->
+            <!-- Sidebar Toggle Button -->
             <button id="sidebarToggleBtn" class="menu-toggle-btn" type="button" aria-label="Toggle Sidebar">
                 <span class="material-symbols-outlined">menu</span>
             </button>
 
             <h1 class="topbar-brand-title">FitCampus <span>Admin</span></h1>
 
-            <!-- Vertical Divider[cite: 2] -->
+            <!-- Vertical Divider -->
             <div class="divider-vertical desktop-only"></div>
 
-            <!-- Dynamic Admin Greeting[cite: 2] -->
+            <!-- Dynamic Admin Greeting -->
             <div class="user-greeting desktop-only">
                 <span class="greeting-heading">Hello, <?php echo htmlspecialchars($display_first_name, ENT_QUOTES, 'UTF-8'); ?></span>
                 <span class="greeting-sub">Ready to manage the system today?</span>
@@ -56,7 +60,8 @@ $page_title = isset($page_title) ? $page_title : $default_title;
         </div>
 
         <div class="topbar-right">
-            <a href="../../views/admin/alerts.php" class="topbar-icon-btn" title="View Alerts">
+            <!-- Notification link dynamically routed to common folder -->
+            <a href="<?php echo $common_prefix; ?>notifications.php" class="topbar-icon-btn" title="View Notifications">
                 <span class="material-symbols-outlined">notifications</span>
                 <span class="notification-badge-dot"></span>
             </a>
