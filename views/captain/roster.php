@@ -1,21 +1,9 @@
 <?php
 // views/captain/roster.php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
 
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../auth/login.php");
-    exit;
-}
+// Include Page Controller ONLY (No Direct Database Queries)
+require_once '../../controllers/captain/roster_page_controller.php';
 
-$page_title = "Team Roster | FitCampus";
-
-$extra_js = [
-    "captain/roster.js"
-];
-
-require_once '../../backend/captain/roster_backend.php';
 require_once '../../includes/headers/header_member.php';
 require_once '../../includes/sidebars/sidebar_captain.php';
 ?>
@@ -107,7 +95,8 @@ require_once '../../includes/sidebars/sidebar_captain.php';
                                             </td>
                                             <td class="bk-px-lg bk-py-md">
                                                 <?php if ($member['Role_In_Team'] !== 'Captain'): ?>
-                                                    <form action="roster.php?team_id=<?= $selected_team_id ?>" method="POST" onsubmit="return confirm('Are you sure you want to remove this member?');" style="margin:0;">
+                                                    <!-- Action path updated to controllers -->
+                                                    <form action="../../controllers/captain/roster_action.php" method="POST" onsubmit="return confirm('Are you sure you want to remove this member?');" style="margin:0;">
                                                         <input type="hidden" name="action" value="remove_member">
                                                         <input type="hidden" name="team_id" value="<?= $selected_team_id ?>">
                                                         <input type="hidden" name="remove_user_id" value="<?= $member['User_ID'] ?>">
@@ -143,7 +132,8 @@ require_once '../../includes/sidebars/sidebar_captain.php';
                     </div>
 
                     <?php if (!empty($selected_team_name)): ?>
-                        <form action="roster.php?team_id=<?= $selected_team_id ?>" method="POST" class="booking-form space-y-md">
+                        <!-- Action path updated to controllers -->
+                        <form action="../../controllers/captain/roster_action.php" method="POST" class="booking-form space-y-md">
                             <input type="hidden" name="action" value="add_member">
                             <input type="hidden" name="team_id" value="<?= $selected_team_id ?>">
                             

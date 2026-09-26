@@ -1,23 +1,8 @@
 <?php
 // views/common/notifications.php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
 
-// Redirect if not logged in
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../auth/login.php");
-    exit;
-}
-
-$page_title = "Notifications & Announcements | FitCampus";
-
-// Fetch the combined data from Backend
-require_once '../../backend/common/get_notifications.php';
-
-// Role Identification Logic
-$role = strtolower($_SESSION['role'] ?? '');
-$is_captain = isset($_SESSION['is_captain']) && $_SESSION['is_captain'] == 1;
+// Include Page Controller ONLY (No Direct Database Queries)
+require_once '../../controllers/common/notifications_page_controller.php';
 
 // 1. Load Appropriate Header
 if ($role === 'admin') {

@@ -40,7 +40,7 @@ require_once '../../includes/headers/header_auth.php';
         </div>
     <?php endif; ?>
 
-    <form action="../../backend/auth/register_process.php?step=3" method="POST" enctype="multipart/form-data" class="auth-form" id="step3Form">
+    <form action="../../controllers/auth/register_process.php?step=3" method="POST" enctype="multipart/form-data" class="auth-form" id="step3Form">
         
         <!-- ID Verification Section -->
         <section class="form-section-card">

@@ -1,53 +1,10 @@
 <?php
 // views/member/settings.php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
 
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../auth/login.php");
-    exit;
-}
-
-$user_id = $_SESSION['user_id'];$page_title = "Account Settings | FitCampus";
-
-$extra_js = [
-    "member/settings.js"
-];
-
-require_once '../../includes/db_connection.php';
-
-// Fetch Member Details
-$stmt =$pdo->prepare("
-    SELECT 
-        u.User_ID, 
-        u.First_Name, 
-        u.Last_Name, 
-        u.Email, 
-        s.Registration_Number, 
-        s.NIC, 
-        s.Faculty, 
-        s.Gender,
-        s.Profile_Image, 
-        s.Status AS student_status
-    FROM `user` u
-    LEFT JOIN `university_student` s ON u.User_ID = s.User_ID
-    WHERE u.User_ID = :uid
-    LIMIT 1
-");
-$stmt->execute([':uid' =>$user_id]);
-$member =$stmt->fetch();
-
-if (!$member) {
-    header("Location: ../../backend/auth/logout.php");
-    exit;
-}
-
-$avatar_filename = $member['Profile_Image'] ?? 'default_avatar.png';$has_custom_avatar = !empty($avatar_filename) &&$avatar_filename !== 'default_avatar.png' && file_exists('../../assets/images/uploads/' . $avatar_filename);$avatar_path = $has_custom_avatar ? '../../assets/images/uploads/' . htmlspecialchars($avatar_filename) : null;
+// Include Page Controller ONLY (No Direct DB Connections)
+require_once '../../controllers/member/settings_page_controller.php';
 
 require_once '../../includes/headers/header_member.php';
-
-$is_captain = isset($_SESSION['is_captain']) &&$_SESSION['is_captain'] == 1;
 
 if ($is_captain) {
     require_once '../../includes/sidebars/sidebar_captain.php';
@@ -102,7 +59,8 @@ if ($is_captain) {
 
                     <div class="avatar-action-info">
                         <div class="avatar-buttons-wrap">
-                            <form action="../../backend/member/update_avatar.php" method="POST" enctype="multipart/form-data" class="st-inline-block">
+                            <!-- Action path updated to controllers -->
+                            <form action="../../controllers/member/update_avatar.php" method="POST" enctype="multipart/form-data" class="st-inline-block">
                                 <input type="hidden" name="action" value="upload">
                                 <label for="profile_image" class="btn btn-glass btn-sm upload-btn-label">
                                     <span class="material-symbols-outlined">photo_camera</span>
@@ -112,7 +70,8 @@ if ($is_captain) {
                             </form>
 
                             <?php if ($has_custom_avatar): ?>
-                                <form action="../../backend/member/update_avatar.php" method="POST" class="st-inline-block" onsubmit="return confirm('Are you sure you want to remove your profile photo?');">
+                                <!-- Action path updated to controllers -->
+                                <form action="../../controllers/member/update_avatar.php" method="POST" class="st-inline-block" onsubmit="return confirm('Are you sure you want to remove your profile photo?');">
                                     <input type="hidden" name="action" value="remove">
                                     <button type="submit" class="btn btn-danger-action btn-sm">
                                         <span class="material-symbols-outlined">delete</span>
@@ -130,7 +89,8 @@ if ($is_captain) {
                 <div class="section-title-wrap">
                     <h3>Security &amp; Password</h3>
                 </div>
-                <form action="../../backend/member/update_password.php" method="POST" class="auth-form">
+                <!-- Action path updated to controllers -->
+                <form action="../../controllers/member/update_password.php" method="POST" class="auth-form">
                     <div class="form-group">
                         <label for="current_password" class="form-label">Current Password</label>
                         <div class="input-wrapper">
@@ -182,7 +142,7 @@ if ($is_captain) {
                         <label class="form-label">Full Name</label>
                         <div class="input-wrapper">
                             <span class="material-symbols-outlined input-icon">badge</span>
-                            <input type="text" class="form-control read-only-input" value="<?php echo htmlspecialchars($member['First_Name'] . ' ' .$member['Last_Name']); ?>" readonly>
+                            <input type="text" class="form-control read-only-input" value="<?php echo htmlspecialchars($member['First_Name'] . ' ' . $member['Last_Name']); ?>" readonly>
                         </div>
                     </div>
 

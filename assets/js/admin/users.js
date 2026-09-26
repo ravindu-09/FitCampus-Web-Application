@@ -1,3 +1,4 @@
+// assets/js/admin/users.js
 document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('filterSearch');
     const roleSelect = document.getElementById('filterRole');
@@ -39,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Edit Role Functionality - Global Teams List එක pass කිරීම
+    // Edit Role Functionality 
     document.querySelectorAll('.btn-role-user').forEach(btn => {
         btn.addEventListener('click', function() {
             const userData = JSON.parse(this.getAttribute('data-user'));
@@ -95,7 +96,8 @@ window.updateStudentMeta = function() {
     
     if (typeof csrfToken !== 'undefined') formData.append('csrf_token', csrfToken);
 
-    fetch('../../backend/admin/user_manage_action.php', { method: 'POST', body: formData })
+    // Path updated to controllers
+    fetch('../../controllers/admin/user_manage_action.php', { method: 'POST', body: formData })
         .then(res => {
             if (!res.ok) throw new Error("Server or Network error");
             return res.json();
@@ -183,7 +185,8 @@ window.submitRoleChange = function(actionType, explicitTeamId = null) {
     
     if (typeof csrfToken !== 'undefined') formData.append('csrf_token', csrfToken);
 
-    fetch('../../backend/admin/user_manage_action.php', { method: 'POST', body: formData })
+    // Path updated to controllers
+    fetch('../../controllers/admin/user_manage_action.php', { method: 'POST', body: formData })
         .then(res => {
             if (!res.ok) throw new Error("Server or Network error");
             return res.json();

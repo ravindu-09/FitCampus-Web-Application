@@ -86,7 +86,8 @@ $avatar_url = '../../assets/images/uploads/' . htmlspecialchars($profile_img_nam
             </div>
         </div>
 
-        <a class="sidebar-settings-link" href="../../backend/auth/logout.php">
+        <!-- Path updated from backend to controllers -->
+        <a class="sidebar-settings-link" href="../../controllers/auth/logout.php">
             <span class="material-symbols-outlined">logout</span>
             <span>Sign Out</span>
         </a>

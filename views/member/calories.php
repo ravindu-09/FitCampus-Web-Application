@@ -1,25 +1,10 @@
 <?php
 // views/member/calories.php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
 
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../auth/login.php");
-    exit;
-}
+// 1. Include Page Controller ONLY (No Direct DB/Model Calls in View)
+require_once '../../controllers/member/calories_page_controller.php';
 
-$user_id = $_SESSION['user_id'];
-$page_title = "Nutrition & Activity Tracker | FitCampus";
-
-$extra_js = [
-    "member/calories.js"
-];
-
-require_once '../../includes/db_connection.php';
 require_once '../../includes/headers/header_member.php';
-
-$is_captain = isset($_SESSION['is_captain']) && $_SESSION['is_captain'] == 1;
 
 if ($is_captain) {
     require_once '../../includes/sidebars/sidebar_captain.php';
@@ -80,7 +65,8 @@ if ($is_captain) {
                 <h3 class="form-title txt-purple cal-spacing-md">
                     <span class="material-symbols-outlined">add_circle</span> Log Nutrition (Intake)
                 </h3>
-                <form method="POST" action="../../backend/member/calorie_action.php?action=add_intake">
+                <!-- Action path updated to controllers -->
+                <form method="POST" action="../../controllers/member/calorie_action.php?action=add_intake">
                     <input type="hidden" name="log_date" id="intake-hidden-date" value="<?php echo date('Y-m-d'); ?>">
                     
                     <div class="form-group-cal cal-spacing-md">
@@ -138,7 +124,8 @@ if ($is_captain) {
                 <h3 class="form-title txt-yellow cal-spacing-md">
                     <span class="material-symbols-outlined">directions_run</span> Log Activity (Burned)
                 </h3>
-                <form method="POST" action="../../backend/member/calorie_action.php?action=add_burned">
+                <!-- Action path updated to controllers -->
+                <form method="POST" action="../../controllers/member/calorie_action.php?action=add_burned">
                     <input type="hidden" name="log_date" id="burned-hidden-date" value="<?php echo date('Y-m-d'); ?>">
 
                     <div class="form-group-cal cal-spacing-md">

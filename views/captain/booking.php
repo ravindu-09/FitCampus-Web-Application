@@ -1,64 +1,11 @@
 <?php
 // views/captain/booking.php
 
-// Check session status and initiate if not already started
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+// Include Page Controller ONLY (No Direct Database Queries)
+require_once '../../controllers/captain/booking_page_controller.php';
 
-// Redirect unauthorized users to login
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../auth/login.php");
-    exit;
-}
-
-$user_id = $_SESSION['user_id'];
-$page_title = "Facilities Booking | FitCampus";
-
-// Include page-specific JS script
-$extra_js = [
-    "captain/booking.js"
-];
-
-require_once '../../includes/db_connection.php';
 require_once '../../includes/headers/header_member.php';
 require_once '../../includes/sidebars/sidebar_captain.php';
-
-// Fetch all teams where the current user holds the 'Captain' role
-$captain_teams = [];
-try {
-    $stmt = $pdo->prepare("
-        SELECT t.Team_ID, t.Team_Name, t.Sport, 
-               (SELECT COUNT(*) FROM team_member WHERE Team_ID = t.Team_ID) as Member_Count 
-        FROM team t 
-        JOIN team_member tm ON t.Team_ID = tm.Team_ID 
-        WHERE tm.User_ID = ? AND tm.Role_In_Team = 'Captain'
-    ");
-    $stmt->execute([$user_id]);
-    $captain_teams = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {}
-
-// Fetch all facilities to generate toggle buttons
-$facilities = [];
-try {
-    $stmtFac = $pdo->query("SELECT Facility_ID, Facility_Name FROM facility ORDER BY Facility_ID ASC");
-    $facilities = $stmtFac->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {}
-
-// Fetch the booking history specific to the logged-in captain
-$booking_history = [];
-try {
-    $stmtHist = $pdo->prepare("
-        SELECT b.*, f.Facility_Name, t.Team_Name 
-        FROM booking b
-        JOIN facility f ON b.Facility_ID = f.Facility_ID
-        JOIN team t ON b.Team_ID = t.Team_ID
-        WHERE b.Requested_By = ?
-        ORDER BY b.Reserve_Date DESC, b.Start_Time DESC
-    ");
-    $stmtHist->execute([$user_id]);
-    $booking_history = $stmtHist->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {}
 ?>
 
 <!-- Main layout wrapper -->

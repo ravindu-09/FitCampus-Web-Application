@@ -130,8 +130,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (intakeHiddenDate) intakeHiddenDate.value = dateStr;
         if (burnedHiddenDate) burnedHiddenDate.value = dateStr;
 
-        // Fetch data from the backend via AJAX
-        fetch(`../../backend/member/calorie_action.php?action=get_date_data&date=${dateStr}`)
+        // Fetch data from the controllers via AJAX (Path updated to controllers)
+        fetch(`../../controllers/member/calorie_action.php?action=get_date_data&date=${dateStr}`)
             .then(res => res.json())
             .then(data => {
                 if (!data || !data.success) return;
@@ -255,7 +255,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 formData.append('action', 'reset_date');
                 formData.append('date', dateStr);
 
-                fetch('../../backend/member/calorie_action.php', { method: 'POST', body: formData })
+                // Path updated to controllers
+                fetch('../../controllers/member/calorie_action.php', { method: 'POST', body: formData })
                 .then(res => res.json())
                 .then(data => {
                     // Reload data if reset was successful

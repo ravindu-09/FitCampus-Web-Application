@@ -1,16 +1,11 @@
 <?php
 // views/admin/bookings.php
-require_once '../../includes/db_connection.php';
+
+// Include the Page Controller ONLY (No Direct DB Connection)
+require_once '../../controllers/admin/bookings_page_controller.php';
 
 $page_title = 'Facility Bookings | Admin';
 $extra_js = ["admin/bookings.js"];
-
-// Fetch facilities dynamically
-$facilities = [];
-try {
-    $stmtFac = $pdo->query("SELECT Facility_ID, Facility_Name FROM facility ORDER BY Facility_ID ASC");
-    $facilities = $stmtFac->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {}
 
 require_once '../../includes/headers/header_admin.php';
 ?>

@@ -59,7 +59,7 @@ require_once '../../includes/headers/header_auth.php';
                 </div>
             <?php endif; ?>
 
-            <form action="../../backend/auth/login_process.php" method="POST" id="loginForm" class="auth-form">
+            <form action="../../controllers/auth/login_process.php" method="POST" id="loginForm" class="auth-form">
                 
                 <div class="form-group">
                     <label for="identifier" class="form-label">Institutional Email / Reg No</label>

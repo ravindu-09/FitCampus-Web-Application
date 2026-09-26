@@ -5,12 +5,12 @@ $page_title = "Member Dashboard | FitCampus";
 // Script Driver via footer_common.php
 $extra_js = "member/dashboard.js";
 
-// Backend Data Processor Include
-require_once '../../backend/member/get_dashboard_data.php';
+// 1. Include Page Controller ONLY (No Direct DB Connection)
+require_once '../../controllers/member/dashboard_page_controller.php';
 
 require_once '../../includes/headers/header_member.php';
 
-// Check if the logged-in member is a captain based on login_process.php session
+// Check if the logged-in member is a captain based on session
 $is_captain = isset($_SESSION['is_captain']) && $_SESSION['is_captain'] == 1;
 
 // Load specific Headers and Sidebars dynamically

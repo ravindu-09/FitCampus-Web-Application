@@ -1,28 +1,10 @@
 <?php
 // views/member/leaderboard.php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
 
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../auth/login.php");
-    exit;
-}
-
-$user_id = $_SESSION['user_id'];
-$page_title = "Leaderboard | FitCampus";
-
-// JS file linked directly to leaderboard.js
-$extra_js = [
-    "member/leaderboard.js"
-];
-
-require_once '../../includes/db_connection.php';
+// Include Page Controller ONLY (No Direct Database Queries)
+require_once '../../controllers/member/leaderboard_page_controller.php';
 
 require_once '../../includes/headers/header_member.php';
-
-// Check if the logged-in member is a captain based on login_process.php session
-$is_captain = isset($_SESSION['is_captain']) && $_SESSION['is_captain'] == 1;
 
 // Load specific Headers and Sidebars dynamically
 if ($is_captain) {
@@ -223,7 +205,7 @@ if ($is_captain) {
     </main>
 
     <?php 
-    if (isset($_SESSION['is_captain']) && $_SESSION['is_captain'] == 1) {
+    if ($is_captain) {
         require_once '../../includes/bottombar/bottombar_captain.php';
     } else {
         require_once '../../includes/bottombar/bottombar_member.php';

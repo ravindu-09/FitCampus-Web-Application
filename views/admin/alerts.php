@@ -1,7 +1,6 @@
 <?php
 // views/admin/alerts.php
-require_once '../../includes/db_connection.php';
-$page_title = 'Staff Alerts & Broadcasts - FitCampus';
+require_once '../../controllers/admin/alerts_page_controller.php';
 require_once '../../includes/headers/header_admin.php';
 ?>
 
@@ -19,7 +18,7 @@ require_once '../../includes/headers/header_admin.php';
         <div class="alerts-grid-layout">
             <div class="glass-card p-6">
                 <h3 class="card-inner-title">Compose Alert</h3>
-                <form method="POST" action="../../backend/admin/broadcast_alert.php" class="flex-col-gap-14">
+                <form method="POST" action="../../controllers/admin/broadcast_alert.php" class="flex-col-gap-14">
                     <div class="form-group">
                         <label class="form-label">Target Audience</label>
                         <select name="audience" class="form-control pl-14">

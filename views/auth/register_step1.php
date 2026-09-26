@@ -37,7 +37,7 @@ $step1_data = $_SESSION['reg_step1'] ?? [];
         </div>
     <?php endif; ?>
 
-    <form action="../../backend/auth/register_process.php?step=1" method="POST" class="auth-form" id="step1Form">
+    <form action="../../controllers/auth/register_process.php?step=1" method="POST" class="auth-form" id="step1Form">
         <div class="form-group">
             <label for="full_name" class="form-label">Full Name</label>
             <div class="input-wrapper">

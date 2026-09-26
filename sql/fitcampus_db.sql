@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 25, 2026 at 11:50 PM
+-- Generation Time: Sep 26, 2026 at 08:06 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -143,6 +143,14 @@ CREATE TABLE `calorie_details` (
   `Created_At` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `calorie_details`
+--
+
+INSERT INTO `calorie_details` (`Detail_ID`, `User_ID`, `Date`, `Type`, `Item_Name`, `Category`, `Portion_Or_Duration`, `Calories`, `Carbs`, `Protein`, `Fat`, `Created_At`) VALUES
+(1, 2, '2026-09-26', 'intake', 'meat & eggs', 'Breakfast', '400g', 250.00, 50.00, 375.00, 150.00, '2026-09-26 03:19:10'),
+(2, 11, '2026-09-17', 'intake', 'Fried rice', 'Dinner', '450g', 300.00, 150.00, 100.00, 200.00, '2026-09-26 14:11:44');
+
 -- --------------------------------------------------------
 
 --
@@ -155,6 +163,14 @@ CREATE TABLE `calorie_log` (
   `Calories_In` decimal(8,2) DEFAULT 0.00,
   `Calories_Out` decimal(8,2) DEFAULT 0.00
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `calorie_log`
+--
+
+INSERT INTO `calorie_log` (`User_ID`, `Date`, `Calories_In`, `Calories_Out`) VALUES
+(2, '2026-09-26', 250.00, 0.00),
+(11, '2026-09-17', 300.00, 0.00);
 
 -- --------------------------------------------------------
 
@@ -729,7 +745,7 @@ ALTER TABLE `booking`
 -- AUTO_INCREMENT for table `calorie_details`
 --
 ALTER TABLE `calorie_details`
-  MODIFY `Detail_ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `Detail_ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `common_workout`

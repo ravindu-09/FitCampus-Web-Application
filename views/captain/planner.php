@@ -1,42 +1,11 @@
 <?php
 // views/captain/planner.php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
 
-// Security Check (Keep this)
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../auth/login.php");
-    exit;
-}
-
-$page_title = "Workout Planner | FitCampus";
-
-$extra_js = [
-    "captain/planner.js" // UI logic and future AJAX calls
-];
-
-// ---------------------------------------------------------
-// MOCK DATA:
-// ---------------------------------------------------------
-$mock_teams = [
-    ['Team_ID' => 1, 'Team_Name' => 'UOC Track & Field'],
-    ['Team_ID' => 2, 'Team_Name' => 'UOC Swimming Team']
-];
-
-$mock_published = [
-    ['id' => 101, 'title' => 'Explosive Power Training', 'target' => 'Oct 24, 2026', 'location' => 'Main Gym', 'icon' => 'fitness_center'],
-    ['id' => 102, 'title' => 'Endurance Conditioning', 'target' => 'Oct 26, 2026', 'location' => 'Arena-A', 'icon' => 'directions_run']
-];
-
-$mock_drafts = [
-    ['id' => 201, 'title' => 'Recovery Flow Session', 'target' => 'Nov 01, 2026', 'location' => 'Pool-Side', 'icon' => 'edit_note']
-];
-// ---------------------------------------------------------
+// Include Page Controller ONLY (No Direct Database Queries)
+require_once '../../controllers/captain/planner_page_controller.php';
 
 require_once '../../includes/headers/header_member.php';
 
-$is_captain = isset($_SESSION['is_captain']) && $_SESSION['is_captain'] == 1;
 if ($is_captain) {
     require_once '../../includes/sidebars/sidebar_captain.php';
 } else {
@@ -226,9 +195,7 @@ if ($is_captain) {
     </div>
 
     <?php 
-    
     require_once '../../includes/bottombar/bottombar_captain.php';
-    
     require_once '../../includes/footers/footer_common.php'; 
     ?>
 </div>
