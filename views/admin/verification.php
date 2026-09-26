@@ -1,42 +1,16 @@
 <?php
 // views/admin/verification.php
 require_once '../../includes/db_connection.php';
+require_once '../../bll/admin/VerificationBLL.php';
 
-try {
-    // 1. Fetch Pending Applicants
-    $stmt =$pdo->query("
-        SELECT 
-            u.User_ID AS user_id, 
-            CONCAT(u.First_Name, ' ', u.Last_Name) AS full_name, 
-            u.Email AS email, 
-            s.Registration_Number AS reg_no, 
-            s.Faculty AS faculty, 
-            s.Emergency_Contact AS emergency_contact, 
-            s.DOB as dob,
-            s.Gender as gender,
-            s.NIC as nic,
-            COALESCE(s.Registration_Photo, s.Profile_Image) AS profile_image, 
-            s.Student_ID_Front AS id_front_image, 
-            s.Student_ID_Back AS id_back_image, 
-            s.Created_At AS created_at 
-        FROM `user` u
-        INNER JOIN `university_student` s ON u.User_ID = s.User_ID 
-        WHERE s.Status = 'pending' 
-        ORDER BY s.Created_At ASC
-    ");
-    $pending_users =$stmt->fetchAll(PDO::FETCH_ASSOC);
+$verificationBLL = new VerificationBLL($pdo);
 
-    // 2. Telemetry Counts
-    $count_pending = count($pending_users);
-    $count_approved =$pdo->query("SELECT COUNT(*) FROM `university_student` WHERE `Status` = 'active'")->fetchColumn() ?: 0;
-    $count_total_members =$pdo->query("SELECT COUNT(*) FROM `university_student`")->fetchColumn() ?: 0;
-
-} catch (\PDOException $e) {
-    error_log("Verification Fetch Error: " . $e->getMessage());
-    $pending_users = [];$count_pending = 0;
-    $count_approved = 0;
-    $count_total_members = 0;
-}
+// Fetch data via BLL instead of direct database queries
+$data = $verificationBLL->getVerificationData();
+$pending_users = $data['pending_users'];
+$count_pending = $data['count_pending'];
+$count_approved = $data['count_approved'];
+$count_total_members = $data['count_total_members'];
 
 $page_title = "User Verification Console - FitCampus";
 require_once '../../includes/headers/header_admin.php';
@@ -113,7 +87,7 @@ require_once '../../includes/headers/header_admin.php';
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($pending_users as$user): ?>
+                            <?php foreach ($pending_users as $user): ?>
                                 <tr class="verification-table-row">
                                     <td>
                                         <div class="user-meta-cell">
@@ -235,7 +209,8 @@ require_once '../../includes/headers/header_admin.php';
                 </div>
             </div>
 
-            <form id="verifyForm" method="POST" action="../../backend/admin/approve_user.php" class="modal-action-form" style="margin-top: 24px;">
+            <!-- Updated form action pointing to the new controller -->
+            <form id="verifyForm" method="POST" action="../../controllers/admin/VerificationController.php" class="modal-action-form" style="margin-top: 24px;">
                 <input type="hidden" name="user_id" id="formUserId" value="">
                 <input type="hidden" name="action" id="formAction" value="approve">
 
@@ -262,12 +237,11 @@ require_once '../../includes/headers/header_admin.php';
 </div>
 
 <style>
-    /* Add hover effect for image zoom overlay */
     .id-image-wrapper:hover .id-zoom-overlay { opacity: 1 !important; }
 </style>
 
-<!-- Hidden Quick Form for Row Actions -->
-<form id="quickDecisionForm" method="POST" action="../../backend/admin/approve_user.php" style="display: none;">
+<!-- Hidden Quick Form for Row Actions pointing to the new controller -->
+<form id="quickDecisionForm" method="POST" action="../../controllers/admin/VerificationController.php" style="display: none;">
     <input type="hidden" name="user_id" id="quickUserId" value="">
     <input type="hidden" name="action" id="quickAction" value="">
     <input type="hidden" name="rejection_reason" id="quickReason" value="">

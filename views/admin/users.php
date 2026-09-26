@@ -4,68 +4,21 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 // Create CSRF Token
-if (empty($_SESSION['csrf_token'])) {$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
 require_once '../../includes/db_connection.php';
+require_once '../../bll/admin/UserBLL.php';
 
-// 1. Fetch All Teams for Dropdowns
-try {
-    $teamsStmt =$pdo->query("SELECT Team_ID, Team_Name FROM team ORDER BY Team_Name ASC");
-    $teamsList =$teamsStmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (\PDOException $e) {$teamsList = []; 
-}
+$userBLL = new UserBLL($pdo);
 
-// 2. Fetch All Users with Meta and Team Roster Details
-try {
-    $pdo->query("SET SESSION group_concat_max_len = 10000;");
+// Fetch Teams and Users via BLL instead of direct database queries
+$teamsList = $userBLL->getTeamsList();
+$users = $userBLL->getUsersRoster();
 
-    $stmt =$pdo->query("
-        SELECT 
-            u.User_ID, u.First_Name, u.Last_Name, u.Email, u.Role,
-            s.Registration_Number, s.Faculty, s.Profile_Image, s.Emergency_Contact,
-            s.Life_Percentage, s.Date_of_Final_Exam, s.DOB, s.NIC, s.Gender,
-            (
-                SELECT GROUP_CONCAT(CONCAT(t.Team_ID, '::', t.Team_Name, '::', tm.Role_In_Team) SEPARATOR '||')
-                FROM team_member tm
-                JOIN team t ON tm.Team_ID = t.Team_ID
-                WHERE tm.User_ID = u.User_ID
-            ) AS Team_Data
-        FROM `user` u
-        LEFT JOIN `university_student` s ON u.User_ID = s.User_ID 
-        ORDER BY u.User_ID DESC
-    ");
-    
-    $users =$stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    // Parse Team Data for JSON output
-    foreach ($users as &$row) {$parsed_teams = [];
-        $team_ids = [];$is_captain = false;
-
-        if (!empty($row['Team_Data'])) {
-            $t_list = explode('||',$row['Team_Data']);
-            foreach ($t_list as$t) {
-                $parts = explode('::',$t);
-                if (count($parts) === 3) {
-                    $parsed_teams[] = ['id' =>$parts[0], 'name' => $parts[1], 'role' =>$parts[2]];
-                    $team_ids[] =$parts[0];
-                    if ($parts[2] === 'Captain')$is_captain = true;
-                }
-            }
-        }
-        
-        $row['parsed_teams'] =$parsed_teams;
-        $row['team_ids'] = implode(',',$team_ids); 
-        $row['is_captain'] =$is_captain;
-    
-        unset($row);
-    }
-
-} catch (\PDOException $e) {
-    error_log("Users Roster Error: " . $e->getMessage());$users = [];
-}
-
-$page_title = 'User & Roster Management - FitCampus';$extra_js = ["admin/users.js?v=" . time()]; 
+$page_title = 'User & Roster Management - FitCampus';
+$extra_js = ["admin/users.js?v=" . time()]; 
 require_once '../../includes/headers/header_admin.php';
 ?>
 
@@ -102,7 +55,7 @@ require_once '../../includes/headers/header_admin.php';
 
                 <select id="filterTeam" class="form-control select-custom" style="width: auto;">
                     <option value="all">All Teams (Entire Directory)</option>
-                    <?php foreach($teamsList as$t): ?>
+                    <?php foreach($teamsList as $t): ?>
                         <option value="<?= $t['Team_ID'] ?>"><?= htmlspecialchars($t['Team_Name']) ?> Roster</option>
                     <?php endforeach; ?>
                 </select>
@@ -121,10 +74,11 @@ require_once '../../includes/headers/header_admin.php';
                         </tr>
                     </thead>
                     <tbody id="userTableBody">
-                        <?php foreach ($users as $row):$roleLower = strtolower($row['Role']);$searchString = strtolower($row['First_Name'] . ' ' .$row['Last_Name'] . ' ' . $row['Email'] . ' ' . ($row['Registration_Number'] ?? ''));
-                            $profileImg =$row['Profile_Image'] ?? 'default_avatar.png';
+                        <?php foreach ($users as $row): 
+                            $roleLower = strtolower($row['Role']);
+                            $searchString = strtolower($row['First_Name'] . ' ' . $row['Last_Name'] . ' ' . $row['Email'] . ' ' . ($row['Registration_Number'] ?? ''));
+                            $profileImg = $row['Profile_Image'] ?? 'default_avatar.png';
                             
-                            // JSON only the data which should be passed to the UI for the security
                             $jsData = [
                                 'User_ID' => $row['User_ID'],
                                 'First_Name' => $row['First_Name'],
@@ -153,7 +107,7 @@ require_once '../../includes/headers/header_admin.php';
                                             <img src="../../assets/images/uploads/<?= htmlspecialchars($profileImg) ?>" onerror="this.src='../../assets/images/uoc-logo.png';">
                                         </div>
                                         <div>
-                                            <div class="user-cell-name"><?= htmlspecialchars($row['First_Name'] . ' ' .$row['Last_Name']) ?></div>
+                                            <div class="user-cell-name"><?= htmlspecialchars($row['First_Name'] . ' ' . $row['Last_Name']) ?></div>
                                             <div class="user-cell-email"><?= htmlspecialchars($row['Email']) ?></div>
                                         </div>
                                     </div>

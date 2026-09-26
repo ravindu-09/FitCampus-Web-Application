@@ -1,16 +1,15 @@
 <?php
 // views/admin/bookings.php
 require_once '../../includes/db_connection.php';
+require_once '../../bll/admin/BookingBLL.php';
+
+$bookingBLL = new BookingBLL($pdo);
 
 $page_title = 'Facility Bookings | Admin';
 $extra_js = ["admin/bookings.js"];
 
-// Fetch facilities dynamically
-$facilities = [];
-try {
-    $stmtFac = $pdo->query("SELECT Facility_ID, Facility_Name FROM facility ORDER BY Facility_ID ASC");
-    $facilities = $stmtFac->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {}
+// Fetch facilities dynamically via BLL instead of direct database queries
+$facilities = $bookingBLL->getFacilities();
 
 require_once '../../includes/headers/header_admin.php';
 ?>

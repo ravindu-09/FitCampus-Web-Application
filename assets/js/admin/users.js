@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Edit Role Functionality - Global Teams List එක pass කිරීම
+    // Edit Role Functionality - Pass Global Teams List 
     document.querySelectorAll('.btn-role-user').forEach(btn => {
         btn.addEventListener('click', function() {
             const userData = JSON.parse(this.getAttribute('data-user'));
@@ -95,8 +95,7 @@ window.updateStudentMeta = function() {
     
     if (typeof csrfToken !== 'undefined') formData.append('csrf_token', csrfToken);
 
-    fetch('../../backend/admin/user_manage_action.php', { method: 'POST', body: formData })
-        .then(res => {
+    fetch('../../controllers/admin/UserController.php', { method: 'POST', body: formData })        .then(res => {
             if (!res.ok) throw new Error("Server or Network error");
             return res.json();
         })
@@ -183,7 +182,7 @@ window.submitRoleChange = function(actionType, explicitTeamId = null) {
     
     if (typeof csrfToken !== 'undefined') formData.append('csrf_token', csrfToken);
 
-    fetch('../../backend/admin/user_manage_action.php', { method: 'POST', body: formData })
+    fetch('../../controllers/admin/UserController.php', { method: 'POST', body: formData })
         .then(res => {
             if (!res.ok) throw new Error("Server or Network error");
             return res.json();

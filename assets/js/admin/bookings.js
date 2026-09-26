@@ -45,7 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
             let d = new Date(currentWeekStart);
             d.setDate(d.getDate() + i);
             let dateNum = d.getDate();
-            let monthShort = d.toLocaleString('default', { month: 'short' });
             
             const isToday = (d.toDateString() === new Date().toDateString()) ? 'txt-green' : 'txt-primary';
 
@@ -79,7 +78,8 @@ document.addEventListener('DOMContentLoaded', () => {
         gridBody.innerHTML = '<div class="py-8 text-center txt-muted">Loading schedule...</div>';
         const dateKey = `${currentWeekStart.getFullYear()}-${String(currentWeekStart.getMonth() + 1).padStart(2, '0')}-${String(currentWeekStart.getDate()).padStart(2, '0')}`;
 
-        fetch(`../../backend/admin/booking_manage_action.php?action=get_schedule&facility_id=${currentGymId}&shift=${currentShift}&start_date=${dateKey}`)
+        // Updated Controller endpoint path
+        fetch(`../../controllers/admin/BookingController.php?action=get_schedule&facility_id=${currentGymId}&shift=${currentShift}&start_date=${dateKey}`)
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- DATA LOADING (REQUESTS & SLOT DETAILS) ---
     function loadPendingRequests() {
-        fetch('../../backend/admin/booking_manage_action.php?action=get_pending')
+        fetch('../../controllers/admin/BookingController.php?action=get_pending')
             .then(res => res.json())
             .then(data => {
                 const tbody = document.getElementById('pending-requests-tbody');
@@ -227,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('selected-slot-lbl').textContent = `${dayName} | ${date} | ${time.substring(0,5)}`;
         container.innerHTML = `<div class="text-center txt-muted py-8">Loading details...</div>`;
 
-        fetch(`../../backend/admin/booking_manage_action.php?action=get_slot_details&facility_id=${currentGymId}&date=${date}&time=${time}`)
+        fetch(`../../controllers/admin/BookingController.php?action=get_slot_details&facility_id=${currentGymId}&date=${date}&time=${time}`)
             .then(res => res.json())
             .then(data => {
                 if (!data.success) {
@@ -269,7 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('action', 'check_conflict');
         formData.append('booking_id', bookingId);
 
-        fetch('../../backend/admin/booking_manage_action.php', { method: 'POST', body: formData })
+        fetch('../../controllers/admin/BookingController.php', { method: 'POST', body: formData })
             .then(res => res.json())
             .then(data => {
                 if (!data.success) { alert(data.error); return; }
@@ -361,7 +361,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('cancel_ids', JSON.stringify(cancelIds));
         formData.append('cancel_reason', reason);
 
-        fetch('../../backend/admin/booking_manage_action.php', { method: 'POST', body: formData })
+        fetch('../../controllers/admin/BookingController.php', { method: 'POST', body: formData })
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
@@ -374,10 +374,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- DECLINE LOGIC ---
     window.handleDecline = function(bookingId) {
-        // Reason eka ahana popup eka
         const reason = prompt("Please enter the reason for rejecting this request:\n(This will be sent to all team members)");
         
-        if (reason === null) return; // User "Cancel" ebuwoth
+        if (reason === null) return; 
         if (reason.trim() === '') {
             alert("A reason is required to reject a request.");
             return;
@@ -388,7 +387,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('booking_id', bookingId);
         formData.append('reject_reason', reason.trim());
 
-        fetch('../../backend/admin/booking_manage_action.php', { method: 'POST', body: formData })
+        fetch('../../controllers/admin/BookingController.php', { method: 'POST', body: formData })
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
@@ -402,7 +401,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function refreshAllData() {
         fetchAndRenderGrid();
         loadPendingRequests();
-        clearSlotDetails(); // reset sidebar on approve/decline
+        clearSlotDetails(); 
     }
 
     window.closeModal = function(id) {
