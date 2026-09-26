@@ -5,8 +5,8 @@ $team_pages = ['facilities.php', 'booking.php', 'roster.php', 'planner.php', 'te
 $is_team_active = in_array($current_page, $team_pages);
 
 $current_dir = basename(dirname($_SERVER['PHP_SELF']));
-$member_prefix = ($current_dir === 'captain') ? '../member/' : '';
-$captain_prefix = ($current_dir === 'captain') ? '' : '../captain/';
+$member_prefix = ($current_dir === 'captain' || $current_dir === 'common') ? '../member/' : '';
+$captain_prefix = ($current_dir === 'member' || $current_dir === 'common') ? '../captain/' : '';
 ?>
 <!-- Mobile Bottom Navigation Bar (Captain Component) -->
 <nav class="mobile-bottom-nav">

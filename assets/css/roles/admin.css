@@ -1032,6 +1032,7 @@
 .overflow-hidden { overflow: hidden !important; }
 .hidden { display: none !important; }
 .flex { display: flex !important; }
+.cursor-pointer { cursor: pointer !important; }
 
 /* --- Settings Layout Extensions --- */
 .settings-header-wrap {
@@ -1080,3 +1081,475 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ==========================================================================
+   [SECTION 8] BOOKINGS PAGE SPECIFIC STYLES (Alerts, Timelines, Grids)
+   ========================================================================== */
+
+/* Layout Grid */
+.bookings-grid-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+@media (min-width: 1024px) {
+  .bookings-grid-layout {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+.bookings-left-col { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+.bookings-right-col { min-width: 0; }
+
+/* Alert Banner */
+.alert-banner-danger {
+  background-color: rgba(147, 0, 10, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.alert-banner-danger .icon { color: var(--error); font-size: 28px; }
+.alert-banner-danger .alert-text { flex: 1; color: #ffffff; font-weight: 600; font-size: 15px; }
+.alert-banner-danger .close-alert-btn { background: transparent; border: none; color: var(--on-surface-variant); cursor: pointer; display: flex; align-items: center; padding: 4px; }
+.alert-banner-danger .close-alert-btn:hover { color: #ffffff; }
+
+/* Today's Schedule Timeline / Slot Details */
+.schedule-timeline { display: flex; flex-direction: column; gap: 16px; }
+.timeline-item {
+  background: #1a1a1a;
+  border-radius: 12px;
+  padding: 16px;
+  border-left: 4px solid var(--surface-variant);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.timeline-item.status-approved { border-left-color: var(--secondary); }
+.timeline-item.status-pending { border-left-color: var(--error); background: rgba(147, 0, 10, 0.1); }
+.tl-time { font-family: var(--font-mono); font-size: 11px; color: var(--on-surface-variant); }
+.tl-title { font-size: 15px; font-weight: 700; color: #ffffff; margin: 0; }
+.tl-meta { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--on-surface-variant); }
+.tl-meta .material-symbols-outlined { font-size: 14px; }
+
+/* Booking Action Tags */
+.b-tag { font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 700; text-transform: uppercase; margin-left: 8px; }
+.b-tag-error { background: rgba(239, 68, 68, 0.2); color: var(--error); border: 1px solid rgba(239, 68, 68, 0.3); }
+
+/* Copying necessary Grid Calendar styles from captain.css to work in admin */
+.cal-header-flex { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+.booking-toggles { display: flex; gap: 12px; flex-wrap: wrap; }
+.toggle-group { display: flex; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); padding: 4px; border-radius: 12px; }
+.toggle-btn { padding: 6px 12px; border: none; background: transparent; color: var(--on-surface-variant); font-size: 12px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+.toggle-btn:hover:not(.active) { color: var(--on-surface); background: rgba(255,255,255,0.05); }
+.toggle-btn.active { background: rgba(223, 183, 255, 0.2); color: var(--primary); }
+
+.date-navigator { display: inline-flex; align-items: center; gap: 16px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
+.nav-arrow { background: transparent; border: none; color: var(--on-surface); cursor: pointer; padding: 4px; border-radius: 8px; display: flex; align-items: center; transition: all 0.2s; }
+.nav-arrow:hover { background: rgba(255,255,255,0.1); }
+
+.grid-table-wrapper { width: 100%; overflow-x: auto; padding-bottom: 12px; }
+.calendar-grid-header, .calendar-grid-row { display: grid; grid-template-columns: 55px repeat(7, 1fr); gap: 6px; align-items: center; }
+.calendar-grid-header { border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 16px; margin-bottom: 12px; }
+.calendar-grid-row { padding: 6px 0; border-bottom: 1px dashed rgba(255,255,255,0.05); }
+
+.sticky-col { font-size: 11px; color: rgba(207, 194, 212, 0.5); text-transform: uppercase; letter-spacing: 0.1em; display: flex; align-items: center; font-family: var(--font-mono); }
+.grid-day-head { text-align: center; }
+.grid-day-head p { font-size: 10px; color: rgba(207, 194, 212, 0.6); margin: 0; font-family: var(--font-mono); }
+.grid-day-head p.date { font-size: 15px; font-weight: bold; color: var(--primary); }
+
+/* Slot Box & Interaction Styles */
+.slot-cell { padding: 0; }
+.slot-box { 
+  height: 46px; 
+  border-radius: 8px; 
+  border: 1px solid; 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  justify-content: center;
+  transition: all 0.2s ease-in-out;
+}
+.slot-box .material-symbols-outlined { font-size: 14px; margin-bottom: 2px; }
+.slot-box span.txt { font-size: 9px; font-weight: bold; }
+
+/* Interactive Hover for clickable slots */
+.slot-box.cursor-pointer:hover {
+  border-color: var(--primary);
+  background-color: rgba(255, 255, 255, 0.08);
+  transform: translateY(-1px);
+}
+
+/* Active Highlighted Slot State */
+.slot-selected {
+  background-color: rgba(223, 183, 255, 0.15) !important;
+  border-color: var(--primary) !important;
+  box-shadow: inset 0 0 0 1px var(--primary);
+}
+.slot-selected span.txt,
+.slot-selected span.material-symbols-outlined {
+  color: var(--primary) !important;
+}
+
+/* Background states for occupancy */
+.slot-available { background: rgba(74, 225, 118, 0.05); border-color: rgba(74, 225, 118, 0.2); color: var(--secondary); }
+.slot-moderate { background: rgba(247, 190, 29, 0.05); border-color: rgba(247, 190, 29, 0.2); color: var(--tertiary); }
+.slot-high { background: rgba(255, 180, 171, 0.05); border-color: rgba(255, 180, 171, 0.2); color: var(--error); }
+.slot-full { background: rgba(53, 53, 52, 0.3); border-color: rgba(255,255,255,0.05); color: var(--on-surface-variant); opacity: 0.5; cursor: not-allowed; }
+.slot-pending-state { background: rgba(255, 180, 171, 0.1); border-color: rgba(255, 180, 171, 0.2); color: #ffb4ab; opacity: 0.8; }
+
+.status-legend { display: flex; flex-wrap: wrap; gap: 20px; align-items: center; }
+.legend-item { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--on-surface-variant); font-family: var(--font-mono); }
+.legend-item .dot { width: 10px; height: 10px; border-radius: 50%; }
+.legend-item .outline-dot { background: var(--surface-variant); border: 1px solid rgba(255,255,255,0.1); }
+.legend-item .pending-dot { background: rgba(255, 180, 171, 0.5); border: 1px solid rgba(255, 180, 171, 0.5); }
+
+/* Modal specific tweaks */
+.max-h-40 { max-height: 160px; overflow-y: auto; }
+.pr-2 { padding-right: 8px; }
+.rounded-lg { border-radius: 8px; }
+
+
+/* ==========================================================================
+   [SECTION 9] MODAL & FORM FIXES (Conflict Resolution & Overlays)
+   ========================================================================== */
+
+/* Fix the Modal Overlay Positioning and Layout */
+.wk-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 9999; /* Ensures modal stays on top of everything */
+}
+
+/* Hide modal when needed without breaking flex setup */
+.wk-modal-overlay.hidden { display: none !important; }
+
+/* Modal Inner Box Styling */
+#conflict-modal-inner {
+    width: 100%;
+    max-width: 550px;
+    background: #1e1e1e;
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* Textarea and General Form Inputs */
+.cal-input-field {
+    width: 100%;
+    padding: 12px 16px;
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 14px;
+    margin-top: 8px;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.cal-input-field:focus { outline: none; border-color: var(--primary); background-color: rgba(255, 255, 255, 0.08) !important; }
+.cal-input-field::placeholder { color: rgba(255, 255, 255, 0.4); }
+
+/* Labels */
+.gl-lbl-accent { font-size: 12px; font-weight: 600; color: var(--on-surface-variant); letter-spacing: 0.5px; display: block; margin-bottom: 4px; }
+
+/* Flex Utilities Missing from Context */
+.flex-between { display: flex; justify-content: space-between; align-items: center; }
+.flex-items-center { display: flex; align-items: center; }
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 12px; }
+
+/* Team List Items (Checkboxes) */
+.bg-dim { background-color: rgba(255, 255, 255, 0.03); }
+.border-dim { border-color: rgba(255, 255, 255, 0.08); }
+.custom-checkbox { width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; }
+
+/* Typography Utilities */
+.text-xl { font-size: 20px; }
+.text-sm { font-size: 14px; }
+.text-xs { font-size: 12px; }
+.font-bold { font-weight: 700; }
+.m-0 { margin: 0; }
+.mt-1 { margin-top: 4px; }
+.mb-2 { margin-bottom: 8px; }
+.bk-mb-sm { margin-bottom: 12px; }
+.bk-mb-md { margin-bottom: 16px; }
+.bk-mb-lg { margin-bottom: 24px; }
+.bk-pb-sm { padding-bottom: 12px; }
+.py-8 { padding-top: 32px; padding-bottom: 32px; }
+.p-3 { padding: 12px; }
+.p-4 { padding: 16px; }
+.flex-1 { flex: 1; }
+
+/* ==========================================================================
+   [SECTION 10] VERIFICATION MODAL SPECIFIC FIXES
+   ========================================================================== */
+
+.modal-dialog-inspector {
+  width: 100%;
+  max-width: 850px;
+  background-color: #1e1e1e;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.9);
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+}
+
+.modal-credentials-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (min-width: 768px) {
+  .modal-credentials-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.cred-info-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cred-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--on-surface-variant);
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.cred-value {
+  padding: 12px 14px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  font-size: 14px;
+  color: #ffffff;
+  word-break: break-word;
+}
+
+/* ID Image Previews Fix */
+.id-previews-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+@media (min-width: 768px) {
+  .id-previews-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.id-preview-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.id-type-title {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--on-surface-variant);
+  font-weight: 600;
+}
+
+.id-image-wrapper {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background-color: #0d0d0d;
+  cursor: pointer;
+  height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.id-image-wrapper img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.id-image-wrapper:hover img {
+  transform: scale(1.03);
+}
+
+.id-zoom-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+  color: #ffffff;
+}
+
+.id-image-wrapper:hover .id-zoom-overlay {
+  opacity: 1;
+}
+
+.id-zoom-overlay .material-symbols-outlined {
+    font-size: 48px;
+}
+
+.rejection-textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 12px;
+    background-color: rgba(255, 180, 171, 0.05);
+    border: 1px solid rgba(255, 180, 171, 0.3);
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 14px;
+    margin-top: 8px;
+    resize: vertical;
+}
+
+.rejection-textarea:focus {
+    outline: none;
+    border-color: var(--error);
+    background-color: rgba(255, 180, 171, 0.1);
+}
+
+/* ==========================================================================
+   [SECTION 11] MOBILE MODAL FIXES (Bottom Nav Overlap Fix)
+   ========================================================================== */
+@media (max-width: 1024px) {
+    .wk-modal-overlay {
+        padding-bottom: 80px !important;
+        padding-top: 20px !important;
+        align-items: flex-start !important;
+    }
+    .modal-dialog-inspector {
+        max-height: calc(100vh - 100px) !important;
+        margin-bottom: 20px !important;
+    }
+}
+
+/* ==========================================================================
+   [SECTION 12] USER MANAGEMENT SPECIFIC STYLES (Role Badges & Modals Fix)
+   ========================================================================== */
+
+.badge-tag {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: inline-block;
+}
+
+.badge-student {
+    background-color: rgba(74, 225, 118, 0.15);
+    color: var(--secondary);
+    border: 1px solid rgba(74, 225, 118, 0.3);
+}
+
+.badge-instructor {
+    background-color: rgba(247, 190, 29, 0.15);
+    color: var(--tertiary);
+    border: 1px solid rgba(247, 190, 29, 0.3);
+}
+
+.badge-admin {
+    background-color: rgba(223, 183, 255, 0.15);
+    color: var(--primary);
+    border: 1px solid rgba(223, 183, 255, 0.3);
+}
+
+.badge-captain {
+    background: rgba(247, 190, 29, 0.2);
+    color: var(--tertiary);
+    border: 1px solid var(--tertiary);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: bold;
+    margin-left: 8px;
+    display: inline-block;
+}
+
+/* Fix for Select Dropdowns inside Modals (Ensures options are readable and fully visible) */
+select.cal-input-field option {
+    background-color: #1e1e1e !important;
+    color: #ffffff !important;
+    padding: 10px;
+}
+
+/* Enhanced Buttons inside Modals */
+.wk-modal-overlay .btn {
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.wk-modal-overlay .btn-glass:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+/* ==========================================================================
+   [SECTION 13] ANALYTICS DASHBOARD SPECIFIC STYLES
+   ========================================================================== */
+
+/* --- Top Control Bar --- */
+.analytics-controls { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+.analytics-select { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; color: #fff; padding: 10px 16px; width: auto; }
+.analytics-btn { display: flex; align-items: center; gap: 8px; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 10px 16px; cursor: pointer; background: transparent; color: #fff; }
+
+/* --- KPI Card Enhancements --- */
+.stat-card-tertiary { border: 1px solid var(--tertiary); position: relative; overflow: hidden; }
+.stat-card-tertiary::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--tertiary); }
+.stat-value-row { display: flex; align-items: baseline; gap: 12px; }
+.stat-change { font-size: 13px; font-weight: 700; }
+.stat-note-text { font-size: 11px; color: rgba(255, 255, 255, 0.4); margin-top: 4px; }
+
+/* --- Charting Area (Facility Utilization) --- */
+.chart-legend { display: flex; gap: 16px; font-size: 11px; color: var(--on-surface-variant); }
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+.dot-gym1 { background: #c084fc; } 
+.dot-gym2 { background: #4ade80; } 
+
+.chart-container { height: 180px; display: flex; align-items: flex-end; justify-content: space-between; padding-top: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); gap: 8px; }
+.chart-column { flex: 1; display: flex; gap: 4px; align-items: flex-end; height: 100%; }
+.bar-gym1 { flex: 1; background: #c084fc; border-radius: 4px 4px 0 0; }
+.bar-gym2 { flex: 1; background: #4ade80; border-radius: 4px 4px 0 0; }
+.chart-x-axis { display: flex; justify-content: space-between; font-size: 11px; color: var(--on-surface-variant); margin-top: 8px; padding: 0 4px; }
+
+/* --- Equipment Availability --- */
+.equipment-list { display: flex; flex-direction: column; gap: 16px; }
+.equipment-header { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+.progress-bg { width: 100%; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 3px; }

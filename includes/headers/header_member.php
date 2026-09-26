@@ -7,10 +7,10 @@ if (session_status() === PHP_SESSION_NONE) {
 // Check if user is a captain
 $is_captain = isset($_SESSION['is_captain']) && $_SESSION['is_captain'] == 1;
 
-// Dynamic path prefixing based on current directory 
+// Dynamic path prefixing based on current directory[cite: 43]
 $current_dir = basename(dirname($_SERVER['PHP_SELF']));
-$member_prefix = ($current_dir === 'captain') ? '../member/' : '';
-$captain_prefix = ($current_dir === 'captain') ? '' : '../captain/';
+$member_prefix = ($current_dir === 'captain' || $current_dir === 'common') ? '../member/' : '';
+$captain_prefix = ($current_dir === 'member' || $current_dir === 'common') ? '../captain/' : '';
 
 // Dynamic Page Title
 $default_title = $is_captain ? 'FitCampus - Captain Portal' : 'FitCampus - Member Portal';
@@ -63,8 +63,8 @@ $display_life = isset($_SESSION['life_percentage']) ? (int)$_SESSION['life_perce
         </div>
 
         <div class="header-right">
-            <!-- Notification link fixed -->
-            <a href="<?php echo $member_prefix; ?>notification.php" class="notif-btn" aria-label="Notifications" style="text-decoration: none;">
+            <!-- Notification link updated to common folder[cite: 43] -->
+            <a href="../../views/common/notifications.php" class="notif-btn" aria-label="Notifications" style="text-decoration: none;">
                 <span class="material-symbols-outlined">notifications</span>
                 <span class="notif-dot"></span>
             </a>

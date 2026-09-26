@@ -8,6 +8,9 @@ $user_reg_no = isset($_SESSION['reg_no']) ? $_SESSION['reg_no'] : 'Student';
 $profile_img_name = isset($_SESSION['profile_image']) ? $_SESSION['profile_image'] : 'default_avatar.png';
 $has_custom_avatar = !empty($profile_img_name) && $profile_img_name !== 'default_avatar.png' && file_exists('../../assets/images/uploads/' . $profile_img_name);
 $avatar_url = '../../assets/images/uploads/' . htmlspecialchars($profile_img_name);
+
+$current_dir = basename(dirname($_SERVER['PHP_SELF']));
+$member_prefix = ($current_dir === 'common') ? '../member/' : '';
 ?>
 <!-- Sidebar Drawer Navigation -->
 <aside id="memberSidebar" class="member-sidebar">
@@ -19,27 +22,27 @@ $avatar_url = '../../assets/images/uploads/' . htmlspecialchars($profile_img_nam
     </div>
 
     <nav class="sidebar-nav-list">
-        <a class="side-nav-item <?php echo ($current_script === 'dashboard.php') ? 'active' : ''; ?>" href="dashboard.php">
+        <a class="side-nav-item <?php echo ($current_script === 'dashboard.php') ? 'active' : ''; ?>" href="<?php echo $member_prefix; ?>dashboard.php">
             <span class="material-symbols-outlined">dashboard</span>
             <span>Dashboard</span>
         </a>
-        <a class="side-nav-item <?php echo ($current_script === 'workouts.php') ? 'active' : ''; ?>" href="workouts.php">
+        <a class="side-nav-item <?php echo ($current_script === 'workouts.php') ? 'active' : ''; ?>" href="<?php echo $member_prefix; ?>workouts.php">
             <span class="material-symbols-outlined">fitness_center</span>
             <span>Workout Plan</span>
         </a>
-        <a class="side-nav-item <?php echo ($current_script === 'calories.php') ? 'active' : ''; ?>" href="calories.php">
+        <a class="side-nav-item <?php echo ($current_script === 'calories.php') ? 'active' : ''; ?>" href="<?php echo $member_prefix; ?>calories.php">
             <span class="material-symbols-outlined">local_fire_department</span>
             <span>Calorie Track</span>
         </a>
-        <a class="side-nav-item <?php echo ($current_script === 'goals.php') ? 'active' : ''; ?>" href="goals.php">
+        <a class="side-nav-item <?php echo ($current_script === 'goals.php') ? 'active' : ''; ?>" href="<?php echo $member_prefix; ?>goals.php">
             <span class="material-symbols-outlined">flag</span>
             <span>My Goals</span>
         </a>
-        <a class="side-nav-item <?php echo ($current_script === 'leaderboard.php') ? 'active' : ''; ?>" href="leaderboard.php">
+        <a class="side-nav-item <?php echo ($current_script === 'leaderboard.php') ? 'active' : ''; ?>" href="<?php echo $member_prefix; ?>leaderboard.php">
             <span class="material-symbols-outlined">leaderboard</span>
             <span>Leaderboard</span>
         </a>
-        <a class="side-nav-item <?php echo ($current_script === 'teams.php') ? 'active' : ''; ?>" href="teams.php">
+        <a class="side-nav-item <?php echo ($current_script === 'teams.php') ? 'active' : ''; ?>" href="<?php echo $member_prefix; ?>teams.php">
             <span class="material-symbols-outlined">groups</span>
             <span>Team</span>
         </a>
@@ -68,7 +71,7 @@ $avatar_url = '../../assets/images/uploads/' . htmlspecialchars($profile_img_nam
             <span>Sign Out</span>
         </a>
 
-        <a class="sidebar-settings-link <?php echo ($current_script === 'settings.php') ? 'active' : ''; ?>" href="settings.php">
+        <a class="sidebar-settings-link <?php echo ($current_script === 'settings.php') ? 'active' : ''; ?>" href="<?php echo $member_prefix; ?>settings.php">
             <span class="material-symbols-outlined">settings</span>
             <span>Settings</span>
         </a>

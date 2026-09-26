@@ -2,6 +2,8 @@
 // includes/sidebars/sidebar_admin.php
 $current_script = basename($_SERVER['PHP_SELF']);
 $admin_name = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Admin User';
+$current_dir = basename(dirname($_SERVER['PHP_SELF']));
+$admin_prefix = ($current_dir === 'common') ? '../admin/' : '';
 ?>
 <!-- Sidebar Drawer Navigation -->
 <aside id="memberSidebar" class="member-sidebar">
@@ -13,23 +15,23 @@ $admin_name = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Admin Us
     </div>
 
     <nav class="sidebar-nav-list">
-        <a class="side-nav-item <?php echo ($current_script === 'analytics.php') ? 'active' : ''; ?>" href="analytics.php">
+        <a class="side-nav-item <?php echo ($current_script === 'analytics.php') ? 'active' : ''; ?>" href="<?php echo $admin_prefix; ?>analytics.php">
             <span class="material-symbols-outlined">analytics</span>
             <span>Analytics</span>
         </a>
-        <a class="side-nav-item <?php echo ($current_script === 'bookings.php') ? 'active' : ''; ?>" href="bookings.php">
+        <a class="side-nav-item <?php echo ($current_script === 'bookings.php') ? 'active' : ''; ?>" href="<?php echo $admin_prefix; ?>bookings.php">
             <span class="material-symbols-outlined">calendar_month</span>
             <span>Bookings</span>
         </a>
-        <a class="side-nav-item <?php echo ($current_script === 'verification.php') ? 'active' : ''; ?>" href="verification.php">
+        <a class="side-nav-item <?php echo ($current_script === 'verification.php') ? 'active' : ''; ?>" href="<?php echo $admin_prefix; ?>verification.php">
             <span class="material-symbols-outlined">verified_user</span>
             <span>Verification</span>
         </a>
-        <a class="side-nav-item <?php echo ($current_script === 'users.php') ? 'active' : ''; ?>" href="users.php">
+        <a class="side-nav-item <?php echo ($current_script === 'users.php') ? 'active' : ''; ?>" href="<?php echo $admin_prefix; ?>users.php">
             <span class="material-symbols-outlined">group</span>
             <span>Users Hub</span>
         </a>
-        <a class="side-nav-item <?php echo ($current_script === 'alerts.php') ? 'active' : ''; ?>" href="alerts.php">
+        <a class="side-nav-item <?php echo ($current_script === 'alerts.php') ? 'active' : ''; ?>" href="<?php echo $admin_prefix; ?>alerts.php">
             <span class="material-symbols-outlined">campaign</span>
             <span>Alerts</span>
         </a>
@@ -54,7 +56,7 @@ $admin_name = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Admin Us
             <span>Sign Out</span>
         </a>
 
-        <a class="sidebar-settings-link <?php echo ($current_script === 'settings.php') ? 'active' : ''; ?>" href="settings.php">
+        <a class="sidebar-settings-link <?php echo ($current_script === 'settings.php') ? 'active' : ''; ?>" href="<?php echo $admin_prefix; ?>settings.php">
             <span class="material-symbols-outlined">settings</span>
             <span>Settings</span>
         </a>
