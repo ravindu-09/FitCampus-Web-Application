@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const dateKey = `${currentWeekStart.getFullYear()}-${String(currentWeekStart.getMonth() + 1).padStart(2, '0')}-${String(currentWeekStart.getDate()).padStart(2, '0')}`;
 
         // Updated Controller endpoint path
-        fetch(`../../controllers/admin/BookingController.php?action=get_schedule&facility_id=${currentGymId}&shift=${currentShift}&start_date=${dateKey}`)
+        fetch(`../../controllers/admin/booking_manage_action.php?action=get_schedule&facility_id=${currentGymId}&shift=${currentShift}&start_date=${dateKey}`)
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
@@ -185,7 +185,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- DATA LOADING (REQUESTS & SLOT DETAILS) ---
     function loadPendingRequests() {
-        fetch('../../controllers/admin/BookingController.php?action=get_pending')
+        // Updated Controller endpoint path
+        fetch('../../controllers/admin/booking_manage_action.php?action=get_pending')
             .then(res => res.json())
             .then(data => {
                 const tbody = document.getElementById('pending-requests-tbody');
@@ -227,7 +228,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('selected-slot-lbl').textContent = `${dayName} | ${date} | ${time.substring(0,5)}`;
         container.innerHTML = `<div class="text-center txt-muted py-8">Loading details...</div>`;
 
-        fetch(`../../controllers/admin/BookingController.php?action=get_slot_details&facility_id=${currentGymId}&date=${date}&time=${time}`)
+        // Updated Controller endpoint path
+        fetch(`../../controllers/admin/booking_manage_action.php?action=get_slot_details&facility_id=${currentGymId}&date=${date}&time=${time}`)
             .then(res => res.json())
             .then(data => {
                 if (!data.success) {
@@ -269,7 +271,8 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('action', 'check_conflict');
         formData.append('booking_id', bookingId);
 
-        fetch('../../controllers/admin/BookingController.php', { method: 'POST', body: formData })
+        // Updated Controller endpoint path
+        fetch('../../controllers/admin/booking_manage_action.php', { method: 'POST', body: formData })
             .then(res => res.json())
             .then(data => {
                 if (!data.success) { alert(data.error); return; }
@@ -361,7 +364,8 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('cancel_ids', JSON.stringify(cancelIds));
         formData.append('cancel_reason', reason);
 
-        fetch('../../controllers/admin/BookingController.php', { method: 'POST', body: formData })
+        // Updated Controller endpoint path
+        fetch('../../controllers/admin/booking_manage_action.php', { method: 'POST', body: formData })
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
@@ -387,7 +391,8 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('booking_id', bookingId);
         formData.append('reject_reason', reason.trim());
 
-        fetch('../../controllers/admin/BookingController.php', { method: 'POST', body: formData })
+        // Updated Controller endpoint path
+        fetch('../../controllers/admin/booking_manage_action.php', { method: 'POST', body: formData })
             .then(res => res.json())
             .then(data => {
                 if (data.success) {

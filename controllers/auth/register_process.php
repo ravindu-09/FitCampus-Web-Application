@@ -1,7 +1,8 @@
 <?php
-// backend/auth/register_process.php
+// controllers/auth/register_process.php
 session_start();
 require_once '../../includes/db_connection.php';
+require_once '../../models/auth/RegisterModel.php'; // Include the newly created model
 
 $step = $_GET['step'] ?? '';
 
@@ -9,6 +10,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header("Location: ../../views/auth/register_step1.php");
     exit();
 }
+
+// Initialize the Register Model
+$registerModel = new RegisterModel($pdo);
 
 // STEP 1 HANDLER
 if ($step == '1') {
@@ -23,16 +27,8 @@ if ($step == '1') {
         exit();
     }
 
-    // Check duplicate in user or university_student
-    $stmt = $pdo->prepare("
-        SELECT u.User_ID 
-        FROM `user` u 
-        LEFT JOIN `university_student` s ON u.User_ID = s.User_ID 
-        WHERE u.Email = :email OR s.Registration_Number = :reg_no 
-        LIMIT 1
-    ");
-    $stmt->execute([':email' => $email, ':reg_no' => $reg_no]);
-    if ($stmt->fetch()) {
+    // Call Model to check duplicate records
+    if ($registerModel->checkDuplicateUser($email, $reg_no)) {
         $_SESSION['error'] = "An account with this Email or Registration Number already exists.";
         header("Location: ../../views/auth/register_step1.php");
         exit();
@@ -105,6 +101,7 @@ if ($step == '3') {
         mkdir($upload_dir, 0755, true);
     }
 
+    // Document upload logic remains exactly the same
     function upload_doc($file_key, $upload_dir, $prefix) {
         if (!isset($_FILES[$file_key]) || $_FILES[$file_key]['error'] !== UPLOAD_ERR_OK) {
             return null;
@@ -129,67 +126,41 @@ if ($step == '3') {
         exit();
     }
 
-    try {
-        $pdo->beginTransaction();
+    // Split Full Name into First Name & Last Name
+    $name_parts = explode(' ', $_SESSION['reg_step1']['full_name'], 2);
+    $first_name = $name_parts[0];
+    $last_name  = $name_parts[1] ?? '.';
 
-        // Split Full Name into First Name & Last Name
-        $name_parts = explode(' ', $_SESSION['reg_step1']['full_name'], 2);
-        $first_name = $name_parts[0];
-        $last_name  = $name_parts[1] ?? '.';
+    $hashed_pwd = password_hash($_SESSION['reg_step2']['password'], PASSWORD_BCRYPT);
 
-        $hashed_pwd = password_hash($_SESSION['reg_step2']['password'], PASSWORD_BCRYPT);
+    // Prepare data array to pass to the Model
+    $studentData = [
+        'reg_no'            => $_SESSION['reg_step1']['reg_no'],
+        'nic'               => $nic,
+        'dob'               => $_SESSION['reg_step2']['dob'],
+        'faculty'           => $_SESSION['reg_step1']['faculty'],
+        'gender'            => $_SESSION['reg_step2']['gender'],
+        'emergency_contact' => $_SESSION['reg_step2']['emergency_contact'],
+        'avatar'            => $profile_image,
+        'reg_photo'         => $profile_image,
+        'id_front'          => $id_front,
+        'id_back'           => $id_back
+    ];
 
-        // 1. Insert into user table
-        $stmt1 = $pdo->prepare("
-            INSERT INTO `user` (`First_Name`, `Last_Name`, `Email`, `Password`, `Role`) 
-            VALUES (:fname, :lname, :email, :pwd, 'Student')
-        ");
-        $stmt1->execute([
-            ':fname' => $first_name,
-            ':lname' => $last_name,
-            ':email' => $_SESSION['reg_step1']['email'],
-            ':pwd'   => $hashed_pwd
-        ]);
+    // Call Model to execute the transaction
+    $registrationSuccess = $registerModel->registerNewStudent($first_name, $last_name, $_SESSION['reg_step1']['email'], $hashed_pwd, $studentData);
 
-        $user_id = $pdo->lastInsertId();
-
-        // 2. Insert into university_student table (with Registration_Photo and Life_Percentage = 100)
-        $stmt2 = $pdo->prepare("
-            INSERT INTO `university_student` 
-            (`User_ID`, `Registration_Number`, `NIC`, `DOB`, `Faculty`, `Gender`, `Emergency_Contact`, `Profile_Image`, `Registration_Photo`, `Life_Percentage`, `Student_ID_Front`, `Student_ID_Back`, `Status`) 
-            VALUES 
-            (:id, :reg_no, :nic, :dob, :faculty, :gender, :emergency, :avatar, :reg_photo, 100, :id_f, :id_b, 'pending')
-        ");
-        $stmt2->execute([
-            ':id'        => $user_id,
-            ':reg_no'    => $_SESSION['reg_step1']['reg_no'],
-            ':nic'       => $nic,
-            ':dob'       => $_SESSION['reg_step2']['dob'],
-            ':faculty'   => $_SESSION['reg_step1']['faculty'],
-            ':gender'    => $_SESSION['reg_step2']['gender'],
-            ':emergency' => $_SESSION['reg_step2']['emergency_contact'],
-            ':avatar'    => $profile_image,
-            ':reg_photo' => $profile_image,
-            ':id_f'      => $id_front,
-            ':id_b'      => $id_back
-        ]);
-
-        $pdo->commit();
-
+    if ($registrationSuccess) {
         unset($_SESSION['reg_step1']);
         unset($_SESSION['reg_step2']);
 
         $_SESSION['registration_success'] = "Registration submitted successfully! Your account is currently under review by the Administrator. You will be notified via email once approved.";
         header("Location: ../../views/auth/login.php");
         exit();
-
-    } catch (\PDOException $e) {
-        if ($pdo->inTransaction()) {
-            $pdo->rollBack();
-        }
-        error_log("Registration DB Error: " . $e->getMessage());
+    } else {
         $_SESSION['error'] = "An error occurred during account registration. Please try again.";
         header("Location: ../../views/auth/register_step3.php");
         exit();
     }
 }
+?>

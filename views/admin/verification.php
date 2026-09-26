@@ -1,16 +1,6 @@
 <?php
 // views/admin/verification.php
-require_once '../../includes/db_connection.php';
-require_once '../../bll/admin/VerificationBLL.php';
-
-$verificationBLL = new VerificationBLL($pdo);
-
-// Fetch data via BLL instead of direct database queries
-$data = $verificationBLL->getVerificationData();
-$pending_users = $data['pending_users'];
-$count_pending = $data['count_pending'];
-$count_approved = $data['count_approved'];
-$count_total_members = $data['count_total_members'];
+require_once '../../controllers/admin/verification_page_controller.php';
 
 $page_title = "User Verification Console - FitCampus";
 require_once '../../includes/headers/header_admin.php';
@@ -209,8 +199,8 @@ require_once '../../includes/headers/header_admin.php';
                 </div>
             </div>
 
-            <!-- Updated form action pointing to the new controller -->
-            <form id="verifyForm" method="POST" action="../../controllers/admin/VerificationController.php" class="modal-action-form" style="margin-top: 24px;">
+            <!-- 1st Form Action Update -->
+            <form id="verifyForm" method="POST" action="../../controllers/admin/approve_user.php" class="modal-action-form" style="margin-top: 24px;">
                 <input type="hidden" name="user_id" id="formUserId" value="">
                 <input type="hidden" name="action" id="formAction" value="approve">
 
@@ -237,11 +227,12 @@ require_once '../../includes/headers/header_admin.php';
 </div>
 
 <style>
+    /* Add hover effect for image zoom overlay */
     .id-image-wrapper:hover .id-zoom-overlay { opacity: 1 !important; }
 </style>
 
-<!-- Hidden Quick Form for Row Actions pointing to the new controller -->
-<form id="quickDecisionForm" method="POST" action="../../controllers/admin/VerificationController.php" style="display: none;">
+<!-- 2nd Form Action Update -->
+<form id="quickDecisionForm" method="POST" action="../../controllers/admin/approve_user.php" style="display: none;">
     <input type="hidden" name="user_id" id="quickUserId" value="">
     <input type="hidden" name="action" id="quickAction" value="">
     <input type="hidden" name="rejection_reason" id="quickReason" value="">

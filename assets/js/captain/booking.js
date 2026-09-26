@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const dateKey = `${currentWeekStart.getFullYear()}-${String(currentWeekStart.getMonth() + 1).padStart(2, '0')}-${String(currentWeekStart.getDate()).padStart(2, '0')}`;
 
-        fetch(`../../backend/captain/booking_action.php?action=get_schedule&facility_id=${currentGymId}&shift=${currentShift}&start_date=${dateKey}`)
+        fetch(`../../controllers/captain/booking_action.php?action=get_schedule&facility_id=${currentGymId}&shift=${currentShift}&start_date=${dateKey}`)
             .then(res => res.json())
             .then(data => {
                 if (data.success) {

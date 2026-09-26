@@ -42,7 +42,7 @@ $step2_data = $_SESSION['reg_step2'] ?? [];
         </div>
     <?php endif; ?>
 
-    <form action="../../backend/auth/register_process.php?step=2" method="POST" class="auth-form" id="step2Form">
+    <form action="../../controllers/auth/register_process.php?step=2" method="POST" class="auth-form" id="step2Form">
         
         <!-- Personal Details -->
         <section class="form-section-card">

@@ -1,15 +1,11 @@
 <?php
 // views/admin/bookings.php
-require_once '../../includes/db_connection.php';
-require_once '../../bll/admin/BookingBLL.php';
 
-$bookingBLL = new BookingBLL($pdo);
+// Include the Page Controller ONLY (No Direct DB Connection)
+require_once '../../controllers/admin/bookings_page_controller.php';
 
 $page_title = 'Facility Bookings | Admin';
 $extra_js = ["admin/bookings.js"];
-
-// Fetch facilities dynamically via BLL instead of direct database queries
-$facilities = $bookingBLL->getFacilities();
 
 require_once '../../includes/headers/header_admin.php';
 ?>

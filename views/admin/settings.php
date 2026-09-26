@@ -1,15 +1,11 @@
 <?php
 // views/admin/settings.php
-require_once '../../includes/db_connection.php';
-require_once '../../bll/admin/SettingBLL.php';
 
-$settingBLL = new SettingBLL($pdo);
+// Include the Page Controller ONLY (No Direct DB Connection)
+require_once '../../controllers/admin/settings_page_controller.php';
 
 $page_title = "Admin Settings | FitCampus";
 $extra_js = "admin/settings.js";
-
-// Fetch facilities dynamically via BLL instead of direct database queries
-$facilities = $settingBLL->getFacilities();
 
 require_once '../../includes/headers/header_admin.php';
 ?>
@@ -48,7 +44,8 @@ require_once '../../includes/headers/header_admin.php';
                 <div class="section-title-wrap mb-4">
                     <h3>Security &amp; Password</h3>
                 </div>
-                <form action="../../controllers/admin/SettingController.php" method="POST">
+                <!-- Updated Path to Controller -->
+                <form action="../../controllers/admin/settings_action.php" method="POST">
                     <input type="hidden" name="action" value="change_password">
                     
                     <div class="form-group mb-4">
@@ -94,7 +91,8 @@ require_once '../../includes/headers/header_admin.php';
                 <div class="section-title-wrap mb-4">
                     <h3 class="text-secondary">Register New Instructor</h3>
                 </div>
-                <form action="../../controllers/admin/SettingController.php" method="POST">
+                <!-- Updated Path to Controller -->
+                <form action="../../controllers/admin/settings_action.php" method="POST">
                     <input type="hidden" name="action" value="register_instructor">
                     
                     <div class="grid-2-col mb-4">
@@ -155,7 +153,8 @@ require_once '../../includes/headers/header_admin.php';
                 <div class="section-title-wrap mb-4">
                     <h3 class="text-tertiary">Add New Facility</h3>
                 </div>
-                <form action="../../controllers/admin/SettingController.php" method="POST">
+                <!-- Updated Path to Controller -->
+                <form action="../../controllers/admin/settings_action.php" method="POST">
                     <input type="hidden" name="action" value="insert_facility">
                     
                     <div class="grid-2-col mb-4">
@@ -203,7 +202,8 @@ require_once '../../includes/headers/header_admin.php';
                 <div class="section-title-wrap mb-4">
                     <h3 class="text-primary">Update Existing Facility</h3>
                 </div>
-                <form action="../../controllers/admin/SettingController.php" method="POST">
+                <!-- Updated Path to Controller -->
+                <form action="../../controllers/admin/settings_action.php" method="POST">
                     <input type="hidden" name="action" value="update_facility">
                     
                     <div class="form-group mb-4">

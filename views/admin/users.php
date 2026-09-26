@@ -1,21 +1,8 @@
 <?php
 // views/admin/users.php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-// Create CSRF Token
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
 
-require_once '../../includes/db_connection.php';
-require_once '../../bll/admin/UserBLL.php';
-
-$userBLL = new UserBLL($pdo);
-
-// Fetch Teams and Users via BLL instead of direct database queries
-$teamsList = $userBLL->getTeamsList();
-$users = $userBLL->getUsersRoster();
+// 1. Include the Page Controller (No Direct DB Connection Here)
+require_once '../../controllers/admin/users_page_controller.php';
 
 $page_title = 'User & Roster Management - FitCampus';
 $extra_js = ["admin/users.js?v=" . time()]; 
@@ -75,7 +62,7 @@ require_once '../../includes/headers/header_admin.php';
                     </thead>
                     <tbody id="userTableBody">
                         <?php foreach ($users as $row): 
-                            $roleLower = strtolower($row['Role']);
+                            $roleLower = strtolower($row['Role']); 
                             $searchString = strtolower($row['First_Name'] . ' ' . $row['Last_Name'] . ' ' . $row['Email'] . ' ' . ($row['Registration_Number'] ?? ''));
                             $profileImg = $row['Profile_Image'] ?? 'default_avatar.png';
                             
@@ -150,7 +137,7 @@ require_once '../../includes/headers/header_admin.php';
     </main>
 </div>
 
-<!-- Modal -->
+<!-- (Modals HTML remains exactly the same below this point) -->
 <div id="viewUserModal" class="wk-modal-overlay hidden" style="z-index: 1000;">
     <div class="modal-dialog-inspector" style="width: 100%; max-width: 600px; background: #1e1e1e; border-radius: 12px; margin: auto; padding: 24px;">
         <div class="flex-between border-b-dim bk-pb-sm bk-mb-md">

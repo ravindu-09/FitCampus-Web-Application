@@ -1,11 +1,6 @@
 <?php
 // views/admin/analytics.php
-
-// Include database connection and define the dynamic page title
-require_once '../../includes/db_connection.php';
-$page_title = 'Executive Analytics Dashboard - FitCampus';
-
-// 1. Load Admin Header, Topbar, and Session Security Guard
+require_once '../../controllers/admin/analytics_page_controller.php';
 require_once '../../includes/headers/header_admin.php';
 ?>
 
@@ -142,12 +137,10 @@ require_once '../../includes/headers/header_admin.php';
 </div>
 
 <?php 
-// 3. Load the Mobile Bottom Navigation Bar for smaller screens
 include_once '../../includes/bottombar/bottombar_admin.php';
 
-// 4. Register the page-specific JavaScript file to be injected by the footer
+// Register the page-specific JavaScript file to be injected by the footer
 $extra_js = "admin/analytics-charts.js";
 
-// 5. Load the Universal Footer and Script Drivers
 include_once '../../includes/footers/footer_common.php'; 
 ?>

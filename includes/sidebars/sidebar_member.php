@@ -66,7 +66,8 @@ $member_prefix = ($current_dir === 'common') ? '../member/' : '';
             </div>
         </div>
 
-        <a class="sidebar-settings-link" href="../../controllers/auth/LogoutController.php">
+        <!-- Path updated from backend to controllers -->
+        <a class="sidebar-settings-link" href="../../controllers/auth/logout.php">
             <span class="material-symbols-outlined">logout</span>
             <span>Sign Out</span>
         </a>

@@ -1,7 +1,8 @@
 <?php
-// backend/member/update_password.php
+// controllers/member/update_password.php
 session_start();
 require_once '../../includes/db_connection.php';
+require_once '../../models/member/SettingsModel.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_SESSION['user_id'])) {
     header("Location: ../../views/member/settings.php");
@@ -12,6 +13,7 @@ $user_id = $_SESSION['user_id'];
 $current_password = $_POST['current_password'] ?? '';
 $new_password = $_POST['new_password'] ?? '';
 $confirm_password = $_POST['confirm_password'] ?? '';
+$settingsModel = new SettingsModel($pdo);
 
 if (empty($current_password) || empty($new_password) || empty($confirm_password)) {
     $_SESSION['settings_error'] = "All password fields are required.";
@@ -32,17 +34,11 @@ if (strlen($new_password) < 8) {
 }
 
 try {
-    $stmt = $pdo->prepare("SELECT Password FROM `user` WHERE User_ID = :uid LIMIT 1");
-    $stmt->execute([':uid' => $user_id]);
-    $user = $stmt->fetch();
+    $user = $settingsModel->getUserPasswordHash($user_id);
 
     if ($user && password_verify($current_password, $user['Password'])) {
         $hashed_password = password_hash($new_password, PASSWORD_BCRYPT);
-        $update_stmt = $pdo->prepare("UPDATE `user` SET Password = :pwd WHERE User_ID = :uid");
-        $update_stmt->execute([
-            ':pwd' => $hashed_password,
-            ':uid' => $user_id
-        ]);
+        $settingsModel->updateUserPassword($user_id, $hashed_password);
 
         $_SESSION['settings_success'] = "Password updated successfully.";
     } else {
