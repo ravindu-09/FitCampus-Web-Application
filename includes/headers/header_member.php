@@ -4,6 +4,12 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// Security Guard: Check if user is logged in and is a Student/Member
+if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id']) || !in_array($_SESSION['role'] ?? '', ['Student', 'student', 'Member', 'member'])) {
+    header("Location: ../../views/auth/login.php");
+    exit();
+}
+
 // Check if user is a captain
 $is_captain = isset($_SESSION['is_captain']) && $_SESSION['is_captain'] == 1;
 
