@@ -12,7 +12,7 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['role'])) {
         header("Location: ../member/dashboard.php");
         exit();
     } elseif ($role === 'instructor') {
-        header("Location: ../instructor/dashboard.php");
+        header("Location: ../instructor/kiosk.php");
         exit();
     }
 }

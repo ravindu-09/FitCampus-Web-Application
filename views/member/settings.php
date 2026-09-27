@@ -21,7 +21,7 @@ if ($is_captain) {
                 <h2 class="settings-main-title">Account Settings</h2>
                 <p class="text-regular-sub">Manage your personal credentials and view institutional identity</p>
             </div>
-            <a href="../../backend/auth/logout.php" class="btn btn-danger-action">
+            <a href="../../controllers/auth/logout.php" class="btn btn-danger-action">
                 <span class="material-symbols-outlined">logout</span>
                 <span>Sign Out</span>
             </a>

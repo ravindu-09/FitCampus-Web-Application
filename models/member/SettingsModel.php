@@ -15,9 +15,9 @@ class SettingsModel {
                 u.First_Name, 
                 u.Last_Name, 
                 u.Email, 
-                s.ReC, 
-                s.Fagistration_Number, 
-                s.NIculty, 
+                s.Registration_Number, 
+                s.NIC, 
+                s.Faculty, 
                 s.Gender,
                 s.Profile_Image, 
                 s.Status AS student_status

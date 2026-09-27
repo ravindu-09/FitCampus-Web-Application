@@ -7,6 +7,8 @@ require_once '../../controllers/common/notifications_page_controller.php';
 // 1. Load Appropriate Header
 if ($role === 'admin') {
     require_once '../../includes/headers/header_admin.php';
+} elseif ($role === 'instructor') {
+    require_once '../../includes/headers/header_instructor.php';
 } else {
     require_once '../../includes/headers/header_member.php';
 }
@@ -19,6 +21,12 @@ if ($role === 'admin') {
     <!-- ADMIN LAYOUT STRUCTURE                     -->
     <div class="admin-viewport-wrapper">
         <?php require_once '../../includes/sidebars/sidebar_admin.php'; ?>
+        <main class="admin-main-canvas">
+
+<?php elseif ($role === 'instructor'): ?>
+    <!-- INSTRUCTOR LAYOUT STRUCTURE                -->
+    <div class="admin-viewport-wrapper">
+        <?php require_once '../../includes/sidebars/sidebar_instructor.php'; ?>
         <main class="admin-main-canvas">
 
 <?php else: ?>
@@ -98,6 +106,8 @@ if ($role === 'admin') {
 // Load Dynamic Bottombars
 if ($role === 'admin') {
     require_once '../../includes/bottombar/bottombar_admin.php';
+} else if ($role === 'instructor') {
+    require_once '../../includes/bottombar/bottombar_instructor.php';   
 } else {
     if ($is_captain) {
         require_once '../../includes/bottombar/bottombar_captain.php';
