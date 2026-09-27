@@ -5,10 +5,14 @@ session_start();
 // For Active session, auto-redirect to Dashboard
 if (isset($_SESSION['user_id']) && isset($_SESSION['role'])) {
     switch ($_SESSION['role']) {
+        case 'admin':
+            header("Location: views/admin/analytics.php");
+            exit();
         case 'instructor':
             header("Location: views/instructor/kiosk.php");
             exit();
         case 'member':
+        case 'student':
             header("Location: views/member/dashboard.php");
             exit();
     }

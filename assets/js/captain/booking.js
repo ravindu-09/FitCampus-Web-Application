@@ -102,6 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const dateKey = `${currentWeekStart.getFullYear()}-${String(currentWeekStart.getMonth() + 1).padStart(2, '0')}-${String(currentWeekStart.getDate()).padStart(2, '0')}`;
 
+        // Updated path to controllers
         fetch(`../../controllers/captain/booking_action.php?action=get_schedule&facility_id=${currentGymId}&shift=${currentShift}&start_date=${dateKey}`)
             .then(res => res.json())
             .then(data => {
@@ -435,7 +436,8 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="material-symbols-outlined text-[20px] animate-spin">sync</span> Processing...';
 
-            fetch('../../backend/captain/booking_action.php', {
+            // Updated path to controllers
+            fetch('../../controllers/captain/booking_action.php', {
                 method: 'POST',
                 body: formData
             })

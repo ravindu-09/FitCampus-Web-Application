@@ -23,7 +23,7 @@ $settingsModel = new SettingsModel($pdo);
 $member = $settingsModel->getMemberDetails($user_id);
 
 if (!$member) {
-    header("Location: ../../backend/auth/logout.php");
+    header("Location: ../../controllers/auth/logout.php");
     exit;
 }
 
