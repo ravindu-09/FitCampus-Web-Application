@@ -100,6 +100,15 @@ class BookingModel {
         return $stmt->execute([$team_id, $user_id, $facility_id, $team_size_input, $date, $time, $end_time, $status, $reason]);
     }
 
+    // Delete normal booking
+    public function deleteBooking($booking_id, $user_id) {
+        $stmt = $this->pdo->prepare("
+            DELETE FROM booking 
+            WHERE Booking_ID = ? AND Requested_By = ? AND (Exception_Reason IS NULL OR Exception_Reason = '')
+        ");
+        return $stmt->execute([$booking_id, $user_id]);
+    }
+
     public function getFacilityName($facility_id) {
         $stmtFacName = $this->pdo->prepare("SELECT Facility_Name FROM facility WHERE Facility_ID = ?");
         $stmtFacName->execute([$facility_id]);

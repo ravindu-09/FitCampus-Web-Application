@@ -1,29 +1,21 @@
 <?php
 // controllers/captain/booking_action.php
 
-// Initialize session and include database connection
 session_start();
 require_once '../../includes/db_connection.php';
 require_once '../../models/captain/BookingModel.php';
 
-// Set header to return JSON responses
 header('Content-Type: application/json');
 
-// Verify if the user is authenticated
 if (!isset($_SESSION['user_id'])) {
     echo json_encode(['success' => false, 'error' => 'Unauthorized access']);
     exit;
 }
 
 $bookingModel = new BookingModel($pdo);
-
-// Determine the requested action from GET or POST parameters
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 $user_id = $_SESSION['user_id'];
 
-// =========================================================================
-// ACTION: Get Facilities List
-// =========================================================================
 if ($action === 'get_facilities') {
     try {
         $facilities = $bookingModel->getAllFacilities();
@@ -34,9 +26,6 @@ if ($action === 'get_facilities') {
     exit;
 }
 
-// =========================================================================
-// ACTION: Get Weekly Schedule
-// =========================================================================
 if ($action === 'get_schedule') {
     $facility_id = isset($_GET['facility_id']) ? (int)$_GET['facility_id'] : 1;
     $shift = isset($_GET['shift']) ? $_GET['shift'] : 'morning';
@@ -79,15 +68,21 @@ if ($action === 'get_schedule') {
     exit;
 }
 
-// =========================================================================
-// ACTION: Create Booking
-// =========================================================================
 if ($action === 'create_booking') {
     $facility_id = isset($_POST['facility_id']) ? (int)$_POST['facility_id'] : 1;
     $date = trim($_POST['date'] ?? '');
     
     $time_input = trim($_POST['time'] ?? '');
     $time = date('H:i:s', strtotime($time_input));
+    
+    // Strict 24-Hour Advance Validation
+    $booking_timestamp = strtotime("$date $time");
+    $min_allowed_timestamp = time() + (24 * 3600);
+
+    if ($booking_timestamp < $min_allowed_timestamp) {
+        echo json_encode(['success' => false, 'error' => 'Bookings must be made at least 24 hours in advance.']);
+        exit;
+    }
     
     $duration = isset($_POST['duration']) ? (int)$_POST['duration'] : 1;
     $team_id = isset($_POST['team_id']) ? (int)$_POST['team_id'] : 0;
@@ -167,6 +162,27 @@ if ($action === 'create_booking') {
             ]
         ]);
 
+    } catch (PDOException $e) {
+        echo json_encode(['success' => false, 'error' => 'Database error: ' . $e->getMessage()]);
+    }
+    exit;
+}
+
+if ($action === 'delete_booking') {
+    $booking_id = isset($_POST['booking_id']) ? (int)$_POST['booking_id'] : 0;
+
+    if (!$booking_id) {
+        echo json_encode(['success' => false, 'error' => 'Invalid booking ID.']);
+        exit;
+    }
+
+    try {
+        $success = $bookingModel->deleteBooking($booking_id, $user_id);
+        if ($success) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'error' => 'Could not delete booking. Special requests cannot be deleted directly.']);
+        }
     } catch (PDOException $e) {
         echo json_encode(['success' => false, 'error' => 'Database error: ' . $e->getMessage()]);
     }

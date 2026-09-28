@@ -90,26 +90,26 @@ if ($is_captain) {
                     <div class="cal-grid-2 cal-spacing-md">
                         <div class="form-group-cal">
                             <label>Portion (g / ml)</label>
-                            <input type="number" name="portion" class="cal-input-field" value="150" required>
+                            <input type="number" name="portion" class="cal-input-field" value="150" min="0" step="any" required>
                         </div>
                         <div class="form-group-cal">
                             <label>Calories (kcal)</label>
-                            <input type="number" name="calories" class="cal-input-field" value="300" required>
+                            <input type="number" name="calories" class="cal-input-field" value="300" min="0" step="any" required>
                         </div>
                     </div>
 
                     <div class="cal-grid-3 cal-spacing-lg">
                         <div class="form-group-cal">
                             <label>Carbs (g)</label>
-                            <input type="number" step="0.1" name="carbs" class="cal-input-field cal-align-center" value="30" required>
+                            <input type="number" step="0.1" name="carbs" class="cal-input-field cal-align-center" value="30" min="0" required>
                         </div>
                         <div class="form-group-cal">
                             <label>Protein (g)</label>
-                            <input type="number" step="0.1" name="protein" class="cal-input-field cal-align-center" value="15" required>
+                            <input type="number" step="0.1" name="protein" class="cal-input-field cal-align-center" value="15" min="0" required>
                         </div>
                         <div class="form-group-cal">
                             <label>Fat (g)</label>
-                            <input type="number" step="0.1" name="fat" class="cal-input-field cal-align-center" value="5" required>
+                            <input type="number" step="0.1" name="fat" class="cal-input-field cal-align-center" value="5" min="0" required>
                         </div>
                     </div>
 
@@ -141,12 +141,12 @@ if ($is_captain) {
 
                     <div class="form-group-cal cal-spacing-md">
                         <label>Duration (minutes)</label>
-                        <input type="number" name="duration" class="cal-input-field" value="45" required>
+                        <input type="number" name="duration" class="cal-input-field" value="45" min="0" required>
                     </div>
 
                     <div class="form-group-cal cal-spacing-lg" style="padding-bottom: 74px;">
                         <label>Calories Burned (Manual Override)</label>
-                        <input type="number" name="calories_burned" class="cal-input-field" placeholder="Optional">
+                        <input type="number" name="calories_burned" class="cal-input-field" placeholder="Optional" min="0">
                     </div>
 
                     <button type="submit" class="cal-submit-btn btn-yellow">
