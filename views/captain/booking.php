@@ -136,7 +136,7 @@ require_once '../../includes/sidebars/sidebar_captain.php';
 
                         <div class="checkbox-wrapper bk-mt-md">
                             <input type="checkbox" id="limit-toggle" class="custom-checkbox">
-                            <label for="limit-toggle" class="text-sm cursor-pointer select-none">Simulate Limit Exceeded / Special Request</label>
+                            <label for="limit-toggle" class="text-sm cursor-pointer select-none">Special Request</label>
                         </div>
 
                         <div class="form-group-cal space-y-xs hidden" id="special-request-field">
