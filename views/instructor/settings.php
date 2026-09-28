@@ -1,7 +1,7 @@
 <?php
 // views/instructor/settings.php
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
-require_once '../../controllers/instructor/settings_page_controller.php';
+require_once '../../controllers/instructor/setting_page_controller.php';
 require_once '../../includes/headers/header_instructor.php';
 require_once '../../includes/sidebars/sidebar_instructor.php';
 ?>

@@ -4,17 +4,26 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Security Guard: Check if user is logged in and is a Student/Member
+// 1. Basic Login Check
 if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id']) || !in_array($_SESSION['role'] ?? '', ['Student', 'student', 'Member', 'member'])) {
     header("Location: ../../views/auth/login.php");
     exit();
 }
 
-// Check if user is a captain
+// Check if user is actually a captain
 $is_captain = isset($_SESSION['is_captain']) && $_SESSION['is_captain'] == 1;
 
-// Dynamic path prefixing based on current directory[cite: 43]
+// 2. Strict Access Control for Captain Pages
 $current_dir = basename(dirname($_SERVER['PHP_SELF']));
+$current_script = basename($_SERVER['PHP_SELF']);
+
+// If the user is in the captain directory but is NOT a captain, redirect them to the member dashboard
+if ($current_dir === 'captain' && !$is_captain) {
+    header("Location: ../member/dashboard.php");
+    exit();
+}
+
+// Dynamic path prefixing based on current directory
 $member_prefix = ($current_dir === 'captain' || $current_dir === 'common') ? '../member/' : '';
 $captain_prefix = ($current_dir === 'member' || $current_dir === 'common') ? '../captain/' : '';
 
@@ -24,8 +33,8 @@ $page_title = isset($page_title) ? $page_title : $default_title;
 
 $display_first_name = isset($_SESSION['first_name']) ? $_SESSION['first_name'] : 'Member';
 $display_life = isset($_SESSION['life_percentage']) ? (int)$_SESSION['life_percentage'] : 100;
-
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
