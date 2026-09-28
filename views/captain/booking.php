@@ -1,31 +1,24 @@
 <?php
 // views/captain/booking.php
 
-// Include Page Controller ONLY (No Direct Database Queries)
 require_once '../../controllers/captain/booking_page_controller.php';
-
 require_once '../../includes/headers/header_member.php';
 require_once '../../includes/sidebars/sidebar_captain.php';
 ?>
 
-<!-- Main layout wrapper -->
 <div class="member-content-wrapper">
     <main class="dashboard-main-container bk-main-container">
         
-        <!-- Two-column grid layout for calendar and booking form -->
         <div class="grid-layout-booking">
             
-            <!-- Left Column: Calendar Grid Section -->
             <section class="booking-calendar-section">
                 <div class="glass-card inner-glow bk-card-pad overflow-hidden">
-                    <!-- Calendar Header and Filters -->
                     <div class="cal-header-flex bk-mb-lg">
                         <div>
                             <h2 class="settings-main-title m-0">Weekly Availability</h2>
                             <p class="txt-muted text-sm bk-mt-xs m-0">Select an open slot to begin your request</p>
                         </div>
                         
-                        <!-- Facility and Shift Toggles -->
                         <div class="booking-toggles">
                             <div class="toggle-group" id="gym-toggle-container">
                                 <?php if (!empty($facilities)): ?>
@@ -45,19 +38,16 @@ require_once '../../includes/sidebars/sidebar_captain.php';
                         </div>
                     </div>
                     
-                    <!-- Week Navigator -->
                     <div class="date-navigator bk-mb-md">
                         <button class="nav-arrow" id="btn-prev-week" type="button"><span class="material-symbols-outlined">chevron_left</span></button>
                         <span class="mono font-bold text-sm" id="week-range-display">Loading Dates...</span>
                         <button class="nav-arrow" id="btn-next-week" type="button"><span class="material-symbols-outlined">chevron_right</span></button>
                     </div>
 
-                    <!-- Swipe hint for mobile users -->
                     <div class="mobile-swipe-hint">
                         <span class="material-symbols-outlined" style="font-size: 14px;">swipe</span> Swipe horizontally to see more
                     </div>
 
-                    <!-- Scrollable Calendar Grid -->
                     <div class="grid-table-wrapper custom-scrollbar">
                         <div class="grid-table-inner">
                             <div class="calendar-grid-header border-b-dim bk-pb-sm bk-mb-sm" id="calendar-grid-header"></div>
@@ -65,7 +55,6 @@ require_once '../../includes/sidebars/sidebar_captain.php';
                         </div>
                     </div>
 
-                    <!-- Slot Status Legend -->
                     <div class="status-legend">
                         <div class="legend-item"><span class="dot bg-secondary"></span>Available (0%)</div>
                         <div class="legend-item"><span class="dot bg-tertiary"></span>Moderate (1-90%)</div>
@@ -77,11 +66,9 @@ require_once '../../includes/sidebars/sidebar_captain.php';
                 </div>
             </section>
 
-            <!-- Right Column: Booking Request Form Sidebar -->
             <aside class="booking-form-section">
                 <div class="glass-card bk-card-pad shadow-xl sticky-form">
                     
-                    <!-- Form Header -->
                     <div class="form-header bk-mb-lg">
                         <div class="flex-between bk-mb-sm">
                             <h3 class="settings-main-title text-lg m-0">Booking Request</h3>
@@ -89,7 +76,6 @@ require_once '../../includes/sidebars/sidebar_captain.php';
                         </div>
                     </div>
 
-                    <!-- Dynamic Capacity Info (Hidden until slot selected) -->
                     <div class="bk-mb-md hidden" id="capacity-info-container">
                         <div class="flex-between mono font-xs txt-white uppercase font-bold">
                             <span>Remaining Capacity</span>
@@ -98,7 +84,6 @@ require_once '../../includes/sidebars/sidebar_captain.php';
                     </div>
 
                     <form id="facility-booking-form" class="booking-form space-y-md">
-                        <!-- Date Display -->
                         <div class="form-group-cal space-y-xs">
                             <label class="gl-lbl-accent">SELECTED DATE</label>
                             <div class="cal-input-field flex-items-center gap-3">
@@ -107,7 +92,6 @@ require_once '../../includes/sidebars/sidebar_captain.php';
                             </div>
                         </div>
 
-                        <!-- Time & Duration Inputs -->
                         <div class="cal-grid-2 gap-3">
                             <div class="form-group-cal space-y-xs">
                                 <label class="gl-lbl-accent">START TIME</label>
@@ -124,7 +108,6 @@ require_once '../../includes/sidebars/sidebar_captain.php';
                             </div>
                         </div>
 
-                        <!-- Team Selection Dropdown -->
                         <div class="form-group-cal space-y-xs">
                             <label class="gl-lbl-accent">SELECT TEAM</label>
                             <select class="cal-input-field gl-select" id="team-select">
@@ -141,31 +124,26 @@ require_once '../../includes/sidebars/sidebar_captain.php';
                             </select>
                         </div>
 
-                        <!-- Custom Team Size Input -->
                         <div class="form-group-cal space-y-xs">
                             <label class="gl-lbl-accent">TEAM SIZE</label>
                             <input class="cal-input-field" id="team-size-input" type="number" min="1" placeholder="Enter team size">
                         </div>
 
-                        <!-- Read-only Captain ID -->
                         <div class="form-group-cal space-y-xs">
                             <label class="gl-lbl-accent">CAPTAIN ID</label>
                             <input class="cal-input-field txt-primary mono tracking-wide font-bold" type="text" readonly value="<?= $user_id ?>">
                         </div>
 
-                        <!-- Special Request Toggle Checkbox -->
                         <div class="checkbox-wrapper bk-mt-md">
                             <input type="checkbox" id="limit-toggle" class="custom-checkbox">
-                            <label for="limit-toggle" class="text-sm cursor-pointer select-none">Simulate Limit Exceeded / Special Request</label>
+                            <label for="limit-toggle" class="text-sm cursor-pointer select-none">Special Request</label>
                         </div>
 
-                        <!-- Hidden Exception Reason Textarea -->
                         <div class="form-group-cal space-y-xs hidden" id="special-request-field">
                             <label class="gl-lbl-accent">REASON FOR REQUEST <span class="txt-error">*</span></label>
                             <textarea class="cal-input-field" id="reason-input" placeholder="Explain why you need this extra session..." style="min-height: 80px;"></textarea>
                         </div>
 
-                        <!-- Error Message & Form Submit Button -->
                         <div class="form-group-cal space-y-xs bk-mt-md">
                             <p class="txt-error font-xs hidden font-medium m-0 bk-mb-xs text-center" id="capacity-error-msg"></p>
                             <button class="gl-btn-gradient w-full bk-py-md font-bold text-sm flex-items-center gap-2 justify-center" id="submit-booking-btn" type="button" disabled>
@@ -179,7 +157,6 @@ require_once '../../includes/sidebars/sidebar_captain.php';
             </aside>
         </div>
 
-        <!-- Full Width History Section -->
         <section class="glass-card bk-card-pad bk-mt-lg">
             <div class="cal-header-flex bk-mb-md">
                 <h3 class="settings-main-title text-lg m-0">My Booking History</h3>
@@ -195,19 +172,18 @@ require_once '../../includes/sidebars/sidebar_captain.php';
                             <th>Date</th>
                             <th>Time Slot</th>
                             <th>Status</th>
+                            <th class="text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Loop through booking records fetched from DB -->
                         <?php if (!empty($booking_history)): ?>
                             <?php foreach ($booking_history as $bk): ?>
-                                <tr>
+                                <tr id="booking-row-<?= $bk['Booking_ID'] ?>">
                                     <td><strong><?= htmlspecialchars($bk['Facility_Name']) ?></strong></td>
                                     <td><?= htmlspecialchars($bk['Team_Name']) ?></td>
                                     <td><span class="mono"><?= htmlspecialchars($bk['Reserve_Date']) ?></span></td>
                                     <td><span class="mono"><?= date('H:i', strtotime($bk['Start_Time'])) ?> - <?= date('H:i', strtotime($bk['End_Time'])) ?></span></td>
                                     <td>
-                                        <!-- Apply specific color badges based on status -->
                                         <?php if ($bk['Status'] === 'Approved'): ?>
                                             <span class="badge-status" style="background: rgba(74,225,118,0.1); border-color: rgba(74,225,118,0.3); color: var(--secondary);">Approved</span>
                                         <?php elseif ($bk['Status'] === 'Pending'): ?>
@@ -216,12 +192,18 @@ require_once '../../includes/sidebars/sidebar_captain.php';
                                             <span class="badge-status" style="background: rgba(255,180,171,0.1); border-color: rgba(255,180,171,0.3); color: var(--error);"><?= htmlspecialchars($bk['Status']) ?></span>
                                         <?php endif; ?>
                                     </td>
+                                    <td class="text-right">
+                                        <?php if (empty($bk['Exception_Reason']) && $bk['Status'] !== 'Cancelled' && $bk['Status'] !== 'Rejected'): ?>
+                                            <button type="button" class="toggle-btn txt-error delete-booking-btn" data-id="<?= $bk['Booking_ID'] ?>" style="padding: 4px 8px; font-size: 11px;">Delete</button>
+                                        <?php else: ?>
+                                            <span class="text-xs txt-muted">N/A</span>
+                                        <?php endif; ?>
+                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
-                            <!-- Fallback for empty history -->
                             <tr>
-                                <td colspan="5" style="text-align: center; padding: 24px; color: var(--on-surface-variant);">No bookings found.</td>
+                                <td colspan="6" style="text-align: center; padding: 24px; color: var(--on-surface-variant);">No bookings found.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
@@ -231,12 +213,10 @@ require_once '../../includes/sidebars/sidebar_captain.php';
 
     </main>
 
-    <!-- Include template layouts -->
     <?php require_once '../../includes/bottombar/bottombar_captain.php'; ?>
     <?php require_once '../../includes/footers/footer_common.php'; ?>
 </div>
 
-<!-- Modal Overlay for Post-Booking Notifications -->
 <div class="wk-modal-overlay flex-items-center justify-center p-4 transition-opacity hidden" id="confirmation-modal" style="z-index: 100;">
     <div class="glass-card shadow-2xl p-8 border-dim max-w-sm w-full transform transition-transform text-center scale-95" id="modal-box-inner">
         <div id="modal-icon-bg" class="w-16 h-16 rounded-full flex-items-center justify-center mx-auto mb-6 bg-secondary-dim txt-green">

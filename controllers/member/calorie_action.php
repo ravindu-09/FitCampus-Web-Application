@@ -13,31 +13,29 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-$user_id = $_SESSION['user_id'];
-$action = $_GET['action'] ?? ($_POST['action'] ?? '');
+$user_id = $_SESSION['user_id'];$action = $_GET['action'] ?? ($_POST['action'] ?? '');
 $calorieModel = new CalorieModel($pdo);
 
 // Action 1: Get data for selected date (AJAX)
 if ($action === 'get_date_data') {
     header('Content-Type: application/json');
-    $date = $_GET['date'] ?? date('Y-m-d');
+    $date =$_GET['date'] ?? date('Y-m-d');
 
-    $summary = $calorieModel->getDailySummary($user_id, $date);
-    $items = $calorieModel->getDailyDetails($user_id, $date);
+    $summary =$calorieModel->getDailySummary($user_id,$date);
+    $items =$calorieModel->getDailyDetails($user_id,$date);
 
     $intake_items = [];
-    $burned_items = [];
-    $totals = ['intake_cals' => 0, 'burned_cals' => 0, 'carbs' => 0, 'protein' => 0, 'fat' => 0];
+    $burned_items = [];$totals = ['intake_cals' => 0, 'burned_cals' => 0, 'carbs' => 0, 'protein' => 0, 'fat' => 0];
 
-    foreach ($items as $row) {
+    foreach ($items as$row) {
         if ($row['Type'] === 'intake') {
-            $intake_items[] = $row;
+            $intake_items[] =$row;
             $totals['intake_cals'] += (float)$row['Calories'];
             $totals['carbs'] += (float)$row['Carbs'];
             $totals['protein'] += (float)$row['Protein'];
             $totals['fat'] += (float)$row['Fat'];
         } else {
-            $burned_items[] = $row;
+            $burned_items[] =$row;
             $totals['burned_cals'] += (float)$row['Calories'];
         }
     }
@@ -53,34 +51,39 @@ if ($action === 'get_date_data') {
     exit;
 }
 
-// Action 2: Add Intake Item (With Manual Macros)
-if ($action === 'add_intake' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    $date     = $_POST['log_date'] ?? date('Y-m-d');
+// Action 2: Add Intake Item (With Manual Macros and Negative Value Prevention)
+if ($action === 'add_intake' &&$_SERVER['REQUEST_METHOD'] === 'POST') {
+    $date     =$_POST['log_date'] ?? date('Y-m-d');
     $category = trim($_POST['meal_category'] ?? 'Lunch');
     $item     = trim($_POST['food_item'] ?? '');
-    $portion  = trim($_POST['portion'] ?? '150');
-    $calories = (float)($_POST['calories'] ?? 0);
-    $carbs    = (float)($_POST['carbs'] ?? 0);
-    $protein  = (float)($_POST['protein'] ?? 0);
-    $fat      = (float)($_POST['fat'] ?? 0);
+    
+    // Prevent negative numbers using max(0, value)
+    $portion  = max(0, (float)($_POST['portion'] ?? 150));
+    $calories = max(0, (float)($_POST['calories'] ?? 0));
+    $carbs    = max(0, (float)($_POST['carbs'] ?? 0));
+    $protein  = max(0, (float)($_POST['protein'] ?? 0));
+    $fat      = max(0, (float)($_POST['fat'] ?? 0));
 
     if (!empty($item)) {
-        $calorieModel->insertIntakeItem($user_id, $date, $item, $category, $portion, $calories, $carbs, $protein, $fat);
+        $calorieModel->insertIntakeItem($user_id, $date,$item, $category,$portion, $calories,$carbs, $protein,$fat);
     }
 
     header("Location: ../../views/member/calories.php?date=" . urlencode($date));
     exit;
 }
 
-// Action 3: Add Activity Item
-if ($action === 'add_burned' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    $date     = $_POST['log_date'] ?? date('Y-m-d');
+// Action 3: Add Activity Item (With Negative Value Prevention)
+if ($action === 'add_burned' &&$_SERVER['REQUEST_METHOD'] === 'POST') {
+    $date     =$_POST['log_date'] ?? date('Y-m-d');
     $activity = trim($_POST['activity_type'] ?? 'Walking');
-    $duration = (int)($_POST['duration'] ?? 30);
-    $calories = (float)($_POST['calories_burned'] ?? ($duration * 5));
+    
+    // Prevent negative numbers using max(0, value)
+    $duration = max(0, (int)($_POST['duration'] ?? 30));$calories = isset($_POST['calories_burned']) &&$_POST['calories_burned'] !== '' 
+                ? max(0, (float)$_POST['calories_burned']) 
+                : ($duration * 5);
 
     if (!empty($activity)) {
-        $calorieModel->insertBurnedItem($user_id, $date, $activity, $duration, $calories);
+        $calorieModel->insertBurnedItem($user_id, $date,$activity, $duration,$calories);
     }
 
     header("Location: ../../views/member/calories.php?date=" . urlencode($date));
@@ -88,12 +91,11 @@ if ($action === 'add_burned' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Action 4: Reset Selected Date Data
-if ($action === 'reset_date' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($action === 'reset_date' &&$_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Content-Type: application/json');
     $date = trim($_POST['date'] ?? '');
     
-    if (!empty($date)) {
-        $calorieModel->resetDateLogs($user_id, $date);
+    if (!empty($date)) {$calorieModel->resetDateLogs($user_id,$date);
         echo json_encode(['success' => true]);
     } else {
         echo json_encode(['success' => false, 'message' => 'Invalid Date']);
