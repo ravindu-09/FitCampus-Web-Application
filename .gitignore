@@ -1,3 +1,7 @@
 # User uploaded images ignore(Only keeps Folder structure)
 assets/images/uploads/*
 !assets/images/uploads/.gitkeep
+
+# Support request uploaded files
+storage/support_requests/*
+!storage/support_requests/.htaccess

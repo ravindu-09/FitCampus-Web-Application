@@ -35,6 +35,10 @@ $admin_prefix = ($current_dir === 'common') ? '../admin/' : '';
             <span class="material-symbols-outlined">campaign</span>
             <span>Alerts</span>
         </a>
+        <a class="side-nav-item <?php echo ($current_script === 'support_requests.php') ? 'active' : ''; ?>" href="<?php echo $admin_prefix; ?>support_requests.php">
+            <span class="material-symbols-outlined">support_agent</span>
+            <span>Support Requests</span>
+        </a>
     </nav>
 
     <!-- Sidebar Bottom Profile & Settings -->

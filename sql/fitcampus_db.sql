@@ -261,6 +261,8 @@ CREATE TABLE `feedback` (
   `Responded_Admin` int(10) UNSIGNED DEFAULT NULL,
   `Category` varchar(50) DEFAULT NULL,
   `Description` text NOT NULL,
+  `Attachment_Path` varchar(255) DEFAULT NULL,
+  `Requested_End_Date` date DEFAULT NULL,
   `Submitted_Date` datetime NOT NULL DEFAULT current_timestamp(),
   `Status` enum('Pending','In Progress','Resolved','Rejected') NOT NULL DEFAULT 'Pending',
   `Response_Date` datetime DEFAULT NULL,
