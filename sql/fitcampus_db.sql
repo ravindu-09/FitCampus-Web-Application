@@ -446,7 +446,6 @@ INSERT INTO `team_member` (`Team_ID`, `User_ID`, `Role_In_Team`) VALUES
 CREATE TABLE `team_workout` (
   `Workout_ID` int(10) UNSIGNED NOT NULL,
   `Team_ID` int(10) UNSIGNED NOT NULL,
-  `Booking_ID` int(10) UNSIGNED NOT NULL,
   `Title` varchar(150) NOT NULL,
   `Description` text DEFAULT NULL,
   `Duration` int(10) UNSIGNED DEFAULT NULL
@@ -693,8 +692,7 @@ ALTER TABLE `team_member`
 --
 ALTER TABLE `team_workout`
   ADD PRIMARY KEY (`Workout_ID`),
-  ADD KEY `fk_team_workout_team` (`Team_ID`),
-  ADD KEY `fk_team_workout_booking` (`Booking_ID`);
+  ADD KEY `fk_team_workout_team` (`Team_ID`);
 
 --
 -- Indexes for table `team_workout_exercise`
@@ -953,7 +951,6 @@ ALTER TABLE `team_member`
 -- Constraints for table `team_workout`
 --
 ALTER TABLE `team_workout`
-  ADD CONSTRAINT `fk_team_workout_booking` FOREIGN KEY (`Booking_ID`) REFERENCES `booking` (`Booking_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_team_workout_team` FOREIGN KEY (`Team_ID`) REFERENCES `team` (`Team_ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
