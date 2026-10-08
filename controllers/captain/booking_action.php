@@ -193,6 +193,15 @@ if ($action === 'create_booking') {
         }
 
         $bookingModel->createBooking($team_id, $user_id, $facility_id, $team_size_input, $date, $time, $end_time, $status, $reason);
+        $booking_id = (int)$pdo->lastInsertId();
+        $available_workouts = [];
+        if ($status === 'Approved') {
+            try {
+                $available_workouts = $bookingModel->getAvailableWorkoutsForBooking($booking_id, (int)$user_id);
+            } catch (PDOException $e) {
+                error_log('Could not load available team workouts for new booking: ' . $e->getMessage());
+            }
+        }
         
         $fac_name = $bookingModel->getFacilityName($facility_id);
         $team_name = $bookingModel->getTeamName($team_id);
@@ -201,11 +210,13 @@ if ($action === 'create_booking') {
             'success' => true, 
             'status' => $status,
             'new_booking' => [
+                'Booking_ID' => $booking_id,
                 'Facility_Name' => $fac_name,
                 'Team_Name' => $team_name,
                 'Reserve_Date' => $date,
                 'Time_Slot' => date('H:i', strtotime($time)) . ' - ' . date('H:i', strtotime($end_time)),
-                'Status' => $status
+                'Status' => $status,
+                'Available_Workouts' => $available_workouts
             ]
         ]);
 
