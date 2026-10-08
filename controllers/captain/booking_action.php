@@ -4,6 +4,7 @@
 session_start();
 require_once '../../includes/db_connection.php';
 require_once '../../models/captain/BookingModel.php';
+require_once '../../models/captain/RosterModel.php';
 
 header('Content-Type: application/json');
 
@@ -92,6 +93,12 @@ if ($action === 'create_booking') {
 
     if (!$team_id) {
         echo json_encode(['success' => false, 'error' => 'Please select a team.']);
+        exit;
+    }
+
+    $rosterModel = new RosterModel($pdo);
+    if (!$rosterModel->isCaptain($team_id, $user_id)) {
+        echo json_encode(['success' => false, 'error' => 'Unauthorized access']);
         exit;
     }
 
