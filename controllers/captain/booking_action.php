@@ -17,6 +17,46 @@ $bookingModel = new BookingModel($pdo);
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 $user_id = $_SESSION['user_id'];
 
+if ($action === 'assign_workout') {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        http_response_code(405);
+        echo json_encode(['success' => false, 'error' => 'Invalid request method']);
+        exit;
+    }
+
+    $booking_id = filter_var($_POST['booking_id'] ?? null, FILTER_VALIDATE_INT);
+    $workout_id = filter_var($_POST['workout_id'] ?? null, FILTER_VALIDATE_INT);
+    if (!$booking_id || $booking_id < 1 || !$workout_id || $workout_id < 1) {
+        http_response_code(422);
+        echo json_encode(['success' => false, 'error' => 'Invalid booking or workout']);
+        exit;
+    }
+
+    try {
+        $rosterModel = new RosterModel($pdo);
+        $bookingModel->assignWorkoutToBooking($booking_id, $workout_id, (int)$user_id, $rosterModel);
+        echo json_encode(['success' => true, 'message' => 'Workout assigned to booking']);
+    } catch (DomainException $e) {
+        http_response_code($e->getMessage() === 'Booking not found.' || $e->getMessage() === 'Workout not found.' ? 404 : 403);
+        echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+    } catch (PDOException $e) {
+        if (($e->errorInfo[0] ?? '') === '23000' && (int)($e->errorInfo[1] ?? 0) === 1062) {
+            http_response_code(409);
+            echo json_encode(['success' => false, 'error' => 'This workout is already assigned to the booking']);
+            exit;
+        }
+
+        error_log('Workout assignment failed: ' . $e->getMessage());
+        http_response_code(500);
+        echo json_encode(['success' => false, 'error' => 'Could not assign workout']);
+    } catch (Throwable $e) {
+        error_log('Workout assignment failed: ' . $e->getMessage());
+        http_response_code(500);
+        echo json_encode(['success' => false, 'error' => 'Could not assign workout']);
+    }
+    exit;
+}
+
 if ($action === 'get_facilities') {
     try {
         $facilities = $bookingModel->getAllFacilities();
