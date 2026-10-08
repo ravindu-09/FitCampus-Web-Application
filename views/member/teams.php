@@ -49,6 +49,49 @@ if ($is_captain) {
                 </p>
             </section>
 
+            <section id="scheduled-training-sessions" class="wk-view-container tm-section-pad" aria-labelledby="scheduled-sessions-heading">
+                <div class="wk-section-head tm-section-head">
+                    <h3 class="monitor-title m-0" id="scheduled-sessions-heading">Scheduled Training Sessions</h3>
+                    <span class="wk-badge-verified">Next 2 Weeks</span>
+                </div>
+
+                <?php if (empty($scheduled_sessions)): ?>
+                    <div class="glass-card tm-empty-state">
+                        <span class="material-symbols-outlined tm-empty-icon">event_busy</span>
+                        <p class="m-0 text-color-on-surface-variant">No approved training sessions scheduled in the next two weeks.</p>
+                    </div>
+                <?php else: ?>
+                    <div class="space-y-md">
+                        <?php $last_session_date = null; ?>
+                        <?php foreach ($scheduled_sessions as $session): ?>
+                            <?php if ($last_session_date !== $session['Reserve_Date']): ?>
+                                <?php $last_session_date = $session['Reserve_Date']; ?>
+                                <h4 class="settings-main-title text-base txt-primary bk-mt-md">
+                                    <?= htmlspecialchars(date('l, F j', strtotime($session['Reserve_Date'])), ENT_QUOTES, 'UTF-8') ?>
+                                </h4>
+                            <?php endif; ?>
+                            <article class="glass-card bk-p-md border-dim">
+                                <div class="flex-between items-center gap-3">
+                                    <div class="flex-items-center gap-3">
+                                        <span class="material-symbols-outlined text-color-secondary">schedule</span>
+                                        <div>
+                                            <p class="font-bold text-base m-0 txt-white">
+                                                <?= htmlspecialchars(date('g:i A', strtotime($session['Start_Time'])) . ' - ' . date('g:i A', strtotime($session['End_Time'])), ENT_QUOTES, 'UTF-8') ?>
+                                            </p>
+                                            <p class="font-xs txt-muted m-0 bk-mt-xs">
+                                                <?= htmlspecialchars($session['Facility_Name'], ENT_QUOTES, 'UTF-8') ?>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <span class="badge-status" style="background: rgba(74,225,118,0.1); border-color: rgba(74,225,118,0.3); color: var(--secondary);">Approved</span>
+                                </div>
+                                <p class="font-xs txt-muted bk-mt-sm mb-0">No workout assigned</p>
+                            </article>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            </section>
+
             <section id="team-goals-section" class="wk-view-container tm-section-pad" aria-labelledby="team-goals-heading">
                 <div class="wk-section-head tm-section-head">
                     <h3 class="monitor-title m-0" id="team-goals-heading">Team Goals</h3>

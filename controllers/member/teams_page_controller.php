@@ -30,6 +30,7 @@ $teamModel = new TeamModel($pdo);
 $teams = $teamModel->getTeamsByUser($user_id);
 $workoutModel = new WorkoutModel($pdo);
 $team_workouts = [];
+$scheduled_sessions = [];
 $selected_team = null;
 $team_access_denied = false;
 
@@ -55,6 +56,7 @@ if (!$team_access_denied && $requested_team_id !== null) {
         $team_access_denied = true;
     } else {
         $team_workouts = $workoutModel->getWorkoutsForTeamMember($requested_team_id, $user_id);
+        $scheduled_sessions = $teamModel->getUpcomingApprovedBookingsForTeam($requested_team_id, $user_id);
     }
 }
 
