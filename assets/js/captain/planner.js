@@ -1,148 +1,201 @@
 // assets/js/captain/planner.js
-
 document.addEventListener('DOMContentLoaded', () => {
-    
-    // =========================================================
-    // 1. ADD NEW EXERCISE ROW LOGIC
-    // =========================================================
-    const addExerciseBtn = document.getElementById('add-exercise-btn');
+    const form = document.getElementById('workout-planner-form');
     const exercisesContainer = document.getElementById('exercises-container');
+    const statusMessage = document.getElementById('form-status-msg');
+    const saveButton = document.getElementById('btn-save-workout');
+    const formTitle = document.getElementById('workout-form-title');
+    const workoutIdInput = document.getElementById('workout-id');
+    const actionInput = document.getElementById('workout-action');
+    const exerciseOptions = exercisesContainer.querySelector('.exercise-select').innerHTML;
 
-    if (addExerciseBtn && exercisesContainer) {
-        addExerciseBtn.addEventListener('click', () => {
-            const exerciseBlock = document.createElement('div');
-            exerciseBlock.className = 'exercise-block bk-mt-md pt-4 border-t-dim'; // Pure CSS separator
-            
-            exerciseBlock.innerHTML = `
-                <div class="flex-between items-center bk-mb-sm">
-                    <label class="gl-lbl-accent m-0">NEXT EXERCISE</label>
-                    <button type="button" class="remove-ex-btn txt-error bg-transparent" style="border:none; cursor:pointer; display:flex; align-items:center;"><span class="material-symbols-outlined" style="font-size:18px;">close</span></button>
-                </div>
-                <div class="form-group-cal space-y-xs bk-mb-md">
-                    <input class="cal-input-field ex-name" type="text" name="ex_name[]" placeholder="e.g., Squats" required>
-                </div>
-                <div class="cal-grid-2 gap-3">
-                    <div class="form-group-cal space-y-xs">
-                        <label class="gl-lbl-accent">SETS</label>
-                        <input class="cal-input-field ex-sets" type="number" name="ex_sets[]" placeholder="0" required>
-                    </div>
-                    <div class="form-group-cal space-y-xs">
-                        <label class="gl-lbl-accent">MAX DURATION (MINS)</label>
-                        <input class="cal-input-field ex-duration" type="number" name="ex_duration[]" placeholder="0" required>
-                    </div>
-                </div>
-            `;
-            exercisesContainer.appendChild(exerciseBlock);
+    if (!form || !exercisesContainer) return;
 
-            // Add event listener to the newly created remove button
-            exerciseBlock.querySelector('.remove-ex-btn').addEventListener('click', function() {
-                exerciseBlock.remove();
-            });
+    function addRemoveButton(block) {
+        const removeButton = document.createElement('button');
+        removeButton.type = 'button';
+        removeButton.className = 'remove-ex-btn txt-error bg-transparent';
+        removeButton.setAttribute('aria-label', 'Remove exercise');
+        removeButton.style.cssText = 'border: none; cursor: pointer; display: flex; align-items: center; margin-left: auto;';
+        removeButton.innerHTML = '<span class="material-symbols-outlined">close</span>';
+        block.appendChild(removeButton);
+        removeButton.addEventListener('click', () => {
+            if (exercisesContainer.children.length === 1) {
+                block.querySelector('.exercise-select').value = '';
+                block.querySelector('.exercise-custom').value = '';
+                block.querySelector('.exercise-name-value').value = '';
+                block.querySelector('.custom-exercise-field').hidden = true;
+                block.querySelector('.exercise-custom').required = false;
+                block.querySelector('.ex-sets').value = '';
+                block.querySelector('.ex-reps').value = '';
+            } else {
+                block.remove();
+            }
         });
     }
 
-    // =========================================================
-    // 2. FORM SUBMISSION (Ready for Backend Integration)
-    // =========================================================
-    const plannerForm = document.getElementById('workout-planner-form');
-    const statusMsg = document.getElementById('form-status-msg');
+    function syncExerciseName(block) {
+        const select = block.querySelector('.exercise-select');
+        const customField = block.querySelector('.custom-exercise-field');
+        const customInput = block.querySelector('.exercise-custom');
+        const exerciseName = block.querySelector('.exercise-name-value');
+        const isCustom = select.value === '__custom__';
 
-    if (plannerForm) {
-        plannerForm.addEventListener('submit', function(e) {
-            e.preventDefault(); // Prevent default page reload
-            
-            // Show processing message to the UI
-            statusMsg.classList.remove('hidden');
-            statusMsg.innerHTML = `<span class="txt-primary">Processing your schedule...</span>`;
-            statusMsg.style.background = 'rgba(223, 183, 255, 0.1)';
+        customField.hidden = !isCustom;
+        customInput.required = isCustom;
+        exerciseName.value = isCustom ? customInput.value.trim() : select.value;
+    }
 
-            const formData = new FormData(plannerForm);
-            formData.append('action', 'save_workout');
-            formData.append('status', 'Published'); // Indicate the Published status
+    function makeExerciseRow(exercise = {}) {
+        const block = document.createElement('div');
+        block.className = 'exercise-block bk-mt-md pt-4 border-t-dim';
+        block.innerHTML = `
+            <div class="form-group-cal space-y-xs bk-mb-md">
+                <label class="gl-lbl-accent">EXERCISE NAME</label>
+                <select class="cal-input-field gl-select exercise-select" required>${exerciseOptions}</select>
+                <div class="custom-exercise-field" hidden>
+                    <input class="cal-input-field exercise-custom" type="text" maxlength="100" placeholder="Enter exercise name">
+                </div>
+                <input type="hidden" name="exercise_name[]" class="exercise-name-value" required>
+            </div>
+            <div class="cal-grid-2 gap-3">
+                <div class="form-group-cal space-y-xs">
+                    <label class="gl-lbl-accent">SETS</label>
+                    <input class="cal-input-field ex-sets" type="number" name="exercise_sets[]" min="1" max="1000" placeholder="3" required>
+                </div>
+                <div class="form-group-cal space-y-xs">
+                    <label class="gl-lbl-accent">REPS</label>
+                    <input class="cal-input-field ex-reps" type="number" name="exercise_reps[]" min="1" max="1000" placeholder="10" required>
+                </div>
+            </div>
+        `;
+        block.querySelector('[name="exercise_sets[]"]').value = exercise.Sets || '';
+        block.querySelector('[name="exercise_reps[]"]').value = exercise.Reps || '';
+        syncExerciseName(block);
+        if (exercise.Exercise_Name) {
+            const select = block.querySelector('.exercise-select');
+            const normalizedName = exercise.Exercise_Name.trim().replace(/\s+/g, ' ');
+            const matchingOption = Array.from(select.options).find((option) =>
+                option.value && option.value !== '__custom__'
+                && option.value.toLocaleLowerCase() === normalizedName.toLocaleLowerCase()
+            );
 
-            // -------------------------------------------------------------
-            // TODO: Uncomment the fetch block below once the backend is ready.
-            // -------------------------------------------------------------
-            /*
-            fetch('planner_backend.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    statusMsg.innerHTML = `<span class="txt-green">Schedule Published Successfully!</span>`;
-                    statusMsg.style.background = 'rgba(74,225,118,0.1)';
-                    plannerForm.reset();
-                    setTimeout(() => window.location.reload(), 2000);
-                } else {
-                    statusMsg.innerHTML = `<span class="txt-error">${data.error}</span>`;
-                    statusMsg.style.background = 'rgba(255,180,171,0.1)';
-                }
-            })
-            .catch(error => {
-                statusMsg.innerHTML = `<span class="txt-error">Network error occurred.</span>`;
-                statusMsg.style.background = 'rgba(255,180,171,0.1)';
-            });
-            */
+            if (matchingOption) {
+                select.value = matchingOption.value;
+            } else {
+                select.value = '__custom__';
+                block.querySelector('.exercise-custom').value = exercise.Exercise_Name;
+            }
+            syncExerciseName(block);
+        }
+        addRemoveButton(block);
+        return block;
+    }
 
-            // For demonstration purposes only (Mock Success):
-            setTimeout(() => {
-                statusMsg.innerHTML = `<span class="txt-green">Mock: Schedule Published Successfully!</span>`;
-                statusMsg.style.background = 'rgba(74,225,118,0.1)';
-                plannerForm.reset();
-            }, 1000);
-        });
-        
-        // Save as Draft Button Logic (Mock)
-        document.getElementById('btn-save-draft').addEventListener('click', function() {
-            if(!plannerForm.checkValidity()) {
-                plannerForm.reportValidity();
+    function setStatus(message, isError = false) {
+        statusMessage.textContent = message;
+        statusMessage.classList.remove('hidden');
+        statusMessage.style.color = isError ? 'var(--error)' : 'var(--secondary)';
+        statusMessage.style.background = isError ? 'rgba(255,180,171,0.1)' : 'rgba(74,225,118,0.1)';
+    }
+
+    function resetForm() {
+        form.reset();
+        workoutIdInput.value = '';
+        actionInput.value = 'create';
+        saveButton.textContent = 'Save Workout';
+        formTitle.textContent = 'Create Reusable Team Workout';
+        exercisesContainer.replaceChildren(makeExerciseRow());
+        statusMessage.classList.add('hidden');
+    }
+
+    exercisesContainer.querySelectorAll('.exercise-block').forEach(addRemoveButton);
+
+    exercisesContainer.addEventListener('change', (event) => {
+        if (event.target.matches('.exercise-select')) {
+            syncExerciseName(event.target.closest('.exercise-block'));
+        }
+    });
+    exercisesContainer.addEventListener('input', (event) => {
+        if (event.target.matches('.exercise-custom')) {
+            syncExerciseName(event.target.closest('.exercise-block'));
+        }
+    });
+
+    document.getElementById('add-exercise-btn').addEventListener('click', () => {
+        exercisesContainer.appendChild(makeExerciseRow());
+    });
+
+    document.getElementById('btn-reset-workout').addEventListener('click', (event) => {
+        event.preventDefault();
+        resetForm();
+    });
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        saveButton.disabled = true;
+        setStatus('Saving workout...');
+
+        try {
+            const response = await fetch(form.getAttribute('action'), { method: 'POST', body: new FormData(form) });
+            const result = await response.json();
+            if (!response.ok || !result.success) {
+                setStatus(result.message || 'The workout could not be saved.', true);
                 return;
             }
-            statusMsg.classList.remove('hidden');
-            statusMsg.innerHTML = `<span class="txt-muted">Mock: Saved as Draft</span>`;
-            statusMsg.style.background = 'rgba(255,255,255,0.05)';
-        });
-    }
+            setStatus(result.message);
+            window.setTimeout(() => window.location.reload(), 500);
+        } catch (error) {
+            setStatus('A network error prevented saving the workout.', true);
+        } finally {
+            saveButton.disabled = false;
+        }
+    });
 
-    // =========================================================
-    // 3. MODALS LOGIC (Delete & Edit)
-    // =========================================================
-    const deleteModal = document.getElementById('delete-modal');
-    const editDraftModal = document.getElementById('edit-draft-modal');
-
-    // Open Delete Modal
-    document.querySelectorAll('.open-delete-modal').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevent parent card click event from triggering
-            const scheduleId = btn.getAttribute('data-id');
-            // TODO: Pass scheduleId to the confirm button for backend use later
-            deleteModal.classList.add('active');
+    document.querySelectorAll('.edit-workout-btn').forEach((button) => {
+        button.addEventListener('click', () => {
+            const workout = JSON.parse(button.dataset.workout);
+            form.elements.team_id.value = workout.Team_ID;
+            form.elements.title.value = workout.Title;
+            form.elements.description.value = workout.Description || '';
+            form.elements.duration.value = workout.Duration || '';
+            workoutIdInput.value = workout.Workout_ID;
+            actionInput.value = 'edit';
+            saveButton.textContent = 'Update Workout';
+            formTitle.textContent = 'Edit Reusable Team Workout';
+            const rows = workout.Exercises.length
+                ? workout.Exercises.map(makeExerciseRow)
+                : [makeExerciseRow()];
+            exercisesContainer.replaceChildren(...rows);
+            setStatus('Editing workout for ' + workout.Team_Name + '.');
+            form.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
     });
 
-    // Open Edit Draft Modal
-    document.querySelectorAll('.open-edit-modal').forEach(card => {
-        card.addEventListener('click', () => {
-            const scheduleId = card.getAttribute('data-id');
-            // TODO: Fetch data for this ID from backend later
-            editDraftModal.classList.add('active');
-        });
-    });
+    document.querySelectorAll('.delete-workout-btn').forEach((button) => {
+        button.addEventListener('click', async () => {
+            if (!window.confirm('Delete this reusable workout? Its exercise links will also be removed.')) return;
 
-    // Close Modals functionality
-    document.querySelectorAll('.close-modal-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            deleteModal.classList.remove('active');
-            editDraftModal.classList.remove('active');
-        });
-    });
+            const formData = new FormData();
+            formData.append('csrf_token', form.elements.csrf_token.value);
+            formData.append('action', 'delete');
+            formData.append('workout_id', button.dataset.workoutId);
+            formData.append('team_id', button.dataset.teamId);
+            button.disabled = true;
 
-    // Confirm Delete Action (Mock)
-    document.getElementById('confirm-delete-btn')?.addEventListener('click', () => {
-        // TODO: Include Backend delete logic here
-        deleteModal.classList.remove('active');
-        alert("Mock: Schedule deleted successfully.");
+            try {
+                const response = await fetch(form.getAttribute('action'), { method: 'POST', body: formData });
+                const result = await response.json();
+                if (!response.ok || !result.success) {
+                    setStatus(result.message || 'The workout could not be deleted.', true);
+                    button.disabled = false;
+                    return;
+                }
+                window.location.reload();
+            } catch (error) {
+                setStatus('A network error prevented deleting the workout.', true);
+                button.disabled = false;
+            }
+        });
     });
 });
