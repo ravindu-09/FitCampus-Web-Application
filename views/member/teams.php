@@ -85,7 +85,22 @@ if ($is_captain) {
                                     </div>
                                     <span class="badge-status" style="background: rgba(74,225,118,0.1); border-color: rgba(74,225,118,0.3); color: var(--secondary);">Approved</span>
                                 </div>
-                                <p class="font-xs txt-muted bk-mt-sm mb-0">No workout assigned</p>
+                                <div class="bk-mt-sm">
+                                    <p class="font-xs txt-muted m-0">Assigned Workouts</p>
+                                    <?php if (empty($session['Assigned_Workouts'])): ?>
+                                        <p class="font-xs txt-muted bk-mt-xs mb-0">No workout assigned</p>
+                                    <?php else: ?>
+                                        <ul class="wk-exercise-list">
+                                            <?php foreach ($session['Assigned_Workouts'] as $assigned_workout): ?>
+                                                <li>
+                                                    <a class="tm-workout-link" href="workout_details.php?booking_id=<?= (int)$session['Booking_ID'] ?>&amp;workout_id=<?= (int)$assigned_workout['Workout_ID'] ?>">
+                                                        <?= htmlspecialchars($assigned_workout['Title'], ENT_QUOTES, 'UTF-8') ?>
+                                                    </a>
+                                                </li>
+                                            <?php endforeach; ?>
+                                        </ul>
+                                    <?php endif; ?>
+                                </div>
                             </article>
                         <?php endforeach; ?>
                     </div>
