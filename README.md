@@ -40,6 +40,11 @@ FitCampus is an all-in-one web-based fitness and facility management platform de
 * **User Management & Captain Promotion Panel:** Role filtering, user suspension, manual instructor creation, and promoting students to Captains.
 * **Broadcast Alerts Center:** Push notifications to staff and student mobile devices.
 
+### 6. 📨 Support Requests
+* Users can submit account extension, life bar replenishment, and complaint/feedback requests.
+* Student account extensions require a requested end date and a new student ID photo; other request types accept an optional photo.
+* Users can follow request status and admin replies. Administrators can review attachments, update status, and respond from the Support Requests inbox.
+
 ---
 
 ## 🏗️ Technical Architecture & Tech Stack
@@ -138,6 +143,8 @@ FitCampus-Web-Application/
 * Create a new database named **`fitcampus_db`** with Collation `utf8mb4_general_ci`.
 * Click on the newly created database, go to the **Import** tab, choose `sql/fitcampus_db.sql` from the project directory, and click **Import**.
 
+* If the database was already imported before the support feature was added, import `sql/support_feature_migration.sql` once to add its two `feedback` columns. Do not run this migration after importing the updated full schema.
+
 
 4. **Verify Database Configuration:**
 * Ensure `includes/db_connection.php` matches your local server credentials:
@@ -160,6 +167,14 @@ http://localhost/FitCampus-Web-Application/
 http://localhost/FitCampus-Web-Application/views/auth/login.php
 
 ```
+
+### Support Feature Flow
+1. A signed-in user opens **Support** from the shared footer and chooses one of the available request categories.
+2. The user describes the request. Account extension requests are limited to student accounts and require a future requested end date plus a JPEG, PNG, or WEBP photo of the new student ID (maximum 5 MB). Images for the other request types are optional.
+3. The request is stored in the existing `feedback` table. Uploaded images are stored in the private `storage/support_requests/` directory and streamed only to the requester or an administrator.
+4. Administrators open **Support Requests** in the admin sidebar to review requests, access attachments, set the status, and send a response. The requester sees the reply in their support history.
+
+Ensure PHP's `fileinfo` extension is enabled and `upload_max_filesize`/`post_max_size` allow the configured attachment size.
 
 ---
 

@@ -1,8 +1,18 @@
+<?php
+$footerDirectory = basename(dirname($_SERVER['PHP_SELF']));
+if ($footerDirectory === 'common') {
+    $supportHref = 'support.php';
+} elseif (in_array($footerDirectory, ['admin', 'auth', 'captain', 'instructor', 'member'], true)) {
+    $supportHref = '../common/support.php';
+} else {
+    $supportHref = 'views/common/support.php';
+}
+?>
 <!-- Universal Modular Footer -->
     <footer class="global-footer">
         <div class="footer-nav">
             <a href="#">Privacy Policy</a>
-            <a href="#">Support</a>
+            <a href="<?php echo htmlspecialchars($supportHref, ENT_QUOTES, 'UTF-8'); ?>">Support</a>
             <a href="#">Facility Rules</a>
         </div>
         <p class="copyright">FITCAMPUS &copy; UNIVERSITY OF COLOMBO</p>
