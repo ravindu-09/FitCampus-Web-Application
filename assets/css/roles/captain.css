@@ -3,6 +3,17 @@
    FitCampus Web Application
    ========================================================================== */
 
+.bk-main-container {
+    padding-top: 90px;
+    padding-bottom: 96px;
+}
+
+@media (min-width: 1024px) {
+    .bk-main-container {
+        padding-bottom: 48px;
+    }
+}
+
 /* ==========================================================================
    [SECTION 1] CAPTAIN BOTTOM BAR & NAVIGATION
    - Mobile navigation item groups & dropdown menus
@@ -477,96 +488,12 @@
   margin: 0; 
 }
 
-.cal-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.bk-main-container { padding-top: 90px; padding-bottom: 96px; }
-
-@media (min-width: 1024px) { 
-  .bk-main-container { padding-bottom: 48px; } 
+/* Preserve captain-specific border styling */
+.border-dim {
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* Flex & Borders */
-.flex-between { display: flex; justify-content: space-between; align-items: center; } 
-.flex-items-center { display: flex; align-items: center; } 
-.justify-center { justify-content: center; }
-
-.border-dim { border: 1px solid rgba(255, 255, 255, 0.05); } 
-.border-b-dim { border-bottom: 1px solid rgba(255, 255, 255, 0.05); } 
-.border-t-dim { border-top: 1px solid rgba(255, 255, 255, 0.05); } 
-.divide-y-dim > * + * { border-top: 1px solid rgba(255, 255, 255, 0.05); }
-
-/* Backgrounds & Colors */
-.bg-dim { background-color: rgba(255, 255, 255, 0.05); } 
-.hover-bg-dim:hover { background-color: rgba(255, 255, 255, 0.05); }
-.bg-secondary-dim { background-color: rgba(74, 225, 118, 0.2); } 
-.bg-tertiary-dim { background-color: rgba(247, 190, 29, 0.2); } 
-.bg-pending { background-color: #ffb4ab; } 
-.bg-pending-dim { background-color: rgba(255, 180, 171, 0.1); border-color: rgba(255, 180, 171, 0.2); } 
-.badge-bg-primary, .captain-badge-highlight { background: rgba(223, 183, 255, 0.2); }
-
-.bg-secondary { background-color: #4ae176; } 
-.bg-tertiary { background-color: #f7be1d; } 
-.bg-error { background-color: #ffb4ab; } 
-.bg-primary { background-color: #dfb7ff; }
-
-.txt-white { color: #e5e2e1; } 
-.txt-muted { color: var(--on-surface-variant); } 
-.txt-error { color: var(--error); } 
-.txt-primary { color: var(--primary); } 
-.txt-green { color: var(--secondary); } 
-.txt-tertiary { color: var(--tertiary); } 
-.txt-pending { color: #ffb4ab; }
-
-/* Typography & Spacing Helpers */
-.font-xs { font-size: 10px; } 
-.font-medium { font-weight: 500; } 
-.font-semibold { font-weight: 600; } 
-.font-bold { font-weight: 700; } 
-.tracking-wide { letter-spacing: 0.1em; } 
-.uppercase { text-transform: uppercase; } 
-.text-center { text-align: center; }
-
-.m-0 { margin: 0 !important; } 
-.bk-mb-xs { margin-bottom: 6px; } 
-.bk-mb-sm { margin-bottom: 12px; } 
-.bk-mb-md { margin-bottom: 16px; } 
-.bk-mb-lg { margin-bottom: 24px; } 
-.bk-mt-xs { margin-top: 6px; } 
-.bk-mt-sm { margin-top: 12px; } 
-.bk-mt-md { margin-top: 16px; } 
-.bk-mt-lg { margin-top: 24px; } 
-.bk-pb-sm { padding-bottom: 16px; } 
-.bk-pt-lg { padding-top: 24px; }
-
-.bk-card-pad { padding: 24px; } 
-.bk-p-md { padding: 16px 20px; } 
-.bk-px-lg { padding-left: 20px; padding-right: 20px; } 
-.bk-py-md { padding-top: 14px; padding-bottom: 14px; } 
-.bk-py-lg { padding-top: 32px; padding-bottom: 32px; } 
 .roster-main-pad { padding: 30px; }
 
-.space-y-xs > * + * { margin-top: 6px; } 
-.space-y-md > * + * { margin-top: 20px; } 
-.gap-2 { gap: 8px; } 
-.gap-3 { gap: 12px; }
-
-/* Utility States & Animations */
-.hidden { display: none !important; } 
-.cursor-pointer { cursor: pointer; } 
-.select-none { user-select: none; }
-
-@keyframes spin { 
-  100% { transform: rotate(360deg); } 
-} 
-.animate-spin { 
-  animation: spin 1s linear infinite; 
-  display: inline-block; 
-}
-
-.opacity-0 { opacity: 0; } 
-.scale-95 { transform: scale(0.95); } 
-.transition-opacity { transition: opacity 0.3s ease; } 
-.transition-transform { transition: transform 0.3s ease; } 
-.transition-colors { transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
-
-.max-w-sm { max-width: 384px; } 
-.z-100 { z-index: 100; }
+body.member-layout-body { --shared-cal-grid-gap: 12px; }
+.captain-badge-highlight { background: rgba(223, 183, 255, 0.2); }

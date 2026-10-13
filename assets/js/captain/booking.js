@@ -14,6 +14,140 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let currentDayNames = []; 
 
+    const assignmentModal = document.getElementById('assign-workout-modal');
+    const assignmentForm = document.getElementById('assign-workout-form');
+    const assignmentSelect = document.getElementById('assign-workout-select');
+    const assignmentBookingId = document.getElementById('assign-workout-booking-id');
+    const assignmentBookingLabel = document.getElementById('assign-workout-booking-label');
+    const assignmentCurrentList = document.getElementById('assign-workout-current-list');
+    const assignmentCurrentEmpty = document.getElementById('assign-workout-current-empty');
+    const assignmentNoOptions = document.getElementById('assign-workout-no-options');
+    const assignmentMessage = document.getElementById('assign-workout-message');
+    const assignmentSubmit = document.getElementById('assign-workout-submit');
+    let activeAssignmentRow = null;
+    let activeAssignmentButton = null;
+
+    function getAvailableWorkouts(button) {
+        try {
+            const workouts = JSON.parse(button.dataset.availableWorkouts || '[]');
+            return Array.isArray(workouts) ? workouts : [];
+        } catch (error) {
+            return [];
+        }
+    }
+
+    function renderAssignedWorkouts(row) {
+        const rowList = row?.querySelector('[data-booking-assigned-list]');
+        if (!rowList) return;
+
+        const assignedItems = Array.from(rowList.querySelectorAll('[data-workout-id]'));
+        assignmentCurrentList.replaceChildren();
+        assignedItems.forEach((item) => {
+            const listItem = document.createElement('li');
+            listItem.textContent = item.textContent;
+            assignmentCurrentList.appendChild(listItem);
+        });
+        assignmentCurrentEmpty.classList.toggle('hidden', assignedItems.length > 0);
+    }
+
+    function populateAvailableWorkouts(button) {
+        const workouts = getAvailableWorkouts(button);
+        assignmentSelect.replaceChildren(new Option('Select a reusable team workout', ''));
+        workouts.forEach((workout) => {
+            const duration = workout.Duration ? ` (${workout.Duration} min)` : '';
+            const option = new Option(`${workout.Title}${duration}`, workout.Workout_ID);
+            option.dataset.workoutTitle = workout.Title;
+            assignmentSelect.add(option);
+        });
+        assignmentSelect.disabled = workouts.length === 0;
+        assignmentSubmit.disabled = workouts.length === 0;
+        assignmentNoOptions.classList.toggle('hidden', workouts.length > 0);
+    }
+
+    function closeAssignmentModal() {
+        assignmentModal?.classList.remove('active');
+        activeAssignmentRow = null;
+        activeAssignmentButton = null;
+    }
+
+    document.addEventListener('click', (event) => {
+        const assignButton = event.target.closest('.assign-workout-trigger');
+        if (assignButton && assignmentModal) {
+            activeAssignmentButton = assignButton;
+            activeAssignmentRow = assignButton.closest('tr');
+            assignmentBookingId.value = assignButton.dataset.bookingId;
+            assignmentBookingLabel.textContent = `Booking #${assignButton.dataset.bookingId} · ${activeAssignmentRow.cells[1].textContent} · ${activeAssignmentRow.cells[2].textContent} · ${activeAssignmentRow.cells[3].textContent}`;
+            assignmentMessage.textContent = '';
+            assignmentMessage.classList.add('hidden');
+            renderAssignedWorkouts(activeAssignmentRow);
+            populateAvailableWorkouts(assignButton);
+            assignmentModal.classList.add('active');
+            return;
+        }
+
+        if (event.target.closest('#assign-workout-close, #assign-workout-cancel')
+            || event.target === assignmentModal) {
+            closeAssignmentModal();
+        }
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') closeAssignmentModal();
+    });
+
+    assignmentForm?.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (!activeAssignmentRow || !assignmentSelect.value) return;
+
+        const selectedWorkout = assignmentSelect.selectedOptions[0];
+        const workoutId = assignmentSelect.value;
+        const formData = new FormData();
+        formData.append('action', 'assign_workout');
+        formData.append('booking_id', assignmentBookingId.value);
+        formData.append('workout_id', workoutId);
+        assignmentSubmit.disabled = true;
+        assignmentSubmit.textContent = 'Assigning...';
+
+        try {
+            const response = await fetch('../../controllers/captain/booking_action.php', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+            if (!response.ok || !result.success) {
+                assignmentMessage.textContent = result.error || 'Could not assign workout.';
+                assignmentMessage.classList.remove('hidden');
+                assignmentMessage.style.color = 'var(--error)';
+                return;
+            }
+
+            const rowList = activeAssignmentRow.querySelector('[data-booking-assigned-list]');
+            if (rowList && !rowList.querySelector(`[data-workout-id="${CSS.escape(workoutId)}"]`)) {
+                rowList.querySelector('.no-assigned-workouts')?.remove();
+                const listItem = document.createElement('li');
+                listItem.dataset.workoutId = workoutId;
+                listItem.textContent = selectedWorkout.dataset.workoutTitle || selectedWorkout.textContent;
+                rowList.appendChild(listItem);
+            }
+
+            const remainingWorkouts = getAvailableWorkouts(activeAssignmentButton)
+                .filter((workout) => String(workout.Workout_ID) !== String(workoutId));
+            activeAssignmentButton.dataset.availableWorkouts = JSON.stringify(remainingWorkouts);
+            renderAssignedWorkouts(activeAssignmentRow);
+            populateAvailableWorkouts(activeAssignmentButton);
+            assignmentMessage.textContent = result.message || 'Workout assigned.';
+            assignmentMessage.classList.remove('hidden');
+            assignmentMessage.style.color = 'var(--secondary)';
+        } catch (error) {
+            assignmentMessage.textContent = 'Network error. Could not assign workout.';
+            assignmentMessage.classList.remove('hidden');
+            assignmentMessage.style.color = 'var(--error)';
+        } finally {
+            assignmentSubmit.textContent = 'Assign';
+            assignmentSubmit.disabled = assignmentSelect.disabled;
+        }
+    });
+
     const gymToggleContainer = document.getElementById('gym-toggle-container');
     if (gymToggleContainer) {
         const firstBtn = gymToggleContainer.querySelector('.toggle-btn');
@@ -423,10 +557,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     const tbody = document.querySelector('.admin-data-table tbody');
                     if (tbody) {
-                        const emptyRow = tbody.querySelector('td[colspan="6"]');
+                        const emptyRow = tbody.querySelector('td[colspan="7"]');
                         if (emptyRow) emptyRow.parentElement.remove();
 
                         const b = data.new_booking;
+                        if (!b.Booking_ID) return;
                         let badgeStyle = '';
                         if (b.Status === 'Approved') {
                             badgeStyle = 'background: rgba(74,225,118,0.1); border-color: rgba(74,225,118,0.3); color: var(--secondary);';
@@ -435,17 +570,69 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
 
                         const tr = document.createElement('tr');
-                        tr.id = `booking-row-${b.Booking_ID || ''}`;
-                        tr.innerHTML = `
-                            <td><strong>${b.Facility_Name}</strong></td>
-                            <td>${b.Team_Name}</td>
-                            <td><span class="mono">${b.Reserve_Date}</span></td>
-                            <td><span class="mono">${b.Time_Slot}</span></td>
-                            <td><span class="badge-status" style="${badgeStyle}">${b.Status}</span></td>
-                            <td class="text-right">
-                                <button type="button" class="toggle-btn txt-error delete-booking-btn" data-id="${b.Booking_ID || ''}" style="padding: 4px 8px; font-size: 11px;">Delete</button>
-                            </td>
-                        `;
+                        tr.id = `booking-row-${b.Booking_ID}`;
+
+                        const facilityCell = document.createElement('td');
+                        const facilityName = document.createElement('strong');
+                        facilityName.textContent = b.Facility_Name;
+                        facilityCell.appendChild(facilityName);
+                        tr.appendChild(facilityCell);
+
+                        [b.Team_Name, b.Reserve_Date, b.Time_Slot].forEach((value, index) => {
+                            const cell = document.createElement('td');
+                            const valueElement = document.createElement('span');
+                            valueElement.className = 'mono';
+                            valueElement.textContent = value;
+                            if (index === 0) cell.textContent = value;
+                            else cell.appendChild(valueElement);
+                            tr.appendChild(cell);
+                        });
+
+                        const statusCell = document.createElement('td');
+                        const statusBadge = document.createElement('span');
+                        statusBadge.className = 'badge-status';
+                        statusBadge.setAttribute('style', badgeStyle);
+                        statusBadge.textContent = b.Status;
+                        statusCell.appendChild(statusBadge);
+                        tr.appendChild(statusCell);
+
+                        const assignedCell = document.createElement('td');
+                        if (b.Status === 'Approved') {
+                            const assignedList = document.createElement('ul');
+                            assignedList.className = 'booking-assigned-workouts';
+                            assignedList.dataset.bookingAssignedList = '';
+                            const emptyMessage = document.createElement('li');
+                            emptyMessage.className = 'no-assigned-workouts txt-muted';
+                            emptyMessage.textContent = 'No workouts assigned';
+                            assignedList.appendChild(emptyMessage);
+                            assignedCell.appendChild(assignedList);
+                        } else {
+                            assignedCell.textContent = '—';
+                            assignedCell.className = 'txt-muted';
+                        }
+                        tr.appendChild(assignedCell);
+
+                        const actionsCell = document.createElement('td');
+                        actionsCell.className = 'text-right';
+                        if (b.Status === 'Approved') {
+                            const assignButton = document.createElement('button');
+                            assignButton.type = 'button';
+                            assignButton.className = 'toggle-btn assign-workout-trigger';
+                            assignButton.dataset.bookingId = b.Booking_ID;
+                            assignButton.dataset.availableWorkouts = JSON.stringify(b.Available_Workouts || []);
+                            assignButton.style.cssText = 'padding: 4px 8px; font-size: 11px;';
+                            assignButton.textContent = 'Assign Workout';
+                            actionsCell.appendChild(assignButton);
+                        }
+
+                        const deleteButton = document.createElement('button');
+                        deleteButton.type = 'button';
+                        deleteButton.className = 'toggle-btn txt-error delete-booking-btn';
+                        deleteButton.dataset.id = b.Booking_ID;
+                        deleteButton.style.cssText = 'padding: 4px 8px; font-size: 11px;';
+                        deleteButton.textContent = 'Delete';
+                        actionsCell.appendChild(deleteButton);
+                        tr.appendChild(actionsCell);
                         tbody.prepend(tr);
                     }
 

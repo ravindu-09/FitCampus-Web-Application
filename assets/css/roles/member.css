@@ -15,6 +15,7 @@
 .member-layout-body {
   background-color: var(--bg-color);
   color: var(--on-surface);
+  --shared-cal-grid-gap: 16px;
 }
 
 /* Header */
@@ -901,6 +902,10 @@
   color: var(--on-surface);
 }
 
+.settings-main-title.txt-primary {
+  color: var(--primary);
+}
+
 /* Form Layout Grids (Used across Settings & Calories) */
 .settings-grid-layout {
   display: grid;
@@ -1177,7 +1182,6 @@
   position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #888; font-size: 18px;
 }
 .cal-input-field.with-icon { padding-left: 40px; }
-.cal-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .cal-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 .cal-submit-btn {
   width: 100%; border: none; border-radius: 8px; padding: 14px; font-size: 14px; font-weight: 600;
@@ -1553,9 +1557,7 @@
 
 .mono { font-family: 'JetBrains Mono', 'Courier New', Courier, monospace; }
 .txt-purple { color: #DFB7FF; }
-.txt-green { color: #4ae176; }
 .txt-yellow { color: #f7be1d; }
-.txt-white { color: #e5e2e1; }
 
 .bg-purple { background-color: #DFB7FF; }
 .bg-green { background-color: #4ae176; }
@@ -1917,6 +1919,21 @@
     grid-column: 1 / -1; 
 }
 
+.tm-back-btn {
+    margin-bottom: 24px;
+}
+
+.tm-workout-link {
+    color: var(--on-surface);
+    text-decoration: none;
+    font-size: 13px;
+    transition: color 0.2s ease;
+}
+
+.tm-workout-link:hover {
+    color: var(--primary);
+    text-decoration: underline;
+}
 
 /* ==========================================================================
    [SECTION 10] SEMANTIC UTILITY REPLACEMENTS (For Workouts, Calories, Settings)
@@ -1944,7 +1961,6 @@
 .st-inline-block { display: inline-block; }
 
 /* General overrides to clean out inline tailwind habits */
-.m-0 { margin: 0 !important; }
 .mb-1 { margin-bottom: 4px; }
 .mb-2 { margin-bottom: 8px; }
 .mb-3 { margin-bottom: 12px; }

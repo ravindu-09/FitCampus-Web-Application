@@ -33,4 +33,24 @@ $facilities = $bookingModel->getAllFacilities();
 
 // Fetch the booking history specific to the logged-in captain
 $booking_history = $bookingModel->getBookingHistory($user_id);
+$captain_team_ids = array_fill_keys(array_map('intval', array_column($captain_teams, 'Team_ID')), true);
+
+foreach ($booking_history as &$booking) {
+    $booking['can_assign_workout'] = $booking['Status'] === 'Approved'
+        && isset($captain_team_ids[(int)$booking['Team_ID']]);
+    $booking['assigned_workouts'] = [];
+    $booking['available_workouts'] = [];
+
+    if ($booking['can_assign_workout']) {
+        $booking['assigned_workouts'] = $bookingModel->getAssignedWorkoutsForBooking(
+            (int)$booking['Booking_ID'],
+            (int)$user_id
+        );
+        $booking['available_workouts'] = $bookingModel->getAvailableWorkoutsForBooking(
+            (int)$booking['Booking_ID'],
+            (int)$user_id
+        );
+    }
+}
+unset($booking);
 ?>

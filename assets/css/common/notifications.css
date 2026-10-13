@@ -57,7 +57,7 @@
   border: 1px solid;
 }
 
-.bg-tertiary-dim { background-color: rgba(247, 190, 29, 0.1); }
+.nt-icon-box.bg-tertiary-dim { background-color: rgba(247, 190, 29, 0.1); }
 .border-tertiary-dim { border-color: rgba(247, 190, 29, 0.2); }
 .text-tertiary { color: var(--tertiary); }
 

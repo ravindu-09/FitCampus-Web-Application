@@ -30,14 +30,105 @@ class BookingModel {
     // Fetch the booking history specific to the logged-in captain
     public function getBookingHistory($user_id) {
         $stmt = $this->pdo->prepare("
-            SELECT b.*, f.Facility_Name, t.Team_Name 
+            SELECT b.*, f.Facility_Name, t.Team_Name,
+                   CASE WHEN b.Requested_By = ? THEN 1 ELSE 0 END AS Can_Delete
             FROM booking b
             JOIN facility f ON b.Facility_ID = f.Facility_ID
             JOIN team t ON b.Team_ID = t.Team_ID
-            WHERE b.Requested_By = ?
+            INNER JOIN team_member tm
+                ON tm.Team_ID = b.Team_ID
+                AND tm.User_ID = ?
+                AND tm.Role_In_Team = 'Captain'
             ORDER BY b.Reserve_Date DESC, b.Start_Time DESC
         ");
-        $stmt->execute([$user_id]);
+        $stmt->execute([$user_id, $user_id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function assignWorkoutToBooking($booking_id, $workout_id, $user_id, RosterModel $rosterModel) {
+        $this->pdo->beginTransaction();
+        try {
+            $bookingStmt = $this->pdo->prepare(
+                'SELECT Team_ID, Status FROM booking WHERE Booking_ID = ? FOR UPDATE'
+            );
+            $bookingStmt->execute([$booking_id]);
+            $booking = $bookingStmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$booking) {
+                throw new DomainException('Booking not found.');
+            }
+            if (!$rosterModel->isCaptain((int)$booking['Team_ID'], $user_id)) {
+                throw new DomainException('Unauthorized access.');
+            }
+            if ($booking['Status'] !== 'Approved') {
+                throw new DomainException('Only approved bookings can receive workout assignments.');
+            }
+
+            $workoutStmt = $this->pdo->prepare(
+                'SELECT Team_ID FROM team_workout WHERE Workout_ID = ? FOR UPDATE'
+            );
+            $workoutStmt->execute([$workout_id]);
+            $workoutTeamId = $workoutStmt->fetchColumn();
+
+            if ($workoutTeamId === false) {
+                throw new DomainException('Workout not found.');
+            }
+            if ((int)$workoutTeamId !== (int)$booking['Team_ID']) {
+                throw new DomainException('Workout assignment is not allowed.');
+            }
+
+            $insertStmt = $this->pdo->prepare(
+                'INSERT INTO booking_workout (Booking_ID, Workout_ID) VALUES (?, ?)'
+            );
+            $insertStmt->execute([$booking_id, $workout_id]);
+
+            $this->pdo->commit();
+            return true;
+        } catch (Throwable $e) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+            throw $e;
+        }
+    }
+
+    public function getAssignedWorkoutsForBooking($booking_id, $user_id) {
+        $stmt = $this->pdo->prepare("
+            SELECT tw.Workout_ID, tw.Title, tw.Description, tw.Duration, tw.Team_ID
+            FROM booking b
+            INNER JOIN team_member tm
+                ON tm.Team_ID = b.Team_ID
+                AND tm.User_ID = ?
+                AND tm.Role_In_Team = 'Captain'
+            INNER JOIN booking_workout bw ON bw.Booking_ID = b.Booking_ID
+            INNER JOIN team_workout tw
+                ON tw.Workout_ID = bw.Workout_ID
+                AND tw.Team_ID = b.Team_ID
+            WHERE b.Booking_ID = ?
+            ORDER BY tw.Title, tw.Workout_ID
+        ");
+        $stmt->execute([$user_id, $booking_id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getAvailableWorkoutsForBooking($booking_id, $user_id) {
+        $stmt = $this->pdo->prepare("
+            SELECT tw.Workout_ID, tw.Title, tw.Duration
+            FROM booking b
+            INNER JOIN team_member tm
+                ON tm.Team_ID = b.Team_ID
+                AND tm.User_ID = ?
+                AND tm.Role_In_Team = 'Captain'
+            INNER JOIN team_workout tw ON tw.Team_ID = b.Team_ID
+            LEFT JOIN booking_workout bw
+                ON bw.Booking_ID = b.Booking_ID
+                AND bw.Workout_ID = tw.Workout_ID
+            WHERE b.Booking_ID = ?
+              AND b.Status = 'Approved'
+              AND bw.Workout_ID IS NULL
+            ORDER BY tw.Title, tw.Workout_ID
+        ");
+        $stmt->execute([$user_id, $booking_id]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 

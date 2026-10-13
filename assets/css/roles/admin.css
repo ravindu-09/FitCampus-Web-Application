@@ -24,6 +24,9 @@
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
+  --shared-bg-dim: rgba(255, 255, 255, 0.03);
+  --shared-border-dim: rgba(255, 255, 255, 0.08);
+  --shared-bk-pb-sm: 12px;
 }
 
 .admin-viewport-wrapper {
@@ -1030,9 +1033,7 @@
 
 .p-0 { padding: 0 !important; }
 .overflow-hidden { overflow: hidden !important; }
-.hidden { display: none !important; }
 .flex { display: flex !important; }
-.cursor-pointer { cursor: pointer !important; }
 
 /* --- Settings Layout Extensions --- */
 .settings-header-wrap {
@@ -1267,29 +1268,15 @@
 /* Labels */
 .gl-lbl-accent { font-size: 12px; font-weight: 600; color: var(--on-surface-variant); letter-spacing: 0.5px; display: block; margin-bottom: 4px; }
 
-/* Flex Utilities Missing from Context */
-.flex-between { display: flex; justify-content: space-between; align-items: center; }
-.flex-items-center { display: flex; align-items: center; }
-.gap-2 { gap: 8px; }
-.gap-3 { gap: 12px; }
-
 /* Team List Items (Checkboxes) */
-.bg-dim { background-color: rgba(255, 255, 255, 0.03); }
-.border-dim { border-color: rgba(255, 255, 255, 0.08); }
 .custom-checkbox { width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; }
 
 /* Typography Utilities */
 .text-xl { font-size: 20px; }
 .text-sm { font-size: 14px; }
 .text-xs { font-size: 12px; }
-.font-bold { font-weight: 700; }
-.m-0 { margin: 0; }
 .mt-1 { margin-top: 4px; }
 .mb-2 { margin-bottom: 8px; }
-.bk-mb-sm { margin-bottom: 12px; }
-.bk-mb-md { margin-bottom: 16px; }
-.bk-mb-lg { margin-bottom: 24px; }
-.bk-pb-sm { padding-bottom: 12px; }
 .py-8 { padding-top: 32px; padding-bottom: 32px; }
 .p-3 { padding: 12px; }
 .p-4 { padding: 16px; }

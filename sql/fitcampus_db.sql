@@ -448,10 +448,20 @@ INSERT INTO `team_member` (`Team_ID`, `User_ID`, `Role_In_Team`) VALUES
 CREATE TABLE `team_workout` (
   `Workout_ID` int(10) UNSIGNED NOT NULL,
   `Team_ID` int(10) UNSIGNED NOT NULL,
-  `Booking_ID` int(10) UNSIGNED NOT NULL,
   `Title` varchar(150) NOT NULL,
   `Description` text DEFAULT NULL,
   `Duration` int(10) UNSIGNED DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `booking_workout`
+--
+
+CREATE TABLE `booking_workout` (
+  `Booking_ID` int(10) UNSIGNED NOT NULL,
+  `Workout_ID` int(10) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -568,6 +578,13 @@ ALTER TABLE `booking`
   ADD KEY `fk_booking_requested_by` (`Requested_By`),
   ADD KEY `fk_booking_facility` (`Facility_ID`),
   ADD KEY `fk_booking_approved_by` (`Approved_By`);
+
+--
+-- Indexes for table `booking_workout`
+--
+ALTER TABLE `booking_workout`
+  ADD PRIMARY KEY (`Booking_ID`,`Workout_ID`),
+  ADD KEY `fk_booking_workout_workout` (`Workout_ID`);
 
 --
 -- Indexes for table `calorie_details`
@@ -695,8 +712,7 @@ ALTER TABLE `team_member`
 --
 ALTER TABLE `team_workout`
   ADD PRIMARY KEY (`Workout_ID`),
-  ADD KEY `fk_team_workout_team` (`Team_ID`),
-  ADD KEY `fk_team_workout_booking` (`Booking_ID`);
+  ADD KEY `fk_team_workout_team` (`Team_ID`);
 
 --
 -- Indexes for table `team_workout_exercise`
@@ -860,6 +876,13 @@ ALTER TABLE `booking`
   ADD CONSTRAINT `fk_booking_team` FOREIGN KEY (`Team_ID`) REFERENCES `team` (`Team_ID`) ON UPDATE CASCADE;
 
 --
+-- Constraints for table `booking_workout`
+--
+ALTER TABLE `booking_workout`
+  ADD CONSTRAINT `fk_booking_workout_booking` FOREIGN KEY (`Booking_ID`) REFERENCES `booking` (`Booking_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_booking_workout_workout` FOREIGN KEY (`Workout_ID`) REFERENCES `team_workout` (`Workout_ID`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+--
 -- Constraints for table `calorie_details`
 --
 ALTER TABLE `calorie_details`
@@ -955,7 +978,6 @@ ALTER TABLE `team_member`
 -- Constraints for table `team_workout`
 --
 ALTER TABLE `team_workout`
-  ADD CONSTRAINT `fk_team_workout_booking` FOREIGN KEY (`Booking_ID`) REFERENCES `booking` (`Booking_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_team_workout_team` FOREIGN KEY (`Team_ID`) REFERENCES `team` (`Team_ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
