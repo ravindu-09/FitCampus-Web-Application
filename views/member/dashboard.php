@@ -1,13 +1,12 @@
 <?php
 // views/member/dashboard.php
-$page_title = "Member Dashboard | FitCampus";
-
 // Script Driver via footer_common.php
 $extra_js = "member/dashboard.js";
 
 // 1. Include Page Controller ONLY (No Direct DB Connection)
 require_once '../../controllers/member/dashboard_page_controller.php';
 
+$page_title = $is_captain ? "Captain Dashboard | FitCampus" : "Member Dashboard | FitCampus";
 require_once '../../includes/headers/header_member.php';
 
 // Check if the logged-in member is a captain based on session
@@ -104,6 +103,72 @@ if ($is_captain) {
                 </div>
             <?php endif; ?>
         </section>
+
+        <?php if (!empty($_SESSION['is_captain'])): ?>
+            <section class="captain-dashboard-overview" aria-labelledby="captain-overview-title">
+                <div class="captain-dashboard-heading">
+                    <div>
+                        <p class="captain-eyebrow">CAPTAIN CONSOLE</p>
+                        <h2 class="settings-main-title" id="captain-overview-title">Your teams at a glance</h2>
+                    </div>
+                    <div class="captain-dashboard-links">
+                        <a class="captain-dashboard-link" href="teams.php">Team hub</a>
+                        <a class="captain-dashboard-link" href="../captain/team_goals.php">Manage goals</a>
+                        <a class="captain-dashboard-link" href="../captain/booking.php">Book a facility</a>
+                    </div>
+                </div>
+                <?php if (empty($captain_teams)): ?>
+                    <div class="glass-card captain-dashboard-empty">
+                        <p class="txt-muted">No current captain assignments were found.</p>
+                    </div>
+                <?php else: ?>
+                    <div class="captain-dashboard-grid">
+                        <article class="glass-card captain-dashboard-card">
+                            <span class="captain-summary-label">TEAMS YOU CAPTAIN</span>
+                            <strong><?= count($captain_teams) ?></strong>
+                            <ul>
+                                <?php foreach ($captain_teams as $team): ?>
+                                    <li><?= htmlspecialchars($team['Team_Name'], ENT_QUOTES, 'UTF-8') ?> <span><?= htmlspecialchars($team['Sport'], ENT_QUOTES, 'UTF-8') ?></span></li>
+                                <?php endforeach; ?>
+                            </ul>
+                            <a href="../captain/roster.php">Manage rosters <span aria-hidden="true">→</span></a>
+                        </article>
+                        <article class="glass-card captain-dashboard-card">
+                            <span class="captain-summary-label">UPCOMING TEAM SESSIONS</span>
+                            <?php if (empty($captain_upcoming_sessions)): ?>
+                                <p class="txt-muted">No approved sessions in the next two weeks.</p>
+                            <?php else: ?>
+                                <ul>
+                                    <?php foreach ($captain_upcoming_sessions as $session): ?>
+                                        <li>
+                                            <span><?= htmlspecialchars($session['Team_Name'], ENT_QUOTES, 'UTF-8') ?> · <?= htmlspecialchars(date('M j', strtotime($session['Reserve_Date'])), ENT_QUOTES, 'UTF-8') ?></span>
+                                            <span><?= htmlspecialchars(date('g:i A', strtotime($session['Start_Time'])), ENT_QUOTES, 'UTF-8') ?> · <?= htmlspecialchars($session['Facility_Name'], ENT_QUOTES, 'UTF-8') ?></span>
+                                        </li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            <?php endif; ?>
+                            <a href="../captain/booking.php">View bookings <span aria-hidden="true">→</span></a>
+                        </article>
+                        <article class="glass-card captain-dashboard-card">
+                            <span class="captain-summary-label">ACTIVE TEAM GOALS</span>
+                            <?php if (empty($captain_active_goals)): ?>
+                                <p class="txt-muted">No active team goals. Set your next shared target.</p>
+                            <?php else: ?>
+                                <ul>
+                                    <?php foreach ($captain_active_goals as $goal): ?>
+                                        <li>
+                                            <span><?= htmlspecialchars($goal['Team_Name'], ENT_QUOTES, 'UTF-8') ?> · <?= htmlspecialchars($goal['Goal_Name'], ENT_QUOTES, 'UTF-8') ?></span>
+                                            <span><?= (int)$goal['Progress_Percentage'] ?>% · due <?= htmlspecialchars(date('M j', strtotime($goal['End_Date'])), ENT_QUOTES, 'UTF-8') ?></span>
+                                        </li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            <?php endif; ?>
+                            <a href="../captain/team_goals.php">Open team goals <span aria-hidden="true">→</span></a>
+                        </article>
+                    </div>
+                <?php endif; ?>
+            </section>
+        <?php endif; ?>
 
         <!-- Instructor Motivation & Announcements -->
         <section>

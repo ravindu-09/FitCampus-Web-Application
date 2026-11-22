@@ -45,7 +45,7 @@ require_once '../../includes/sidebars/sidebar_captain.php';
                     </div>
 
                     <div class="mobile-swipe-hint">
-                        <span class="material-symbols-outlined" style="font-size: 14px;">swipe</span> Swipe horizontally to see more
+                        <span class="material-symbols-outlined captain-swipe-icon">swipe</span> Swipe horizontally to see more
                     </div>
 
                     <div class="grid-table-wrapper custom-scrollbar">
@@ -84,10 +84,11 @@ require_once '../../includes/sidebars/sidebar_captain.php';
                     </div>
 
                     <form id="facility-booking-form" class="booking-form space-y-md">
+                        <input type="hidden" id="booking-csrf-token" value="<?= htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8') ?>">
                         <div class="form-group-cal space-y-xs">
                             <label class="gl-lbl-accent">SELECTED DATE</label>
                             <div class="cal-input-field flex-items-center gap-3">
-                                <span class="material-symbols-outlined txt-primary" style="font-size: 20px;">calendar_today</span>
+                                <span class="material-symbols-outlined txt-primary booking-calendar-icon">calendar_today</span>
                                 <span class="font-medium text-sm" id="selected-date-display">Select a slot</span>
                             </div>
                         </div>
@@ -141,7 +142,7 @@ require_once '../../includes/sidebars/sidebar_captain.php';
 
                         <div class="form-group-cal space-y-xs hidden" id="special-request-field">
                             <label class="gl-lbl-accent">REASON FOR REQUEST <span class="txt-error">*</span></label>
-                            <textarea class="cal-input-field" id="reason-input" placeholder="Explain why you need this extra session..." style="min-height: 80px;"></textarea>
+                            <textarea class="cal-input-field booking-textarea" id="reason-input" placeholder="Explain why you need this extra session..."></textarea>
                         </div>
 
                         <div class="form-group-cal space-y-xs bk-mt-md">
@@ -186,11 +187,11 @@ require_once '../../includes/sidebars/sidebar_captain.php';
                                     <td><span class="mono"><?= date('H:i', strtotime($bk['Start_Time'])) ?> - <?= date('H:i', strtotime($bk['End_Time'])) ?></span></td>
                                     <td>
                                         <?php if ($bk['Status'] === 'Approved'): ?>
-                                            <span class="badge-status" style="background: rgba(74,225,118,0.1); border-color: rgba(74,225,118,0.3); color: var(--secondary);">Approved</span>
+                                            <span class="badge-status booking-status-approved">Approved</span>
                                         <?php elseif ($bk['Status'] === 'Pending'): ?>
-                                            <span class="badge-status" style="background: rgba(247,190,29,0.1); border-color: rgba(247,190,29,0.3); color: var(--tertiary);">Pending</span>
+                                            <span class="badge-status booking-status-pending">Pending</span>
                                         <?php else: ?>
-                                            <span class="badge-status" style="background: rgba(255,180,171,0.1); border-color: rgba(255,180,171,0.3); color: var(--error);"><?= htmlspecialchars($bk['Status']) ?></span>
+                                            <span class="badge-status booking-status-other"><?= htmlspecialchars($bk['Status']) ?></span>
                                         <?php endif; ?>
                                     </td>
                                     <td>
@@ -211,10 +212,10 @@ require_once '../../includes/sidebars/sidebar_captain.php';
                                     <td class="text-right">
                                         <?php if ($bk['can_assign_workout']): ?>
                                             <?php $available_workouts_json = json_encode($bk['available_workouts'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>
-                                            <button type="button" class="toggle-btn assign-workout-trigger" data-booking-id="<?= (int)$bk['Booking_ID'] ?>" data-available-workouts="<?= htmlspecialchars($available_workouts_json, ENT_QUOTES, 'UTF-8') ?>" style="padding: 4px 8px; font-size: 11px;">Assign Workout</button>
+                                            <button type="button" class="toggle-btn booking-action-button assign-workout-trigger" data-booking-id="<?= (int)$bk['Booking_ID'] ?>" data-available-workouts="<?= htmlspecialchars($available_workouts_json, ENT_QUOTES, 'UTF-8') ?>">Assign Workout</button>
                                         <?php endif; ?>
                                         <?php if (!empty($bk['Can_Delete']) && empty($bk['Exception_Reason']) && $bk['Status'] !== 'Cancelled' && $bk['Status'] !== 'Rejected'): ?>
-                                            <button type="button" class="toggle-btn txt-error delete-booking-btn" data-id="<?= $bk['Booking_ID'] ?>" style="padding: 4px 8px; font-size: 11px;">Delete</button>
+                                            <button type="button" class="toggle-btn txt-error booking-action-button delete-booking-btn" data-id="<?= $bk['Booking_ID'] ?>">Delete</button>
                                         <?php else: ?>
                                             <span class="text-xs txt-muted">N/A</span>
                                         <?php endif; ?>
@@ -223,7 +224,7 @@ require_once '../../includes/sidebars/sidebar_captain.php';
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                    <td colspan="7" style="text-align: center; padding: 24px; color: var(--on-surface-variant);">No bookings found.</td>
+                                    <td colspan="7" class="booking-empty-cell">No bookings found.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
@@ -237,8 +238,8 @@ require_once '../../includes/sidebars/sidebar_captain.php';
     <?php require_once '../../includes/footers/footer_common.php'; ?>
 </div>
 
-<div class="wk-modal-overlay flex-items-center justify-center p-4 transition-opacity hidden" id="confirmation-modal" style="z-index: 100;">
-    <div class="glass-card shadow-2xl p-8 border-dim max-w-sm w-full transform transition-transform text-center scale-95" id="modal-box-inner">
+<div class="wk-modal-overlay flex-items-center justify-center p-4 transition-opacity hidden booking-confirmation-modal" id="confirmation-modal">
+    <div class="glass-card shadow-2xl p-8 border-dim max-w-sm w-full transform transition-transform scale-95 booking-modal-inner" id="modal-box-inner">
         <div id="modal-icon-bg" class="w-16 h-16 rounded-full flex-items-center justify-center mx-auto mb-6 bg-secondary-dim txt-green">
             <span class="material-symbols-outlined text-4xl" id="modal-icon">task_alt</span>
         </div>

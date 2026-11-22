@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
         removeButton.type = 'button';
         removeButton.className = 'remove-ex-btn txt-error bg-transparent';
         removeButton.setAttribute('aria-label', 'Remove exercise');
-        removeButton.style.cssText = 'border: none; cursor: pointer; display: flex; align-items: center; margin-left: auto;';
+        removeButton.classList.add('captain-exercise-remove');
         removeButton.innerHTML = '<span class="material-symbols-outlined">close</span>';
         block.appendChild(removeButton);
         removeButton.addEventListener('click', () => {
@@ -95,8 +95,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function setStatus(message, isError = false) {
         statusMessage.textContent = message;
         statusMessage.classList.remove('hidden');
-        statusMessage.style.color = isError ? 'var(--error)' : 'var(--secondary)';
-        statusMessage.style.background = isError ? 'rgba(255,180,171,0.1)' : 'rgba(74,225,118,0.1)';
+        statusMessage.classList.toggle('captain-feedback-error', isError);
+        statusMessage.classList.toggle('captain-feedback-success', !isError);
     }
 
     function resetForm() {

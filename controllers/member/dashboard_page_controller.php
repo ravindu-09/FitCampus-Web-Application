@@ -50,4 +50,48 @@ $rules = $dashboardModel->getGymRules();
 
 /* 4. Latest Announcements & Motivation */
 $announcements = $dashboardModel->getAnnouncements();
+
+$is_captain = isset($_SESSION['is_captain']) && (int)$_SESSION['is_captain'] === 1;
+$captain_teams = [];
+$captain_active_goals = [];
+$captain_upcoming_sessions = [];
+if ($is_captain) {
+    require_once __DIR__ . '/../../models/common/TeamGoalModel.php';
+    require_once __DIR__ . '/../../models/member/TeamModel.php';
+
+    $teamGoalModel = new TeamGoalModel($pdo);
+    $teamModel = new TeamModel($pdo);
+    $captain_teams = $teamGoalModel->getCaptainTeams((int)$user_id);
+    foreach ($captain_teams as $team) {
+        $teamId = (int)$team['Team_ID'];
+        foreach ($teamGoalModel->getGoalsForCaptain($teamId, (int)$user_id) as $goal) {
+            if ($goal['Effective_Status'] === 'Active') {
+                $captain_active_goals[] = [
+                    'Team_Name' => $team['Team_Name'],
+                    'Team_ID' => $teamId,
+                    'Goal_Name' => $goal['Goal_Name'],
+                    'End_Date' => $goal['End_Date'],
+                    'Progress' => (float)$goal['Total_Progress'],
+                    'Target' => (float)$goal['Target_Value'],
+                    'Progress_Percentage' => (int)$goal['Progress_Percentage'],
+                    'Unit' => $goal['Unit']
+                ];
+            }
+        }
+        foreach ($teamModel->getUpcomingApprovedBookingsForTeam($teamId, (int)$user_id) as $session) {
+            $session['Team_Name'] = $team['Team_Name'];
+            $session['Team_ID'] = $teamId;
+            $captain_upcoming_sessions[] = $session;
+        }
+    }
+
+    usort($captain_active_goals, static function ($a, $b) {
+        return strcmp($a['End_Date'], $b['End_Date']);
+    });
+    usort($captain_upcoming_sessions, static function ($a, $b) {
+        return strcmp($a['Reserve_Date'] . ' ' . $a['Start_Time'], $b['Reserve_Date'] . ' ' . $b['Start_Time']);
+    });
+    $captain_active_goals = array_slice($captain_active_goals, 0, 3);
+    $captain_upcoming_sessions = array_slice($captain_upcoming_sessions, 0, 3);
+}
 ?>

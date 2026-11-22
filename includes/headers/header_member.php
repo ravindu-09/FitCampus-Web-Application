@@ -48,10 +48,11 @@ $display_life = isset($_SESSION['life_percentage']) ? (int)$_SESSION['life_perce
     <link rel="stylesheet" href="../../assets/css/base/components.css">
 
     <!-- Role Stylesheet -->
-    <link rel="stylesheet" href="../../assets/css/roles/member.css">
+    <link rel="stylesheet" href="../../assets/css/roles/member.css?v=<?php echo filemtime(__DIR__ . '/../../assets/css/roles/member.css'); ?>">
     <!-- Captain Specific Stylesheet (Loads only for Captains) -->
     <?php if ($is_captain): ?>
-        <link rel="stylesheet" href="../../assets/css/roles/captain.css">
+        <link rel="stylesheet" href="../../assets/css/roles/captain.css?v=<?php echo filemtime(__DIR__ . '/../../assets/css/roles/captain.css'); ?>">
+        <script src="../../assets/js/captain/navigation.js" defer></script>
     <?php endif; ?>
 </head>
 <body class="member-layout-body">

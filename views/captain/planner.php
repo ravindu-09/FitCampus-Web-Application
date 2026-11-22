@@ -6,8 +6,8 @@ require_once '../../includes/sidebars/sidebar_captain.php';
 ?>
 
 <div class="member-content-wrapper">
-    <main class="dashboard-main-container bk-main-container" style="max-width: 850px; margin: 0 auto;">
-        <div class="glass-card inner-glow overflow-hidden border-dim bk-mb-lg" style="animation: slideUpFade 0.5s ease-out;">
+    <main class="dashboard-main-container bk-main-container captain-planner-page">
+        <div class="glass-card inner-glow overflow-hidden border-dim bk-mb-lg captain-planner-panel">
             <div class="bk-p-md border-b-dim flex-between items-center bg-dim">
                 <h3 class="settings-main-title text-lg m-0" id="workout-form-title">Create Reusable Team Workout</h3>
             </div>
@@ -43,7 +43,7 @@ require_once '../../includes/sidebars/sidebar_captain.php';
                         <input class="cal-input-field" id="workout-duration" type="number" name="duration" min="1" max="1440" placeholder="e.g., 45" required>
                     </div>
 
-                    <div class="bg-dim border-dim bk-p-md space-y-md" style="border-radius: 12px;" id="exercises-container">
+                    <div class="bg-dim border-dim bk-p-md space-y-md captain-exercise-container" id="exercises-container">
                         <div class="exercise-block">
                             <div class="form-group-cal space-y-xs bk-mb-md">
                                 <label class="gl-lbl-accent">EXERCISE NAME</label>
@@ -96,14 +96,14 @@ require_once '../../includes/sidebars/sidebar_captain.php';
                         </div>
                     </div>
 
-                    <button type="button" id="add-exercise-btn" class="w-full bk-py-md bg-dim border-dim txt-muted font-semibold text-sm hover-bg-dim transition-colors" style="border-radius: 8px; cursor: pointer; border-style: dashed;">
+                    <button type="button" id="add-exercise-btn" class="w-full bk-py-md bg-dim border-dim txt-muted font-semibold text-sm hover-bg-dim transition-colors captain-add-exercise">
                         + Add Another Exercise
                     </button>
-                    <div id="form-status-msg" class="hidden bk-p-sm font-semibold text-sm text-center" role="status" style="border-radius: 8px;"></div>
+                    <div id="form-status-msg" class="hidden bk-p-sm font-semibold text-sm text-center captain-planner-status" role="status"></div>
 
-                    <div class="flex-between gap-3 bk-mt-md bg-dim bk-p-sm" style="flex-wrap: wrap; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                    <div class="flex-between gap-3 bk-mt-md bg-dim bk-p-sm captain-planner-actions">
                         <button class="gl-btn-gradient flex-1 bk-py-md font-bold text-sm justify-center" type="submit" id="btn-save-workout">Save Workout</button>
-                        <button class="gl-btn-gradient flex-1 bk-py-md font-bold text-sm justify-center" type="reset" id="btn-reset-workout" style="background: transparent; border: 1px solid rgba(255,255,255,0.1); color: var(--on-surface-variant);">Clear Form</button>
+                        <button class="gl-btn-gradient flex-1 bk-py-md font-bold text-sm justify-center captain-reset-button" type="reset" id="btn-reset-workout">Clear Form</button>
                     </div>
                 </form>
             </div>
@@ -133,10 +133,10 @@ require_once '../../includes/sidebars/sidebar_captain.php';
                                     </p>
                                 </div>
                                 <div class="flex-items-center gap-2">
-                                    <button type="button" class="toggle-btn edit-workout-btn" data-workout="<?= htmlspecialchars($workoutJson, ENT_QUOTES, 'UTF-8') ?>" aria-label="Edit workout" title="Edit workout" style="padding: 8px;">
+                                    <button type="button" class="toggle-btn planner-workout-icon-button edit-workout-btn" data-workout="<?= htmlspecialchars($workoutJson, ENT_QUOTES, 'UTF-8') ?>" aria-label="Edit workout" title="Edit workout">
                                         <span class="material-symbols-outlined">edit</span>
                                     </button>
-                                    <button type="button" class="toggle-btn txt-error delete-workout-btn" data-workout-id="<?= (int)$workout['Workout_ID'] ?>" data-team-id="<?= (int)$workout['Team_ID'] ?>" aria-label="Delete workout" title="Delete workout" style="padding: 8px;">
+                                    <button type="button" class="toggle-btn txt-error planner-workout-icon-button delete-workout-btn" data-workout-id="<?= (int)$workout['Workout_ID'] ?>" data-team-id="<?= (int)$workout['Team_ID'] ?>" aria-label="Delete workout" title="Delete workout">
                                         <span class="material-symbols-outlined">delete</span>
                                     </button>
                                 </div>

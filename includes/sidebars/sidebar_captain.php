@@ -66,6 +66,10 @@ $avatar_url = '../../assets/images/uploads/' . htmlspecialchars($profile_img_nam
             <span class="material-symbols-outlined">event_available</span>
             <span>Team Workout Planner</span>
         </a>
+        <a class="side-nav-item <?php echo ($current_script === 'team_goals.php') ? 'active' : ''; ?>" href="<?php echo $captain_prefix; ?>team_goals.php">
+            <span class="material-symbols-outlined">flag</span>
+            <span>Team Goals</span>
+        </a>
     </nav>
 
     <!-- Sidebar Bottom Profile & Settings -->

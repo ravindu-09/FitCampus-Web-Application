@@ -25,6 +25,7 @@ FitCampus is an all-in-one web-based fitness and facility management platform de
 * **Interactive Facility Booking:** Weekly availability grid with time-slot selection, capacity limit checks, and special request handling.
 * **Team Roster Management:** Roster tracking by Student ID and attendance logging (Present/Absent).
 * **Team Workout Planner:** Schedule, draft, and publish team-specific training routines directly to player feeds.
+* **Team Goals:** Captains create shared targets; team members submit dated contributions, with aggregate progress calculated from contribution history.
 
 ### 4. 🎛️ Gym Instructor Console
 * **Front-Desk Attendance Terminal / QR Kiosk:** Instant QR code scanner check-in/out and live Life Bar deduction.
@@ -144,6 +145,8 @@ FitCampus-Web-Application/
 * Click on the newly created database, go to the **Import** tab, choose `sql/fitcampus_db.sql` from the project directory, and click **Import**.
 
 * If the database was already imported before the support feature was added, import `sql/support_feature_migration.sql` once to add its two `feedback` columns. Do not run this migration after importing the updated full schema.
+* For an existing database, import `sql/team_goals_migration.sql` once to add the team-goal and contribution tables. Fresh imports of `sql/fitcampus_db.sql` already include these tables. Migrations are manual and are not executed by the application.
+* The checked-in individual-goal model currently expects columns and a `goal_progress` table not declared in the checked-in base schema. Team Goals uses separate tables and does not change individual-goal behavior; reconcile that existing schema discrepancy separately.
 
 
 4. **Verify Database Configuration:**
