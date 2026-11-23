@@ -13,6 +13,7 @@ if (!isset($_SESSION['user_id'])) {
 $page_title = "Workout Planner | FitCampus";
 
 $extra_js = [
+    "common/exercise-autocomplete.js",
     "captain/planner.js"
 ];
 

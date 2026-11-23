@@ -50,44 +50,12 @@ require_once '../../includes/sidebars/sidebar_captain.php';
                         <div class="exercise-block captain-exercise-card">
                             <div class="form-group-cal space-y-xs bk-mb-md">
                                 <label class="gl-lbl-accent">EXERCISE NAME</label>
-                                <div class="captain-planner-select-wrap">
-                                    <select class="cal-input-field gl-select captain-planner-select exercise-select" required>
-                                        <option value="" disabled selected>Select an exercise</option>
-                                        <optgroup label="Strength">
-                                            <option value="Squat">Squat</option>
-                                            <option value="Bench Press">Bench Press</option>
-                                            <option value="Deadlift">Deadlift</option>
-                                            <option value="Overhead Press">Overhead Press</option>
-                                            <option value="Barbell Row">Barbell Row</option>
-                                            <option value="Pull-Up">Pull-Up</option>
-                                            <option value="Push-Up">Push-Up</option>
-                                            <option value="Lunges">Lunges</option>
-                                        </optgroup>
-                                        <optgroup label="Lower Body">
-                                            <option value="Leg Press">Leg Press</option>
-                                            <option value="Leg Curl">Leg Curl</option>
-                                            <option value="Leg Extension">Leg Extension</option>
-                                            <option value="Calf Raise">Calf Raise</option>
-                                        </optgroup>
-                                        <optgroup label="Core">
-                                            <option value="Plank">Plank</option>
-                                            <option value="Sit-Up">Sit-Up</option>
-                                            <option value="Crunch">Crunch</option>
-                                            <option value="Russian Twist">Russian Twist</option>
-                                        </optgroup>
-                                        <optgroup label="Cardio">
-                                            <option value="Running">Running</option>
-                                            <option value="Cycling">Cycling</option>
-                                            <option value="Jump Rope">Jump Rope</option>
-                                        </optgroup>
-                                        <option value="__custom__">Custom Exercise...</option>
-                                    </select>
-                                    <span class="material-symbols-outlined captain-planner-select-arrow" aria-hidden="true">expand_more</span>
+                                <div class="exercise-autocomplete">
+                                    <input class="cal-input-field exercise-search" type="text" name="exercise_name[]" maxlength="100" placeholder="Search or enter an exercise name" autocomplete="off" required data-exercise-search>
+                                    <input type="hidden" name="exercise_id[]" data-exercise-id>
+                                    <div class="exercise-autocomplete-list" hidden data-exercise-suggestions></div>
+                                    <div class="exercise-autocomplete-message" hidden data-exercise-message></div>
                                 </div>
-                                <div class="custom-exercise-field" hidden>
-                                    <input class="cal-input-field exercise-custom" type="text" maxlength="100" placeholder="Enter exercise name">
-                                </div>
-                                <input type="hidden" name="exercise_name[]" class="exercise-name-value" required>
                             </div>
                             <div class="captain-exercise-fields">
                                 <div class="form-group-cal space-y-xs">

@@ -2,14 +2,13 @@
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('workout-planner-form');
     const exercisesContainer = document.getElementById('exercises-container');
+    if (!form || !exercisesContainer) return;
+
     const statusMessage = document.getElementById('form-status-msg');
     const saveButton = document.getElementById('btn-save-workout');
     const formTitle = document.getElementById('workout-form-title');
     const workoutIdInput = document.getElementById('workout-id');
     const actionInput = document.getElementById('workout-action');
-    const exerciseOptions = exercisesContainer.querySelector('.exercise-select').innerHTML;
-
-    if (!form || !exercisesContainer) return;
 
     function addRemoveButton(block) {
         const removeButton = document.createElement('button');
@@ -22,11 +21,9 @@ document.addEventListener('DOMContentLoaded', () => {
         block.appendChild(removeButton);
         removeButton.addEventListener('click', () => {
             if (exercisesContainer.children.length === 1) {
-                block.querySelector('.exercise-select').value = '';
-                block.querySelector('.exercise-custom').value = '';
-                block.querySelector('.exercise-name-value').value = '';
-                block.querySelector('.custom-exercise-field').hidden = true;
-                block.querySelector('.exercise-custom').required = false;
+                block.querySelector('.exercise-search').value = '';
+                block.querySelector('[data-exercise-id]').value = '';
+                block.querySelector('[data-exercise-message]').hidden = true;
                 block.querySelector('.ex-sets').value = '';
                 block.querySelector('.ex-reps').value = '';
             } else {
@@ -35,32 +32,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function syncExerciseName(block) {
-        const select = block.querySelector('.exercise-select');
-        const customField = block.querySelector('.custom-exercise-field');
-        const customInput = block.querySelector('.exercise-custom');
-        const exerciseName = block.querySelector('.exercise-name-value');
-        const isCustom = select.value === '__custom__';
-
-        customField.hidden = !isCustom;
-        customInput.required = isCustom;
-        exerciseName.value = isCustom ? customInput.value.trim() : select.value;
-    }
-
     function makeExerciseRow(exercise = {}) {
         const block = document.createElement('div');
         block.className = 'exercise-block captain-exercise-card';
         block.innerHTML = `
             <div class="form-group-cal space-y-xs bk-mb-md">
                 <label class="gl-lbl-accent">EXERCISE NAME</label>
-                <div class="captain-planner-select-wrap">
-                    <select class="cal-input-field gl-select captain-planner-select exercise-select" required>${exerciseOptions}</select>
-                    <span class="material-symbols-outlined captain-planner-select-arrow" aria-hidden="true">expand_more</span>
+                <div class="exercise-autocomplete">
+                    <input class="cal-input-field exercise-search" type="text" name="exercise_name[]" maxlength="100" placeholder="Search or enter an exercise name" autocomplete="off" required data-exercise-search>
+                    <input type="hidden" name="exercise_id[]" data-exercise-id>
+                    <div class="exercise-autocomplete-list" hidden data-exercise-suggestions></div>
+                    <div class="exercise-autocomplete-message" hidden data-exercise-message></div>
                 </div>
-                <div class="custom-exercise-field" hidden>
-                    <input class="cal-input-field exercise-custom" type="text" maxlength="100" placeholder="Enter exercise name">
-                </div>
-                <input type="hidden" name="exercise_name[]" class="exercise-name-value" required>
             </div>
             <div class="captain-exercise-fields">
                 <div class="form-group-cal space-y-xs">
@@ -75,24 +58,12 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         block.querySelector('[name="exercise_sets[]"]').value = exercise.Sets || '';
         block.querySelector('[name="exercise_reps[]"]').value = exercise.Reps || '';
-        syncExerciseName(block);
         if (exercise.Exercise_Name) {
-            const select = block.querySelector('.exercise-select');
-            const normalizedName = exercise.Exercise_Name.trim().replace(/\s+/g, ' ');
-            const matchingOption = Array.from(select.options).find((option) =>
-                option.value && option.value !== '__custom__'
-                && option.value.toLocaleLowerCase() === normalizedName.toLocaleLowerCase()
-            );
-
-            if (matchingOption) {
-                select.value = matchingOption.value;
-            } else {
-                select.value = '__custom__';
-                block.querySelector('.exercise-custom').value = exercise.Exercise_Name;
-            }
-            syncExerciseName(block);
+            block.querySelector('.exercise-search').value = exercise.Exercise_Name;
+            block.querySelector('[data-exercise-id]').value = exercise.Exercise_ID || '';
         }
         addRemoveButton(block);
+        window.FitCampusExerciseAutocomplete.initializeWithin(block);
         return block;
     }
 
@@ -125,24 +96,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (hasMainFields) return true;
 
         return Array.from(exercisesContainer.querySelectorAll('.exercise-block')).some((block) => (
-            block.querySelector('.exercise-select').value
-            || block.querySelector('.exercise-custom').value.trim()
+            block.querySelector('.exercise-search').value.trim()
+            || block.querySelector('[data-exercise-id]').value
             || block.querySelector('.ex-sets').value
             || block.querySelector('.ex-reps').value
         ));
     }
 
-    exercisesContainer.querySelectorAll('.exercise-block').forEach(addRemoveButton);
-
-    exercisesContainer.addEventListener('change', (event) => {
-        if (event.target.matches('.exercise-select')) {
-            syncExerciseName(event.target.closest('.exercise-block'));
-        }
-    });
-    exercisesContainer.addEventListener('input', (event) => {
-        if (event.target.matches('.exercise-custom')) {
-            syncExerciseName(event.target.closest('.exercise-block'));
-        }
+    exercisesContainer.querySelectorAll('.exercise-block').forEach((block) => {
+    addRemoveButton(block);
+    window.FitCampusExerciseAutocomplete.initializeWithin(block);
     });
 
     document.getElementById('add-exercise-btn').addEventListener('click', () => {

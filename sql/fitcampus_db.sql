@@ -183,7 +183,8 @@ CREATE TABLE `common_workout` (
   `Instructor_ID` int(10) UNSIGNED NOT NULL,
   `Workout_Level` varchar(50) DEFAULT NULL,
   `Duration` int(10) UNSIGNED DEFAULT NULL,
-  `Title` varchar(150) NOT NULL
+  `Title` varchar(150) NOT NULL,
+  `Description` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -202,12 +203,26 @@ CREATE TABLE `common_workout_exercise` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `member_saved_common_workout`
+--
+
+CREATE TABLE `member_saved_common_workout` (
+  `User_ID` int(10) UNSIGNED NOT NULL,
+  `Common_Workout_ID` int(10) UNSIGNED NOT NULL,
+  `Saved_At` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `exercise`
 --
 
 CREATE TABLE `exercise` (
   `Exercise_ID` int(10) UNSIGNED NOT NULL,
   `Exercise_Name` varchar(100) NOT NULL,
+  `Exercise_Name_Normalized` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin
+    GENERATED ALWAYS AS (UPPER(TRIM(REGEXP_REPLACE(`Exercise_Name`, '[[:space:]]+', ' ')))) STORED,
   `Description` text DEFAULT NULL,
   `Demo_Link` varchar(500) DEFAULT NULL,
   `Type` varchar(50) DEFAULT NULL
@@ -430,6 +445,7 @@ CREATE TABLE `penalty` (
 CREATE TABLE `personal_workout` (
   `Personal_Workout_ID` int(10) UNSIGNED NOT NULL,
   `User_ID` int(10) UNSIGNED NOT NULL,
+  `Source_Common_Workout_ID` int(10) UNSIGNED DEFAULT NULL,
   `Duration` int(10) UNSIGNED DEFAULT NULL,
   `Title` varchar(150) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -718,11 +734,18 @@ ALTER TABLE `common_workout_exercise`
   ADD KEY `fk_common_workout_exercise_exercise` (`Exercise_ID`);
 
 --
+-- Indexes for table `member_saved_common_workout`
+--
+ALTER TABLE `member_saved_common_workout`
+  ADD PRIMARY KEY (`User_ID`,`Common_Workout_ID`),
+  ADD KEY `idx_saved_common_workout_workout` (`Common_Workout_ID`);
+
+--
 -- Indexes for table `exercise`
 --
 ALTER TABLE `exercise`
   ADD PRIMARY KEY (`Exercise_ID`),
-  ADD UNIQUE KEY `uq_exercise_name` (`Exercise_Name`);
+  ADD UNIQUE KEY `uq_exercise_name_normalized` (`Exercise_Name_Normalized`);
 
 --
 -- Indexes for table `facility`
@@ -822,7 +845,8 @@ ALTER TABLE `penalty`
 --
 ALTER TABLE `personal_workout`
   ADD PRIMARY KEY (`Personal_Workout_ID`),
-  ADD KEY `fk_personal_workout_user` (`User_ID`);
+  ADD KEY `fk_personal_workout_user` (`User_ID`),
+  ADD UNIQUE KEY `uq_personal_workout_user_source_common` (`User_ID`,`Source_Common_Workout_ID`);
 
 --
 -- Indexes for table `personal_workout_exercise`
@@ -1097,6 +1121,13 @@ ALTER TABLE `common_workout_exercise`
   ADD CONSTRAINT `fk_common_workout_exercise_workout` FOREIGN KEY (`Common_Workout_ID`) REFERENCES `common_workout` (`Common_Workout_ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
+-- Constraints for table `member_saved_common_workout`
+--
+ALTER TABLE `member_saved_common_workout`
+  ADD CONSTRAINT `fk_saved_common_workout_user` FOREIGN KEY (`User_ID`) REFERENCES `user` (`User_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_saved_common_workout_workout` FOREIGN KEY (`Common_Workout_ID`) REFERENCES `common_workout` (`Common_Workout_ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
 -- Constraints for table `facility_equipment`
 --
 ALTER TABLE `facility_equipment`
@@ -1172,7 +1203,8 @@ ALTER TABLE `penalty`
 -- Constraints for table `personal_workout`
 --
 ALTER TABLE `personal_workout`
-  ADD CONSTRAINT `fk_personal_workout_user` FOREIGN KEY (`User_ID`) REFERENCES `user` (`User_ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `fk_personal_workout_user` FOREIGN KEY (`User_ID`) REFERENCES `user` (`User_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_personal_workout_source_common` FOREIGN KEY (`Source_Common_Workout_ID`) REFERENCES `common_workout` (`Common_Workout_ID`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
 -- Constraints for table `personal_workout_exercise`

@@ -13,10 +13,17 @@ if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'instructor') 
 }
 
 $page_title = "Common Workouts Manager - FitCampus";
-$extra_js = ["instructor/workouts.js"];
+$extra_js = ["common/exercise-autocomplete.js", "instructor/workouts.js"];
 
 require_once '../../includes/db_connection.php';
-// require_once '../../models/instructor/WorkoutModel.php';
-// $workoutModel = new WorkoutModel($pdo);
-// $workouts_list = $workoutModel->getCommonWorkouts();
+require_once '../../models/instructor/WorkoutModel.php';
+
+$workoutModel = new InstructorWorkoutModel($pdo);
+$instructor_id = (int)$_SESSION['user_id'];
+$workouts_list = $workoutModel->getWorkouts($instructor_id);
+
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+$csrf_token = $_SESSION['csrf_token'];
 ?>
