@@ -74,17 +74,50 @@ if ($action === 'add_intake' &&$_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Action 3: Add Activity Item (With Negative Value Prevention)
 if ($action === 'add_burned' &&$_SERVER['REQUEST_METHOD'] === 'POST') {
-    $date     =$_POST['log_date'] ?? date('Y-m-d');
-    $activity = trim($_POST['activity_type'] ?? 'Walking');
-    
-    // Prevent negative numbers using max(0, value)
-    $duration = max(0, (int)($_POST['duration'] ?? 30));$calories = isset($_POST['calories_burned']) &&$_POST['calories_burned'] !== '' 
-                ? max(0, (float)$_POST['calories_burned']) 
-                : ($duration * 5);
+    $date = is_string($_POST['log_date'] ?? null)
+        ? $_POST['log_date']
+        : date('Y-m-d');
+    $activity = is_string($_POST['activity_type'] ?? null)
+        ? trim($_POST['activity_type'])
+        : '';
+    $durationInput = is_string($_POST['duration'] ?? null)
+        ? $_POST['duration']
+        : '';
+    $caloriesInput = is_string($_POST['calories_burned'] ?? null)
+        ? trim($_POST['calories_burned'])
+        : '';
 
-    if (!empty($activity)) {
-        $calorieModel->insertBurnedItem($user_id, $date,$activity, $duration,$calories);
+    $caloriesIsValid = preg_match('/^\d{1,6}(?:\.\d{1,2})?$/D', $caloriesInput) === 1;
+    $calories = $caloriesIsValid ? (float) $caloriesInput : 0;
+    $activityLength = preg_match_all('/./us', $activity);
+
+    if (!$caloriesIsValid || !is_finite($calories) || $calories <= 0) {
+        header(
+            "Location: ../../views/member/calories.php?date=" .
+            urlencode($date) .
+            "&activity_error=" .
+            urlencode('Enter a calorie value greater than zero, using up to two decimal places.')
+        );
+        exit;
     }
+
+    if (
+        $activity === ''
+        || $activityLength === false
+        || $activityLength > 150
+        || !preg_match('/^\d+$/D', $durationInput)
+    ) {
+        header(
+            "Location: ../../views/member/calories.php?date=" .
+            urlencode($date) .
+            "&activity_error=" .
+            urlencode('Enter a valid activity type and duration.')
+        );
+        exit;
+    }
+
+    $duration = max(0, (int) $durationInput);
+    $calorieModel->insertBurnedItem($user_id, $date, $activity, $duration, $calories);
 
     header("Location: ../../views/member/calories.php?date=" . urlencode($date));
     exit;

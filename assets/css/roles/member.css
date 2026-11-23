@@ -1177,6 +1177,10 @@
   box-sizing: border-box;
 }
 .cal-input-field:focus { border-color: #7A3EDB; outline: none; }
+.cal-select-wrapper { position: relative; }
+.cal-input-field.cal-select { appearance: none; -webkit-appearance: none; cursor: pointer; padding-right: 44px; }
+.cal-select-arrow { position: absolute; top: 50%; right: 14px; transform: translateY(-50%); color: #888; pointer-events: none; font-size: 20px; line-height: 1; }
+.cal-validation-message { margin: 0 0 16px; padding: 10px 12px; border: 1px solid rgba(255, 180, 171, 0.25); border-radius: 8px; background: rgba(255, 180, 171, 0.08); color: #ffb4ab; font-size: 13px; }
 .relative-input { position: relative; }
 .absolute-icon {
   position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #888; font-size: 18px;

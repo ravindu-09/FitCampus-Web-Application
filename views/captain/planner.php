@@ -20,12 +20,15 @@ require_once '../../includes/sidebars/sidebar_captain.php';
 
                     <div class="form-group-cal space-y-xs">
                         <label class="gl-lbl-accent" for="workout-team">SELECT TEAM</label>
-                        <select class="cal-input-field gl-select" name="team_id" id="workout-team" required>
-                            <option value="" disabled selected>Select a team you captain</option>
-                            <?php foreach ($captain_teams as $team): ?>
-                                <option value="<?= (int)$team['Team_ID'] ?>"><?= htmlspecialchars($team['Team_Name'], ENT_QUOTES, 'UTF-8') ?></option>
-                            <?php endforeach; ?>
-                        </select>
+                        <div class="captain-planner-select-wrap">
+                            <select class="cal-input-field gl-select captain-planner-select" name="team_id" id="workout-team" required>
+                                <option value="" disabled selected>Select a team you captain</option>
+                                <?php foreach ($captain_teams as $team): ?>
+                                    <option value="<?= (int)$team['Team_ID'] ?>"><?= htmlspecialchars($team['Team_Name'], ENT_QUOTES, 'UTF-8') ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <span class="material-symbols-outlined captain-planner-select-arrow" aria-hidden="true">expand_more</span>
+                        </div>
                     </div>
 
                     <div class="form-group-cal space-y-xs">
@@ -43,47 +46,50 @@ require_once '../../includes/sidebars/sidebar_captain.php';
                         <input class="cal-input-field" id="workout-duration" type="number" name="duration" min="1" max="1440" placeholder="e.g., 45" required>
                     </div>
 
-                    <div class="bg-dim border-dim bk-p-md space-y-md captain-exercise-container" id="exercises-container">
-                        <div class="exercise-block">
+                    <div class="bg-dim border-dim bk-p-md captain-exercise-container" id="exercises-container">
+                        <div class="exercise-block captain-exercise-card">
                             <div class="form-group-cal space-y-xs bk-mb-md">
                                 <label class="gl-lbl-accent">EXERCISE NAME</label>
-                                <select class="cal-input-field gl-select exercise-select" required>
-                                    <option value="" disabled selected>Select an exercise</option>
-                                    <optgroup label="Strength">
-                                        <option value="Squat">Squat</option>
-                                        <option value="Bench Press">Bench Press</option>
-                                        <option value="Deadlift">Deadlift</option>
-                                        <option value="Overhead Press">Overhead Press</option>
-                                        <option value="Barbell Row">Barbell Row</option>
-                                        <option value="Pull-Up">Pull-Up</option>
-                                        <option value="Push-Up">Push-Up</option>
-                                        <option value="Lunges">Lunges</option>
-                                    </optgroup>
-                                    <optgroup label="Lower Body">
-                                        <option value="Leg Press">Leg Press</option>
-                                        <option value="Leg Curl">Leg Curl</option>
-                                        <option value="Leg Extension">Leg Extension</option>
-                                        <option value="Calf Raise">Calf Raise</option>
-                                    </optgroup>
-                                    <optgroup label="Core">
-                                        <option value="Plank">Plank</option>
-                                        <option value="Sit-Up">Sit-Up</option>
-                                        <option value="Crunch">Crunch</option>
-                                        <option value="Russian Twist">Russian Twist</option>
-                                    </optgroup>
-                                    <optgroup label="Cardio">
-                                        <option value="Running">Running</option>
-                                        <option value="Cycling">Cycling</option>
-                                        <option value="Jump Rope">Jump Rope</option>
-                                    </optgroup>
-                                    <option value="__custom__">Custom Exercise...</option>
-                                </select>
+                                <div class="captain-planner-select-wrap">
+                                    <select class="cal-input-field gl-select captain-planner-select exercise-select" required>
+                                        <option value="" disabled selected>Select an exercise</option>
+                                        <optgroup label="Strength">
+                                            <option value="Squat">Squat</option>
+                                            <option value="Bench Press">Bench Press</option>
+                                            <option value="Deadlift">Deadlift</option>
+                                            <option value="Overhead Press">Overhead Press</option>
+                                            <option value="Barbell Row">Barbell Row</option>
+                                            <option value="Pull-Up">Pull-Up</option>
+                                            <option value="Push-Up">Push-Up</option>
+                                            <option value="Lunges">Lunges</option>
+                                        </optgroup>
+                                        <optgroup label="Lower Body">
+                                            <option value="Leg Press">Leg Press</option>
+                                            <option value="Leg Curl">Leg Curl</option>
+                                            <option value="Leg Extension">Leg Extension</option>
+                                            <option value="Calf Raise">Calf Raise</option>
+                                        </optgroup>
+                                        <optgroup label="Core">
+                                            <option value="Plank">Plank</option>
+                                            <option value="Sit-Up">Sit-Up</option>
+                                            <option value="Crunch">Crunch</option>
+                                            <option value="Russian Twist">Russian Twist</option>
+                                        </optgroup>
+                                        <optgroup label="Cardio">
+                                            <option value="Running">Running</option>
+                                            <option value="Cycling">Cycling</option>
+                                            <option value="Jump Rope">Jump Rope</option>
+                                        </optgroup>
+                                        <option value="__custom__">Custom Exercise...</option>
+                                    </select>
+                                    <span class="material-symbols-outlined captain-planner-select-arrow" aria-hidden="true">expand_more</span>
+                                </div>
                                 <div class="custom-exercise-field" hidden>
                                     <input class="cal-input-field exercise-custom" type="text" maxlength="100" placeholder="Enter exercise name">
                                 </div>
                                 <input type="hidden" name="exercise_name[]" class="exercise-name-value" required>
                             </div>
-                            <div class="cal-grid-2 gap-3">
+                            <div class="captain-exercise-fields">
                                 <div class="form-group-cal space-y-xs">
                                     <label class="gl-lbl-accent">SETS</label>
                                     <input class="cal-input-field ex-sets" type="number" name="exercise_sets[]" min="1" max="1000" placeholder="3" required>
@@ -96,14 +102,15 @@ require_once '../../includes/sidebars/sidebar_captain.php';
                         </div>
                     </div>
 
-                    <button type="button" id="add-exercise-btn" class="w-full bk-py-md bg-dim border-dim txt-muted font-semibold text-sm hover-bg-dim transition-colors captain-add-exercise">
-                        + Add Another Exercise
+                    <button type="button" id="add-exercise-btn" class="captain-add-exercise">
+                        <span class="material-symbols-outlined" aria-hidden="true">add</span>
+                        <span>Add Another Exercise</span>
                     </button>
                     <div id="form-status-msg" class="hidden bk-p-sm font-semibold text-sm text-center captain-planner-status" role="status"></div>
 
                     <div class="flex-between gap-3 bk-mt-md bg-dim bk-p-sm captain-planner-actions">
-                        <button class="gl-btn-gradient flex-1 bk-py-md font-bold text-sm justify-center" type="submit" id="btn-save-workout">Save Workout</button>
-                        <button class="gl-btn-gradient flex-1 bk-py-md font-bold text-sm justify-center captain-reset-button" type="reset" id="btn-reset-workout">Clear Form</button>
+                        <button class="gl-btn-gradient captain-planner-primary" type="submit" id="btn-save-workout">Save Workout</button>
+                        <button class="captain-reset-button" type="reset" id="btn-reset-workout">Clear Form</button>
                     </div>
                 </form>
             </div>
@@ -123,28 +130,29 @@ require_once '../../includes/sidebars/sidebar_captain.php';
                 <div class="space-y-md">
                     <?php foreach ($workouts as $workout): ?>
                         <?php $workoutJson = json_encode($workout, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>
-                        <article class="glass-card bk-p-md border-dim">
-                            <div class="flex-between items-center gap-3">
-                                <div>
-                                    <p class="font-bold text-base m-0 txt-white"><?= htmlspecialchars($workout['Title'], ENT_QUOTES, 'UTF-8') ?></p>
-                                    <p class="font-xs txt-muted m-0 bk-mt-xs">
-                                        <?= htmlspecialchars($workout['Team_Name'], ENT_QUOTES, 'UTF-8') ?>
-                                        &middot; <?= (int)$workout['Duration'] ?> min
-                                    </p>
+                        <article class="glass-card bk-p-md border-dim captain-workout-card">
+                            <div class="captain-workout-card-header">
+                                <div class="captain-workout-heading">
+                                    <h5 class="captain-workout-name"><?= htmlspecialchars($workout['Title'], ENT_QUOTES, 'UTF-8') ?></h5>
+                                    <div class="captain-workout-meta">
+                                        <span><?= htmlspecialchars($workout['Team_Name'], ENT_QUOTES, 'UTF-8') ?></span>
+                                        <span class="captain-workout-meta-separator" aria-hidden="true"></span>
+                                        <span><?= (int)$workout['Duration'] ?> min</span>
+                                    </div>
                                 </div>
-                                <div class="flex-items-center gap-2">
-                                    <button type="button" class="toggle-btn planner-workout-icon-button edit-workout-btn" data-workout="<?= htmlspecialchars($workoutJson, ENT_QUOTES, 'UTF-8') ?>" aria-label="Edit workout" title="Edit workout">
+                                <div class="captain-workout-actions">
+                                    <button type="button" class="toggle-btn planner-workout-icon-button edit-workout-btn" data-workout="<?= htmlspecialchars($workoutJson, ENT_QUOTES, 'UTF-8') ?>" aria-label="Edit <?= htmlspecialchars($workout['Title'], ENT_QUOTES, 'UTF-8') ?>" title="Edit workout">
                                         <span class="material-symbols-outlined">edit</span>
                                     </button>
-                                    <button type="button" class="toggle-btn txt-error planner-workout-icon-button delete-workout-btn" data-workout-id="<?= (int)$workout['Workout_ID'] ?>" data-team-id="<?= (int)$workout['Team_ID'] ?>" aria-label="Delete workout" title="Delete workout">
+                                    <button type="button" class="toggle-btn txt-error planner-workout-icon-button delete-workout-btn" data-workout-id="<?= (int)$workout['Workout_ID'] ?>" data-team-id="<?= (int)$workout['Team_ID'] ?>" aria-label="Delete <?= htmlspecialchars($workout['Title'], ENT_QUOTES, 'UTF-8') ?>" title="Delete workout">
                                         <span class="material-symbols-outlined">delete</span>
                                     </button>
                                 </div>
                             </div>
                             <?php if (!empty($workout['Description'])): ?>
-                                <p class="txt-muted text-sm bk-mt-sm"><?= nl2br(htmlspecialchars($workout['Description'], ENT_QUOTES, 'UTF-8')) ?></p>
+                                <p class="captain-workout-description"><?= nl2br(htmlspecialchars($workout['Description'], ENT_QUOTES, 'UTF-8')) ?></p>
                             <?php endif; ?>
-                            <ul class="wk-exercise-list bk-mt-sm">
+                            <ul class="wk-exercise-list captain-workout-exercises">
                                 <?php foreach ($workout['Exercises'] as $exercise): ?>
                                     <li>
                                         <div class="ex-name"><span class="ex-dot dot-primary"></span><?= htmlspecialchars($exercise['Exercise_Name'], ENT_QUOTES, 'UTF-8') ?></div>

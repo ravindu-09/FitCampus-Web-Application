@@ -17,7 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
         removeButton.className = 'remove-ex-btn txt-error bg-transparent';
         removeButton.setAttribute('aria-label', 'Remove exercise');
         removeButton.classList.add('captain-exercise-remove');
-        removeButton.innerHTML = '<span class="material-symbols-outlined">close</span>';
+        removeButton.title = 'Remove exercise';
+        removeButton.innerHTML = '<span class="material-symbols-outlined" aria-hidden="true">delete</span>';
         block.appendChild(removeButton);
         removeButton.addEventListener('click', () => {
             if (exercisesContainer.children.length === 1) {
@@ -48,17 +49,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function makeExerciseRow(exercise = {}) {
         const block = document.createElement('div');
-        block.className = 'exercise-block bk-mt-md pt-4 border-t-dim';
+        block.className = 'exercise-block captain-exercise-card';
         block.innerHTML = `
             <div class="form-group-cal space-y-xs bk-mb-md">
                 <label class="gl-lbl-accent">EXERCISE NAME</label>
-                <select class="cal-input-field gl-select exercise-select" required>${exerciseOptions}</select>
+                <div class="captain-planner-select-wrap">
+                    <select class="cal-input-field gl-select captain-planner-select exercise-select" required>${exerciseOptions}</select>
+                    <span class="material-symbols-outlined captain-planner-select-arrow" aria-hidden="true">expand_more</span>
+                </div>
                 <div class="custom-exercise-field" hidden>
                     <input class="cal-input-field exercise-custom" type="text" maxlength="100" placeholder="Enter exercise name">
                 </div>
                 <input type="hidden" name="exercise_name[]" class="exercise-name-value" required>
             </div>
-            <div class="cal-grid-2 gap-3">
+            <div class="captain-exercise-fields">
                 <div class="form-group-cal space-y-xs">
                     <label class="gl-lbl-accent">SETS</label>
                     <input class="cal-input-field ex-sets" type="number" name="exercise_sets[]" min="1" max="1000" placeholder="3" required>
@@ -109,6 +113,25 @@ document.addEventListener('DOMContentLoaded', () => {
         statusMessage.classList.add('hidden');
     }
 
+    function hasWorkoutFormData() {
+        const hasMainFields = [
+            form.elements.team_id.value,
+            form.elements.title.value.trim(),
+            form.elements.description.value.trim(),
+            form.elements.duration.value,
+            workoutIdInput.value
+        ].some(Boolean);
+
+        if (hasMainFields) return true;
+
+        return Array.from(exercisesContainer.querySelectorAll('.exercise-block')).some((block) => (
+            block.querySelector('.exercise-select').value
+            || block.querySelector('.exercise-custom').value.trim()
+            || block.querySelector('.ex-sets').value
+            || block.querySelector('.ex-reps').value
+        ));
+    }
+
     exercisesContainer.querySelectorAll('.exercise-block').forEach(addRemoveButton);
 
     exercisesContainer.addEventListener('change', (event) => {
@@ -128,6 +151,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btn-reset-workout').addEventListener('click', (event) => {
         event.preventDefault();
+        if (
+            hasWorkoutFormData()
+            && !window.confirm('Clear the workout form? Your unsaved workout details will be lost.')
+        ) {
+            return;
+        }
         resetForm();
     });
 
@@ -169,6 +198,9 @@ document.addEventListener('DOMContentLoaded', () => {
             exercisesContainer.replaceChildren(...rows);
             setStatus('Editing workout for ' + workout.Team_Name + '.');
             form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            window.setTimeout(() => {
+                form.elements.title.focus({ preventScroll: true });
+            }, 350);
         });
     });
 
