@@ -2,30 +2,28 @@
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('workout-planner-form');
     const exercisesContainer = document.getElementById('exercises-container');
+    if (!form || !exercisesContainer) return;
+
     const statusMessage = document.getElementById('form-status-msg');
     const saveButton = document.getElementById('btn-save-workout');
     const formTitle = document.getElementById('workout-form-title');
     const workoutIdInput = document.getElementById('workout-id');
     const actionInput = document.getElementById('workout-action');
-    const exerciseOptions = exercisesContainer.querySelector('.exercise-select').innerHTML;
-
-    if (!form || !exercisesContainer) return;
 
     function addRemoveButton(block) {
         const removeButton = document.createElement('button');
         removeButton.type = 'button';
         removeButton.className = 'remove-ex-btn txt-error bg-transparent';
         removeButton.setAttribute('aria-label', 'Remove exercise');
-        removeButton.style.cssText = 'border: none; cursor: pointer; display: flex; align-items: center; margin-left: auto;';
-        removeButton.innerHTML = '<span class="material-symbols-outlined">close</span>';
+        removeButton.classList.add('captain-exercise-remove');
+        removeButton.title = 'Remove exercise';
+        removeButton.innerHTML = '<span class="material-symbols-outlined" aria-hidden="true">delete</span>';
         block.appendChild(removeButton);
         removeButton.addEventListener('click', () => {
             if (exercisesContainer.children.length === 1) {
-                block.querySelector('.exercise-select').value = '';
-                block.querySelector('.exercise-custom').value = '';
-                block.querySelector('.exercise-name-value').value = '';
-                block.querySelector('.custom-exercise-field').hidden = true;
-                block.querySelector('.exercise-custom').required = false;
+                block.querySelector('.exercise-search').value = '';
+                block.querySelector('[data-exercise-id]').value = '';
+                block.querySelector('[data-exercise-message]').hidden = true;
                 block.querySelector('.ex-sets').value = '';
                 block.querySelector('.ex-reps').value = '';
             } else {
@@ -34,31 +32,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function syncExerciseName(block) {
-        const select = block.querySelector('.exercise-select');
-        const customField = block.querySelector('.custom-exercise-field');
-        const customInput = block.querySelector('.exercise-custom');
-        const exerciseName = block.querySelector('.exercise-name-value');
-        const isCustom = select.value === '__custom__';
-
-        customField.hidden = !isCustom;
-        customInput.required = isCustom;
-        exerciseName.value = isCustom ? customInput.value.trim() : select.value;
-    }
-
     function makeExerciseRow(exercise = {}) {
         const block = document.createElement('div');
-        block.className = 'exercise-block bk-mt-md pt-4 border-t-dim';
+        block.className = 'exercise-block captain-exercise-card';
         block.innerHTML = `
             <div class="form-group-cal space-y-xs bk-mb-md">
                 <label class="gl-lbl-accent">EXERCISE NAME</label>
-                <select class="cal-input-field gl-select exercise-select" required>${exerciseOptions}</select>
-                <div class="custom-exercise-field" hidden>
-                    <input class="cal-input-field exercise-custom" type="text" maxlength="100" placeholder="Enter exercise name">
+                <div class="exercise-autocomplete">
+                    <input class="cal-input-field exercise-search" type="text" name="exercise_name[]" maxlength="100" placeholder="Search or enter an exercise name" autocomplete="off" required data-exercise-search>
+                    <input type="hidden" name="exercise_id[]" data-exercise-id>
+                    <div class="exercise-autocomplete-list" hidden data-exercise-suggestions></div>
+                    <div class="exercise-autocomplete-message" hidden data-exercise-message></div>
                 </div>
-                <input type="hidden" name="exercise_name[]" class="exercise-name-value" required>
             </div>
-            <div class="cal-grid-2 gap-3">
+            <div class="captain-exercise-fields">
                 <div class="form-group-cal space-y-xs">
                     <label class="gl-lbl-accent">SETS</label>
                     <input class="cal-input-field ex-sets" type="number" name="exercise_sets[]" min="1" max="1000" placeholder="3" required>
@@ -71,32 +58,20 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         block.querySelector('[name="exercise_sets[]"]').value = exercise.Sets || '';
         block.querySelector('[name="exercise_reps[]"]').value = exercise.Reps || '';
-        syncExerciseName(block);
         if (exercise.Exercise_Name) {
-            const select = block.querySelector('.exercise-select');
-            const normalizedName = exercise.Exercise_Name.trim().replace(/\s+/g, ' ');
-            const matchingOption = Array.from(select.options).find((option) =>
-                option.value && option.value !== '__custom__'
-                && option.value.toLocaleLowerCase() === normalizedName.toLocaleLowerCase()
-            );
-
-            if (matchingOption) {
-                select.value = matchingOption.value;
-            } else {
-                select.value = '__custom__';
-                block.querySelector('.exercise-custom').value = exercise.Exercise_Name;
-            }
-            syncExerciseName(block);
+            block.querySelector('.exercise-search').value = exercise.Exercise_Name;
+            block.querySelector('[data-exercise-id]').value = exercise.Exercise_ID || '';
         }
         addRemoveButton(block);
+        window.FitCampusExerciseAutocomplete.initializeWithin(block);
         return block;
     }
 
     function setStatus(message, isError = false) {
         statusMessage.textContent = message;
         statusMessage.classList.remove('hidden');
-        statusMessage.style.color = isError ? 'var(--error)' : 'var(--secondary)';
-        statusMessage.style.background = isError ? 'rgba(255,180,171,0.1)' : 'rgba(74,225,118,0.1)';
+        statusMessage.classList.toggle('captain-feedback-error', isError);
+        statusMessage.classList.toggle('captain-feedback-success', !isError);
     }
 
     function resetForm() {
@@ -109,17 +84,28 @@ document.addEventListener('DOMContentLoaded', () => {
         statusMessage.classList.add('hidden');
     }
 
-    exercisesContainer.querySelectorAll('.exercise-block').forEach(addRemoveButton);
+    function hasWorkoutFormData() {
+        const hasMainFields = [
+            form.elements.team_id.value,
+            form.elements.title.value.trim(),
+            form.elements.description.value.trim(),
+            form.elements.duration.value,
+            workoutIdInput.value
+        ].some(Boolean);
 
-    exercisesContainer.addEventListener('change', (event) => {
-        if (event.target.matches('.exercise-select')) {
-            syncExerciseName(event.target.closest('.exercise-block'));
-        }
-    });
-    exercisesContainer.addEventListener('input', (event) => {
-        if (event.target.matches('.exercise-custom')) {
-            syncExerciseName(event.target.closest('.exercise-block'));
-        }
+        if (hasMainFields) return true;
+
+        return Array.from(exercisesContainer.querySelectorAll('.exercise-block')).some((block) => (
+            block.querySelector('.exercise-search').value.trim()
+            || block.querySelector('[data-exercise-id]').value
+            || block.querySelector('.ex-sets').value
+            || block.querySelector('.ex-reps').value
+        ));
+    }
+
+    exercisesContainer.querySelectorAll('.exercise-block').forEach((block) => {
+    addRemoveButton(block);
+    window.FitCampusExerciseAutocomplete.initializeWithin(block);
     });
 
     document.getElementById('add-exercise-btn').addEventListener('click', () => {
@@ -128,6 +114,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btn-reset-workout').addEventListener('click', (event) => {
         event.preventDefault();
+        if (
+            hasWorkoutFormData()
+            && !window.confirm('Clear the workout form? Your unsaved workout details will be lost.')
+        ) {
+            return;
+        }
         resetForm();
     });
 
@@ -169,6 +161,9 @@ document.addEventListener('DOMContentLoaded', () => {
             exercisesContainer.replaceChildren(...rows);
             setStatus('Editing workout for ' + workout.Team_Name + '.');
             form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            window.setTimeout(() => {
+                form.elements.title.focus({ preventScroll: true });
+            }, 350);
         });
     });
 

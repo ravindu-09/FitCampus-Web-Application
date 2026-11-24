@@ -71,12 +71,15 @@ if ($is_captain) {
                     
                     <div class="form-group-cal cal-spacing-md">
                         <label>Meal Category</label>
-                        <select name="meal_category" class="cal-input-field" required>
-                            <option value="Breakfast">Breakfast</option>
-                            <option value="Lunch" selected>Lunch</option>
-                            <option value="Dinner">Dinner</option>
-                            <option value="Snack">Snack</option>
-                        </select>
+                        <div class="cal-select-wrapper">
+                            <select name="meal_category" class="cal-input-field cal-select" required>
+                                <option value="Breakfast">Breakfast</option>
+                                <option value="Lunch" selected>Lunch</option>
+                                <option value="Dinner">Dinner</option>
+                                <option value="Snack">Snack</option>
+                            </select>
+                            <span class="material-symbols-outlined cal-select-arrow" aria-hidden="true">expand_more</span>
+                        </div>
                     </div>
 
                     <div class="form-group-cal cal-spacing-md">
@@ -124,19 +127,28 @@ if ($is_captain) {
                 <h3 class="form-title txt-yellow cal-spacing-md">
                     <span class="material-symbols-outlined">directions_run</span> Log Activity (Burned)
                 </h3>
+                <?php if (is_string($_GET['activity_error'] ?? null) && $_GET['activity_error'] !== ''): ?>
+                    <p class="cal-validation-message" role="alert">
+                        <?= htmlspecialchars($_GET['activity_error'], ENT_QUOTES, 'UTF-8') ?>
+                    </p>
+                <?php endif; ?>
                 <!-- Action path updated to controllers -->
                 <form method="POST" action="../../controllers/member/calorie_action.php?action=add_burned">
                     <input type="hidden" name="log_date" id="burned-hidden-date" value="<?php echo date('Y-m-d'); ?>">
 
                     <div class="form-group-cal cal-spacing-md">
                         <label>Activity Type</label>
-                        <select name="activity_type" class="cal-input-field" required>
-                            <option value="Running">Running</option>
-                            <option value="Cycling">Cycling</option>
-                            <option value="Weightlifting">Weightlifting</option>
-                            <option value="Walking" selected>Walking</option>
-                            <option value="Swimming">Swimming</option>
-                        </select>
+                        <div class="cal-select-wrapper">
+                            <select name="activity_type" class="cal-input-field cal-select" required>
+                                <option value="Running">Running</option>
+                                <option value="Cycling">Cycling</option>
+                                <option value="Weightlifting">Weightlifting</option>
+                                <option value="Walking" selected>Walking</option>
+                                <option value="Swimming">Swimming</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <span class="material-symbols-outlined cal-select-arrow" aria-hidden="true">expand_more</span>
+                        </div>
                     </div>
 
                     <div class="form-group-cal cal-spacing-md">
@@ -146,7 +158,7 @@ if ($is_captain) {
 
                     <div class="form-group-cal cal-spacing-lg" style="padding-bottom: 74px;">
                         <label>Calories Burned (Manual Override)</label>
-                        <input type="number" name="calories_burned" class="cal-input-field" placeholder="Optional" min="0">
+                        <input type="number" name="calories_burned" class="cal-input-field" placeholder="Enter calories burned" min="0.01" max="999999.99" step="0.01" required>
                     </div>
 
                     <button type="submit" class="cal-submit-btn btn-yellow">

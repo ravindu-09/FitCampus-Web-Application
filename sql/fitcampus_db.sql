@@ -72,6 +72,22 @@ CREATE TABLE `attendance` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `attendance_visit_points`
+--
+
+CREATE TABLE `attendance_visit_points` (
+  `Attendance_ID` int(10) UNSIGNED NOT NULL,
+  `Points` tinyint(3) UNSIGNED NOT NULL,
+  `Visit_Minutes` int(10) UNSIGNED NOT NULL,
+  `Awarded_At` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`Attendance_ID`),
+  CONSTRAINT `chk_visit_points_positive` CHECK (`Points` > 0),
+  CONSTRAINT `chk_visit_points_minimum_duration` CHECK (`Visit_Minutes` >= 30)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `booking`
 --
 
@@ -183,7 +199,8 @@ CREATE TABLE `common_workout` (
   `Instructor_ID` int(10) UNSIGNED NOT NULL,
   `Workout_Level` varchar(50) DEFAULT NULL,
   `Duration` int(10) UNSIGNED DEFAULT NULL,
-  `Title` varchar(150) NOT NULL
+  `Title` varchar(150) NOT NULL,
+  `Description` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -202,12 +219,26 @@ CREATE TABLE `common_workout_exercise` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `member_saved_common_workout`
+--
+
+CREATE TABLE `member_saved_common_workout` (
+  `User_ID` int(10) UNSIGNED NOT NULL,
+  `Common_Workout_ID` int(10) UNSIGNED NOT NULL,
+  `Saved_At` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `exercise`
 --
 
 CREATE TABLE `exercise` (
   `Exercise_ID` int(10) UNSIGNED NOT NULL,
   `Exercise_Name` varchar(100) NOT NULL,
+  `Exercise_Name_Normalized` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin
+    GENERATED ALWAYS AS (UPPER(TRIM(REGEXP_REPLACE(`Exercise_Name`, '[[:space:]]+', ' ')))) STORED,
   `Description` text DEFAULT NULL,
   `Demo_Link` varchar(500) DEFAULT NULL,
   `Type` varchar(50) DEFAULT NULL
@@ -278,11 +309,75 @@ CREATE TABLE `feedback` (
 CREATE TABLE `goal` (
   `Goal_ID` int(10) UNSIGNED NOT NULL,
   `User_ID` int(10) UNSIGNED NOT NULL,
+  `Goal_Name` varchar(150) NOT NULL,
+  `Activity_Name` varchar(150) DEFAULT NULL,
   `Goal_Type` varchar(100) NOT NULL,
   `Target` decimal(10,2) DEFAULT NULL,
+  `Start_Value` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `Current_Value` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `Unit` varchar(50) NOT NULL,
   `Start_Date` date DEFAULT NULL,
   `End_Date` date DEFAULT NULL,
   `Status` varchar(30) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `goal_progress`
+--
+
+CREATE TABLE `goal_progress` (
+  `Progress_ID` int(10) UNSIGNED NOT NULL,
+  `Goal_ID` int(10) UNSIGNED NOT NULL,
+  `Value` decimal(10,2) NOT NULL,
+  `Update_Date` date NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `goal_metric`
+--
+
+CREATE TABLE `goal_metric` (
+  `Goal_Metric_ID` int(10) UNSIGNED NOT NULL,
+  `Goal_ID` int(10) UNSIGNED NOT NULL,
+  `Metric_Key` varchar(40) NOT NULL,
+  `Metric_Label` varchar(100) NOT NULL,
+  `Unit` varchar(30) NOT NULL,
+  `Target_Value` decimal(10,2) DEFAULT NULL,
+  `Comparison_Direction` enum('at_least','at_most') NOT NULL,
+  `Baseline_Value` decimal(10,2) DEFAULT NULL,
+  `Display_Order` tinyint(3) UNSIGNED NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `goal_performance`
+--
+
+CREATE TABLE `goal_performance` (
+  `Performance_ID` int(10) UNSIGNED NOT NULL,
+  `Goal_ID` int(10) UNSIGNED NOT NULL,
+  `Performance_Date` date NOT NULL,
+  `Legacy_Progress_ID` int(10) UNSIGNED DEFAULT NULL,
+  `Created_At` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `goal_performance_value`
+--
+
+CREATE TABLE `goal_performance_value` (
+  `Performance_Value_ID` int(10) UNSIGNED NOT NULL,
+  `Performance_ID` int(10) UNSIGNED NOT NULL,
+  `Goal_ID` int(10) UNSIGNED NOT NULL,
+  `Goal_Metric_ID` int(10) UNSIGNED NOT NULL,
+  `Measured_Value` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -352,9 +447,19 @@ CREATE TABLE `penalty` (
   `User_ID` int(10) UNSIGNED NOT NULL,
   `Team_ID` int(10) UNSIGNED DEFAULT NULL,
   `Instructor_ID` int(10) UNSIGNED DEFAULT NULL,
+  `Issuer_User_ID` int(10) UNSIGNED DEFAULT NULL,
+  `Issuer_Type` enum('admin','instructor','system') DEFAULT NULL,
   `Description` text NOT NULL,
   `Date` date NOT NULL,
-  `Severity` varchar(30) DEFAULT NULL
+  `Created_At` datetime DEFAULT NULL,
+  `Severity` varchar(30) DEFAULT NULL,
+  `Requested_Life_Deduction` tinyint(3) UNSIGNED DEFAULT NULL,
+  `Life_Deduction` tinyint(3) UNSIGNED DEFAULT NULL,
+  `Source_Attendance_ID` int(10) UNSIGNED DEFAULT NULL,
+  `Request_Key` char(32) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,
+  CONSTRAINT `chk_penalty_requested_life_deduction` CHECK (`Requested_Life_Deduction` IS NULL OR `Requested_Life_Deduction` BETWEEN 1 AND 100),
+  CONSTRAINT `chk_penalty_life_deduction` CHECK (`Life_Deduction` IS NULL OR `Life_Deduction` BETWEEN 0 AND 100),
+  CONSTRAINT `chk_penalty_actual_not_above_requested` CHECK (`Life_Deduction` IS NULL OR `Requested_Life_Deduction` IS NULL OR `Life_Deduction` <= `Requested_Life_Deduction`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -366,6 +471,7 @@ CREATE TABLE `penalty` (
 CREATE TABLE `personal_workout` (
   `Personal_Workout_ID` int(10) UNSIGNED NOT NULL,
   `User_ID` int(10) UNSIGNED NOT NULL,
+  `Source_Common_Workout_ID` int(10) UNSIGNED DEFAULT NULL,
   `Duration` int(10) UNSIGNED DEFAULT NULL,
   `Title` varchar(150) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -438,6 +544,45 @@ INSERT INTO `team_member` (`Team_ID`, `User_ID`, `Role_In_Team`) VALUES
 (5, 22, 'Member'),
 (6, 2, 'Member'),
 (6, 21, 'Captain');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `team_goal`
+--
+
+CREATE TABLE `team_goal` (
+  `Team_Goal_ID` int(10) UNSIGNED NOT NULL,
+  `Team_ID` int(10) UNSIGNED NOT NULL,
+  `Created_By` int(10) UNSIGNED NOT NULL,
+  `Goal_Name` varchar(150) NOT NULL,
+  `Description` text DEFAULT NULL,
+  `Target_Value` decimal(12,2) NOT NULL,
+  `Unit` varchar(50) NOT NULL,
+  `Start_Date` date NOT NULL,
+  `End_Date` date NOT NULL,
+  `Status` varchar(30) NOT NULL DEFAULT 'Active',
+  `Created_At` timestamp NOT NULL DEFAULT current_timestamp(),
+  `Updated_At` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  CONSTRAINT `chk_team_goal_target_positive` CHECK (`Target_Value` > 0),
+  CONSTRAINT `chk_team_goal_dates` CHECK (`End_Date` >= `Start_Date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `team_goal_progress`
+--
+
+CREATE TABLE `team_goal_progress` (
+  `Progress_ID` int(10) UNSIGNED NOT NULL,
+  `Team_Goal_ID` int(10) UNSIGNED NOT NULL,
+  `User_ID` int(10) UNSIGNED NOT NULL,
+  `Contribution_Value` decimal(12,2) NOT NULL,
+  `Progress_Date` date NOT NULL,
+  `Created_At` timestamp NOT NULL DEFAULT current_timestamp(),
+  CONSTRAINT `chk_team_goal_progress_positive` CHECK (`Contribution_Value` > 0)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -567,7 +712,8 @@ ALTER TABLE `announcement`
 ALTER TABLE `attendance`
   ADD PRIMARY KEY (`Attendance_ID`),
   ADD KEY `fk_attendance_user` (`User_ID`),
-  ADD KEY `fk_attendance_facility` (`Facility_ID`);
+  ADD KEY `fk_attendance_facility` (`Facility_ID`),
+  ADD KEY `idx_attendance_user_active_checkout` (`User_ID`,`Active_Status`,`Check_Out_Time`);
 
 --
 -- Indexes for table `booking`
@@ -615,11 +761,18 @@ ALTER TABLE `common_workout_exercise`
   ADD KEY `fk_common_workout_exercise_exercise` (`Exercise_ID`);
 
 --
+-- Indexes for table `member_saved_common_workout`
+--
+ALTER TABLE `member_saved_common_workout`
+  ADD PRIMARY KEY (`User_ID`,`Common_Workout_ID`),
+  ADD KEY `idx_saved_common_workout_workout` (`Common_Workout_ID`);
+
+--
 -- Indexes for table `exercise`
 --
 ALTER TABLE `exercise`
   ADD PRIMARY KEY (`Exercise_ID`),
-  ADD UNIQUE KEY `uq_exercise_name` (`Exercise_Name`);
+  ADD UNIQUE KEY `uq_exercise_name_normalized` (`Exercise_Name_Normalized`);
 
 --
 -- Indexes for table `facility`
@@ -650,6 +803,40 @@ ALTER TABLE `goal`
   ADD KEY `fk_goal_user` (`User_ID`);
 
 --
+-- Indexes for table `goal_progress`
+--
+ALTER TABLE `goal_progress`
+  ADD PRIMARY KEY (`Progress_ID`),
+  ADD KEY `idx_goal_progress_goal_date` (`Goal_ID`,`Update_Date`);
+
+--
+-- Indexes for table `goal_metric`
+--
+ALTER TABLE `goal_metric`
+  ADD PRIMARY KEY (`Goal_Metric_ID`),
+  ADD UNIQUE KEY `uq_goal_metric_id_goal` (`Goal_Metric_ID`,`Goal_ID`),
+  ADD UNIQUE KEY `uq_goal_metric_key` (`Goal_ID`,`Metric_Key`),
+  ADD KEY `idx_goal_metric_goal_order` (`Goal_ID`,`Display_Order`);
+
+--
+-- Indexes for table `goal_performance`
+--
+ALTER TABLE `goal_performance`
+  ADD PRIMARY KEY (`Performance_ID`),
+  ADD UNIQUE KEY `uq_goal_performance_id_goal` (`Performance_ID`,`Goal_ID`),
+  ADD UNIQUE KEY `uq_goal_performance_legacy_progress` (`Legacy_Progress_ID`),
+  ADD KEY `idx_goal_performance_goal_date` (`Goal_ID`,`Performance_Date`,`Performance_ID`);
+
+--
+-- Indexes for table `goal_performance_value`
+--
+ALTER TABLE `goal_performance_value`
+  ADD PRIMARY KEY (`Performance_Value_ID`),
+  ADD UNIQUE KEY `uq_goal_performance_metric` (`Performance_ID`,`Goal_Metric_ID`),
+  ADD KEY `idx_goal_performance_value_performance_goal` (`Performance_ID`,`Goal_ID`),
+  ADD KEY `idx_goal_performance_value_metric_goal` (`Goal_Metric_ID`,`Goal_ID`);
+
+--
 -- Indexes for table `gym_rule`
 --
 ALTER TABLE `gym_rule`
@@ -678,14 +865,19 @@ ALTER TABLE `penalty`
   ADD PRIMARY KEY (`Penalty_ID`),
   ADD KEY `fk_penalty_user` (`User_ID`),
   ADD KEY `fk_penalty_team` (`Team_ID`),
-  ADD KEY `fk_penalty_instructor` (`Instructor_ID`);
+  ADD KEY `fk_penalty_instructor` (`Instructor_ID`),
+  ADD KEY `fk_penalty_issuer_user` (`Issuer_User_ID`),
+  ADD UNIQUE KEY `uq_penalty_source_attendance` (`Source_Attendance_ID`),
+  ADD UNIQUE KEY `uq_penalty_request_key` (`Request_Key`),
+  ADD KEY `idx_penalty_user_created` (`User_ID`,`Created_At`);
 
 --
 -- Indexes for table `personal_workout`
 --
 ALTER TABLE `personal_workout`
   ADD PRIMARY KEY (`Personal_Workout_ID`),
-  ADD KEY `fk_personal_workout_user` (`User_ID`);
+  ADD KEY `fk_personal_workout_user` (`User_ID`),
+  ADD UNIQUE KEY `uq_personal_workout_user_source_common` (`User_ID`,`Source_Common_Workout_ID`);
 
 --
 -- Indexes for table `personal_workout_exercise`
@@ -706,6 +898,22 @@ ALTER TABLE `team`
 ALTER TABLE `team_member`
   ADD PRIMARY KEY (`Team_ID`,`User_ID`),
   ADD KEY `fk_team_member_user` (`User_ID`);
+
+--
+-- Indexes for table `team_goal`
+--
+ALTER TABLE `team_goal`
+  ADD PRIMARY KEY (`Team_Goal_ID`),
+  ADD KEY `idx_team_goal_team_dates` (`Team_ID`,`Start_Date`,`End_Date`),
+  ADD KEY `idx_team_goal_created_by` (`Created_By`);
+
+--
+-- Indexes for table `team_goal_progress`
+--
+ALTER TABLE `team_goal_progress`
+  ADD PRIMARY KEY (`Progress_ID`),
+  ADD KEY `idx_team_goal_progress_goal_date` (`Team_Goal_ID`,`Progress_Date`),
+  ADD KEY `idx_team_goal_progress_user` (`User_ID`);
 
 --
 -- Indexes for table `team_workout`
@@ -802,6 +1010,30 @@ ALTER TABLE `goal`
   MODIFY `Goal_ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `goal_progress`
+--
+ALTER TABLE `goal_progress`
+  MODIFY `Progress_ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `goal_metric`
+--
+ALTER TABLE `goal_metric`
+  MODIFY `Goal_Metric_ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `goal_performance`
+--
+ALTER TABLE `goal_performance`
+  MODIFY `Performance_ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `goal_performance_value`
+--
+ALTER TABLE `goal_performance_value`
+  MODIFY `Performance_Value_ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `gym_rule`
 --
 ALTER TABLE `gym_rule`
@@ -830,6 +1062,18 @@ ALTER TABLE `personal_workout`
 --
 ALTER TABLE `team`
   MODIFY `Team_ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `team_goal`
+--
+ALTER TABLE `team_goal`
+  MODIFY `Team_Goal_ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `team_goal_progress`
+--
+ALTER TABLE `team_goal_progress`
+  MODIFY `Progress_ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `team_workout`
@@ -865,6 +1109,12 @@ ALTER TABLE `announcement`
 ALTER TABLE `attendance`
   ADD CONSTRAINT `fk_attendance_facility` FOREIGN KEY (`Facility_ID`) REFERENCES `facility` (`Facility_ID`) ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_attendance_user` FOREIGN KEY (`User_ID`) REFERENCES `user` (`User_ID`) ON UPDATE CASCADE;
+
+--
+-- Constraints for table `attendance_visit_points`
+--
+ALTER TABLE `attendance_visit_points`
+  ADD CONSTRAINT `fk_visit_points_attendance` FOREIGN KEY (`Attendance_ID`) REFERENCES `attendance` (`Attendance_ID`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 --
 -- Constraints for table `booking`
@@ -908,6 +1158,13 @@ ALTER TABLE `common_workout_exercise`
   ADD CONSTRAINT `fk_common_workout_exercise_workout` FOREIGN KEY (`Common_Workout_ID`) REFERENCES `common_workout` (`Common_Workout_ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
+-- Constraints for table `member_saved_common_workout`
+--
+ALTER TABLE `member_saved_common_workout`
+  ADD CONSTRAINT `fk_saved_common_workout_user` FOREIGN KEY (`User_ID`) REFERENCES `user` (`User_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_saved_common_workout_workout` FOREIGN KEY (`Common_Workout_ID`) REFERENCES `common_workout` (`Common_Workout_ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
 -- Constraints for table `facility_equipment`
 --
 ALTER TABLE `facility_equipment`
@@ -925,6 +1182,31 @@ ALTER TABLE `feedback`
 --
 ALTER TABLE `goal`
   ADD CONSTRAINT `fk_goal_user` FOREIGN KEY (`User_ID`) REFERENCES `user` (`User_ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `goal_progress`
+--
+ALTER TABLE `goal_progress`
+  ADD CONSTRAINT `fk_goal_progress_goal` FOREIGN KEY (`Goal_ID`) REFERENCES `goal` (`Goal_ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `goal_metric`
+--
+ALTER TABLE `goal_metric`
+  ADD CONSTRAINT `fk_goal_metric_goal` FOREIGN KEY (`Goal_ID`) REFERENCES `goal` (`Goal_ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `goal_performance`
+--
+ALTER TABLE `goal_performance`
+  ADD CONSTRAINT `fk_goal_performance_goal` FOREIGN KEY (`Goal_ID`) REFERENCES `goal` (`Goal_ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `goal_performance_value`
+--
+ALTER TABLE `goal_performance_value`
+  ADD CONSTRAINT `fk_goal_performance_value_performance_goal` FOREIGN KEY (`Performance_ID`,`Goal_ID`) REFERENCES `goal_performance` (`Performance_ID`,`Goal_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_goal_performance_value_metric_goal` FOREIGN KEY (`Goal_Metric_ID`,`Goal_ID`) REFERENCES `goal_metric` (`Goal_Metric_ID`,`Goal_ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `gym_rule`
@@ -952,13 +1234,16 @@ ALTER TABLE `notification`
 ALTER TABLE `penalty`
   ADD CONSTRAINT `fk_penalty_instructor` FOREIGN KEY (`Instructor_ID`) REFERENCES `instructor` (`Instructor_ID`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_penalty_team` FOREIGN KEY (`Team_ID`) REFERENCES `team` (`Team_ID`) ON DELETE SET NULL ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_penalty_user` FOREIGN KEY (`User_ID`) REFERENCES `user` (`User_ID`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `fk_penalty_user` FOREIGN KEY (`User_ID`) REFERENCES `user` (`User_ID`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_penalty_issuer_user` FOREIGN KEY (`Issuer_User_ID`) REFERENCES `user` (`User_ID`) ON DELETE RESTRICT ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_penalty_source_attendance` FOREIGN KEY (`Source_Attendance_ID`) REFERENCES `attendance` (`Attendance_ID`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 --
 -- Constraints for table `personal_workout`
 --
 ALTER TABLE `personal_workout`
-  ADD CONSTRAINT `fk_personal_workout_user` FOREIGN KEY (`User_ID`) REFERENCES `user` (`User_ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `fk_personal_workout_user` FOREIGN KEY (`User_ID`) REFERENCES `user` (`User_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_personal_workout_source_common` FOREIGN KEY (`Source_Common_Workout_ID`) REFERENCES `common_workout` (`Common_Workout_ID`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
 -- Constraints for table `personal_workout_exercise`
@@ -973,6 +1258,20 @@ ALTER TABLE `personal_workout_exercise`
 ALTER TABLE `team_member`
   ADD CONSTRAINT `fk_team_member_team` FOREIGN KEY (`Team_ID`) REFERENCES `team` (`Team_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_team_member_user` FOREIGN KEY (`User_ID`) REFERENCES `user` (`User_ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `team_goal`
+--
+ALTER TABLE `team_goal`
+  ADD CONSTRAINT `fk_team_goal_team` FOREIGN KEY (`Team_ID`) REFERENCES `team` (`Team_ID`) ON DELETE RESTRICT ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_team_goal_creator` FOREIGN KEY (`Created_By`) REFERENCES `user` (`User_ID`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+--
+-- Constraints for table `team_goal_progress`
+--
+ALTER TABLE `team_goal_progress`
+  ADD CONSTRAINT `fk_team_goal_progress_goal` FOREIGN KEY (`Team_Goal_ID`) REFERENCES `team_goal` (`Team_Goal_ID`) ON DELETE RESTRICT ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_team_goal_progress_user` FOREIGN KEY (`User_ID`) REFERENCES `user` (`User_ID`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 --
 -- Constraints for table `team_workout`

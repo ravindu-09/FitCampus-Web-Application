@@ -48,6 +48,31 @@ document.addEventListener('DOMContentLoaded', () => {
             openRoleModal(userData, teamsList);
         });
     });
+
+    document.getElementById('admin-penalty-form')?.addEventListener('submit', async event => {
+        event.preventDefault();
+        const form = event.currentTarget;
+        const submit = form.querySelector('[type="submit"]');
+        const feedback = document.getElementById('admin-penalty-feedback');
+        submit.disabled = true;
+        feedback.textContent = 'Applying penalty...';
+        try {
+            const response = await fetch('../../controllers/common/penalty_action.php', {
+                method: 'POST',
+                body: new FormData(form),
+                headers: { Accept: 'application/json' }
+            });
+            const result = await response.json();
+            if (!response.ok || !result.success) throw new Error(result.message || 'Penalty could not be recorded.');
+            feedback.textContent = `${result.message} Remaining Life Bar: ${result.life_balance}%.`;
+            window.setTimeout(() => window.location.reload(), 1100);
+        } catch (error) {
+            feedback.textContent = error.message || 'Penalty could not be recorded. Please try again.';
+            feedback.classList.add('text-error');
+        } finally {
+            submit.disabled = false;
+        }
+    });
 });
 
 // View Modal Logic
@@ -74,8 +99,14 @@ function openViewModal(user) {
     const updateSection = document.getElementById('student-update-section');
     if (user.Role && user.Role.toLowerCase() === 'student') {
         updateSection.style.display = 'block';
-        document.getElementById('v-life').value = user.Life_Percentage || 100;
+        document.getElementById('v-life').textContent = `${user.Life_Percentage ?? 100}%`;
         document.getElementById('v-exam').value = user.Date_of_Final_Exam || '';
+        const penaltyForm = document.getElementById('admin-penalty-form');
+        penaltyForm.reset();
+        document.getElementById('admin-penalty-user-id').value = user.User_ID;
+        document.getElementById('admin-penalty-request-key').value = createPenaltyRequestKey();
+        document.getElementById('admin-penalty-feedback').textContent = '';
+        document.getElementById('admin-penalty-feedback').classList.remove('text-error');
     } else {
         updateSection.style.display = 'none';
     }
@@ -85,13 +116,11 @@ function openViewModal(user) {
 
 window.updateStudentMeta = function() {
     const userId = document.getElementById('v-userid').value;
-    const life = document.getElementById('v-life').value;
     const exam = document.getElementById('v-exam').value;
 
     const formData = new FormData();
     formData.append('action', 'update_meta');
     formData.append('user_id', userId);
-    formData.append('life_percentage', life);
     formData.append('final_exam', exam);
     
     if (typeof csrfToken !== 'undefined') formData.append('csrf_token', csrfToken);
@@ -114,6 +143,13 @@ window.updateStudentMeta = function() {
             alert("Failed to update: " + err.message);
         });
 };
+
+function createPenaltyRequestKey() {
+    if (window.crypto?.randomUUID) return window.crypto.randomUUID().replace(/-/g, '');
+    const bytes = new Uint8Array(16);
+    window.crypto.getRandomValues(bytes);
+    return Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
+}
 
 function openRoleModal(user, allTeams) {
     document.getElementById('r-userid').value = user.User_ID;

@@ -23,6 +23,11 @@ $extra_js = [
 require_once '../../includes/db_connection.php';
 require_once '../../models/captain/BookingModel.php';
 
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+$csrf_token = $_SESSION['csrf_token'];
+
 $bookingModel = new BookingModel($pdo);
 
 // Fetch all teams where the current user holds the 'Captain' role

@@ -25,6 +25,7 @@ FitCampus is an all-in-one web-based fitness and facility management platform de
 * **Interactive Facility Booking:** Weekly availability grid with time-slot selection, capacity limit checks, and special request handling.
 * **Team Roster Management:** Roster tracking by Student ID and attendance logging (Present/Absent).
 * **Team Workout Planner:** Schedule, draft, and publish team-specific training routines directly to player feeds.
+* **Team Goals:** Captains create shared targets; team members submit dated contributions, with aggregate progress calculated from contribution history.
 
 ### 4. 🎛️ Gym Instructor Console
 * **Front-Desk Attendance Terminal / QR Kiosk:** Instant QR code scanner check-in/out and live Life Bar deduction.
@@ -144,6 +145,12 @@ FitCampus-Web-Application/
 * Click on the newly created database, go to the **Import** tab, choose `sql/fitcampus_db.sql` from the project directory, and click **Import**.
 
 * If the database was already imported before the support feature was added, import `sql/support_feature_migration.sql` once to add its two `feedback` columns. Do not run this migration after importing the updated full schema.
+* For an existing database, import `sql/team_goals_migration.sql` once to add the team-goal and contribution tables. Fresh imports of `sql/fitcampus_db.sql` already include these tables. Migrations are manual and are not executed by the application.
+* For an existing database, review and manually apply `sql/member_leaderboard_life_bar_migration.sql` once to add visit-point ledger and penalty-audit structures. A fresh import of `sql/fitcampus_db.sql` already includes them. The application never runs migrations automatically, and historical attendance is not backfilled with points.
+* The migration leaves old penalty rows and their stored Life Bar values unchanged; their `Requested_Life_Deduction` remains `NULL` and the member history labels them as legacy records because their original requested-versus-actual amounts cannot be reconstructed safely.
+* Schedule `controllers/cron/finalize_facility_closures.php` to run once per minute using the PHP CLI executable configured for your installation. For example, a Unix-like cron entry is `* * * * * /path/to/php /path/to/FitCampus-Web-Application/controllers/cron/finalize_facility_closures.php`. This closes unmatched active visits at each facility's configured closing time, applies the approved missed-sign-out Life Bar penalty, and awards visit points when the finalized visit qualifies. Run it only after applying the leaderboard/Life Bar migration.
+* Application database connections set the MySQL session timezone to `+05:30`, and PHP uses `Asia/Colombo`. Attendance timestamps, facility closing, penalty timestamps, and monthly leaderboard boundaries therefore use Sri Lanka local time. If running cron outside the web server, use the same application connection configuration; do not override the MySQL session timezone.
+* The checked-in individual-goal model currently expects columns and a `goal_progress` table not declared in the checked-in base schema. Team Goals uses separate tables and does not change individual-goal behavior; reconcile that existing schema discrepancy separately.
 
 
 4. **Verify Database Configuration:**

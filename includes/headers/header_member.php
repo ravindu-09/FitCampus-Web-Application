@@ -32,7 +32,18 @@ $default_title = $is_captain ? 'FitCampus - Captain Portal' : 'FitCampus - Membe
 $page_title = isset($page_title) ? $page_title : $default_title;
 
 $display_first_name = isset($_SESSION['first_name']) ? $_SESSION['first_name'] : 'Member';
-$display_life = isset($_SESSION['life_percentage']) ? (int)$_SESSION['life_percentage'] : 100;
+require_once __DIR__ . '/../db_connection.php';
+$lifeStatement = $pdo->prepare(
+    "SELECT s.Life_Percentage FROM university_student s "
+    . "INNER JOIN `user` u ON u.User_ID = s.User_ID "
+    . "WHERE s.User_ID = ? AND u.Role = 'Student' LIMIT 1"
+);
+$lifeStatement->execute([(int)$_SESSION['user_id']]);
+$currentLife = $lifeStatement->fetchColumn();
+if ($currentLife === false) {
+    throw new RuntimeException('The signed-in member has no Life Bar record.');
+}
+$display_life = max(0, min(100, (int)$currentLife));
 ?>
 
 <!DOCTYPE html>
@@ -48,10 +59,11 @@ $display_life = isset($_SESSION['life_percentage']) ? (int)$_SESSION['life_perce
     <link rel="stylesheet" href="../../assets/css/base/components.css">
 
     <!-- Role Stylesheet -->
-    <link rel="stylesheet" href="../../assets/css/roles/member.css">
+    <link rel="stylesheet" href="../../assets/css/roles/member.css?v=<?php echo filemtime(__DIR__ . '/../../assets/css/roles/member.css'); ?>">
     <!-- Captain Specific Stylesheet (Loads only for Captains) -->
     <?php if ($is_captain): ?>
-        <link rel="stylesheet" href="../../assets/css/roles/captain.css">
+        <link rel="stylesheet" href="../../assets/css/roles/captain.css?v=<?php echo filemtime(__DIR__ . '/../../assets/css/roles/captain.css'); ?>">
+        <script src="../../assets/js/captain/navigation.js" defer></script>
     <?php endif; ?>
 </head>
 <body class="member-layout-body">

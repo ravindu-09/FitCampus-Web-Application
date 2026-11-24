@@ -17,13 +17,21 @@ $bookingModel = new BookingModel($pdo);
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 $user_id = $_SESSION['user_id'];
 
-if ($action === 'assign_workout') {
+if (in_array($action, ['assign_workout', 'create_booking', 'delete_booking'], true)) {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         http_response_code(405);
         echo json_encode(['success' => false, 'error' => 'Invalid request method']);
         exit;
     }
+    if (empty($_SESSION['csrf_token']) || !is_string($_POST['csrf_token'] ?? null)
+        || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'error' => 'Your session expired. Reload the page and try again.']);
+        exit;
+    }
+}
 
+if ($action === 'assign_workout') {
     $booking_id = filter_var($_POST['booking_id'] ?? null, FILTER_VALIDATE_INT);
     $workout_id = filter_var($_POST['workout_id'] ?? null, FILTER_VALIDATE_INT);
     if (!$booking_id || $booking_id < 1 || !$workout_id || $workout_id < 1) {

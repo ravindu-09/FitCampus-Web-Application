@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const assignmentNoOptions = document.getElementById('assign-workout-no-options');
     const assignmentMessage = document.getElementById('assign-workout-message');
     const assignmentSubmit = document.getElementById('assign-workout-submit');
+    const csrfToken = document.getElementById('booking-csrf-token')?.value || '';
     let activeAssignmentRow = null;
     let activeAssignmentButton = null;
 
@@ -105,6 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('action', 'assign_workout');
         formData.append('booking_id', assignmentBookingId.value);
         formData.append('workout_id', workoutId);
+        formData.append('csrf_token', csrfToken);
         assignmentSubmit.disabled = true;
         assignmentSubmit.textContent = 'Assigning...';
 
@@ -526,6 +528,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const formData = new FormData();
             formData.append('action', 'create_booking');
+            formData.append('csrf_token', csrfToken);
             formData.append('facility_id', currentGymId);
             formData.append('date', selectedSlot.dbdate); 
             formData.append('time', selectedSlot.time);
@@ -663,6 +666,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const formData = new FormData();
                 formData.append('action', 'delete_booking');
                 formData.append('booking_id', bookingId);
+                formData.append('csrf_token', csrfToken);
 
                 fetch('../../controllers/captain/booking_action.php', {
                     method: 'POST',

@@ -9,22 +9,8 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
 require_once '../../controllers/instructor/kiosk_page_controller.php';
 require_once '../../includes/headers/header_instructor.php';
 
-// Mock data for UI layout rendering
-$recent_checkin = [
-    'name' => 'Alex Chen', 'id' => 'STU-8921', 'faculty' => 'Computer Science', 'year' => 'Junior',
-    'image' => 'https://lh3.googleusercontent.com/aida-public/AB6AXuCFYIIWG-DJrrw7nBUg6H28xRxVkc5rsJ0enrUl8dnG1m3puxT5avRDeqFzUfyykr3JqDXj9EEHNR6xzTlqmeYvSXj4rmfJDdWdUtOhOhTgePSBCnAgULr8kSfKictzpXu7vn9OcdamwLC5uBGTnEA2tACDMIoTxM33SNNxgL9VKzbfxZ-h1chlwR0IXdbylifvTyUVm3ebvtoYXSaw0vde3rfMkvpWO78MUkxgVLiigYWXEj8X6kuf0g'
-];
-
-$occupancy_data = [
-    ['name' => 'Gym 01 - Main', 'sub' => 'STRENGTH & FREE WEIGHTS', 'current' => 32, 'max' => 50, 'pct' => 64, 'male' => 60, 'female' => 40, 'status' => 'OPTIMAL', 'color' => 'var(--primary)'],
-    ['name' => 'Gym 02 - Cardio', 'sub' => 'TREADMILLS & CYCLES', 'current' => 18, 'max' => 40, 'pct' => 45, 'male' => 45, 'female' => 55, 'status' => 'LOW TRAFFIC', 'color' => 'var(--secondary)']
-];
-
-$attendance_logs = [
-    ['name' => 'Alex Chen', 'id' => 'STU-8921', 'time' => '14:22', 'life' => 85, 'color' => 'var(--secondary)', 'img' => $recent_checkin['image'], 'status' => 'Active'],
-    ['name' => 'Jordan Smith', 'id' => 'STU-4410', 'time' => '14:15', 'life' => 45, 'color' => 'var(--tertiary)', 'img' => '', 'status' => 'Active'],
-    ['name' => 'Taylor Brooks', 'id' => 'STU-1102', 'time' => '13:05', 'life' => 15, 'color' => 'var(--error)', 'img' => '', 'status' => 'Complete']
-];
+$recent_checkin = $attendance_logs[0] ?? null;
+$escape = static fn($value): string => htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
 ?>
 
 <!-- Ambient glow background effects -->
@@ -59,18 +45,27 @@ $attendance_logs = [
                     <h3 class="card-header-title border-bottom-sub">
                         <span class="material-symbols-outlined text-color-secondary">verified_user</span> Recent Check-In
                     </h3>
-                    <div class="recent-profile">
-                        <div class="avatar-lg">
-                            <img src="<?= $recent_checkin['image'] ?>" alt="Profile">
-                            <div class="status-tick"><span class="material-symbols-outlined">check</span></div>
+                    <?php if ($recent_checkin): ?>
+                        <?php $recentImage = basename((string)($recent_checkin['Profile_Image'] ?? '')); ?>
+                        <div class="recent-profile">
+                            <div class="avatar-lg">
+                                <?php if ($recentImage !== '' && $recentImage !== 'default_avatar.png'): ?>
+                                    <img src="../../assets/images/uploads/<?= $escape($recentImage) ?>" alt="">
+                                <?php else: ?>
+                                    <span class="material-symbols-outlined">person</span>
+                                <?php endif; ?>
+                                <div class="status-tick"><span class="material-symbols-outlined">check</span></div>
+                            </div>
+                            <h2><?= $escape($recent_checkin['First_Name'] . ' ' . $recent_checkin['Last_Name']) ?></h2>
+                            <h4 class="text-color-primary font-mono"><?= $escape($recent_checkin['Registration_Number']) ?></h4>
+                            <div class="profile-tags">
+                                <span class="badge-tag"><?= $escape($recent_checkin['Faculty'] ?: 'Faculty not specified') ?></span>
+                                <span class="badge-tag"><?= $escape($recent_checkin['Attendance_Status']) ?></span>
+                            </div>
                         </div>
-                        <h2><?= $recent_checkin['name'] ?></h2>
-                        <h4 class="text-color-primary font-mono"><?= $recent_checkin['id'] ?></h4>
-                        <div class="profile-tags">
-                            <span class="badge-tag"><?= $recent_checkin['faculty'] ?></span>
-                            <span class="badge-tag"><?= $recent_checkin['year'] ?></span>
-                        </div>
-                    </div>
+                    <?php else: ?>
+                        <p class="text-regular-sub">No attendance records have been recorded yet.</p>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -104,24 +99,29 @@ $attendance_logs = [
                     </h3>
                 </div>
                 <div class="grid-2-col">
-                    <?php foreach($occupancy_data as $fac): ?>
+                    <?php foreach ($occupancy_data as $index => $fac): ?>
+                    <?php
+                    $capacity = max(1, (int)$fac['Capacity']);
+                    $current = (int)$fac['live_count'];
+                    $percentage = min(100, (int)round($current / $capacity * 100));
+                    $color = $index % 2 === 0 ? 'var(--primary)' : 'var(--secondary)';
+                    ?>
                     <div class="occ-box">
                         <div class="flex-between align-end mb-2">
                             <div>
-                                <h4><?= $fac['name'] ?></h4>
-                                <p class="form-label m-0"><?= $fac['sub'] ?></p>
+                                <h4><?= $escape($fac['Facility_Name']) ?></h4>
+                                <p class="form-label m-0">Current gym members</p>
                             </div>
-                            <div class="occ-count"><span style="color: <?= $fac['color'] ?>;"><?= $fac['current'] ?></span> / <?= $fac['max'] ?></div>
+                            <div class="occ-count"><span style="color: <?= $color ?>;"><?= $current ?></span> / <?= $capacity ?></div>
                         </div>
                         <div class="progress-track mb-3">
-                            <div class="progress-fill" style="width: <?= $fac['pct'] ?>%; background-color: <?= $fac['color'] ?>;"></div>
+                            <div class="progress-fill" style="width: <?= $percentage ?>%; background-color: <?= $color ?>;"></div>
                         </div>
                         <div class="flex-between align-center">
-                            <div class="flex-items gap-3">
-                                <span class="gender-stat text-regular-sub"><span class="material-symbols-outlined text-color-primary">male</span> <?= $fac['male'] ?>%</span>
-                                <span class="gender-stat text-regular-sub"><span class="material-symbols-outlined text-color-secondary">female</span> <?= $fac['female'] ?>%</span>
-                            </div>
-                            <span class="badge-status" style="border-color: <?= $fac['color'] ?>; color: <?= $fac['color'] ?>;"><?= $fac['status'] ?></span>
+                            <span class="text-regular-sub"><?= $percentage ?>% capacity</span>
+                            <span class="badge-status" style="border-color: <?= $color ?>; color: <?= $color ?>;">
+                                <?= $current >= $capacity ? 'At capacity' : 'Available' ?>
+                            </span>
                         </div>
                     </div>
                     <?php endforeach; ?>
@@ -149,40 +149,56 @@ $attendance_logs = [
                                 <th>Time</th>
                                 <th>Life Bar</th>
                                 <th class="text-right">Status</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach($attendance_logs as $log): ?>
+                            <?php foreach ($attendance_logs as $log): ?>
+                            <?php
+                            $logImage = basename((string)($log['Profile_Image'] ?? ''));
+                            $lifePercentage = max(0, min(100, (int)$log['Life_Percentage']));
+                            $lifeColor = $lifePercentage > 50 ? 'var(--secondary)' : ($lifePercentage > 20 ? 'var(--tertiary)' : 'var(--error)');
+                            ?>
                             <tr>
                                 <td>
                                     <div class="flex-items gap-2">
-                                        <?php if($log['img']): ?> 
-                                            <img src="<?= $log['img'] ?>" class="table-avatar">
-                                        <?php else: ?> 
+                                        <?php if ($logImage !== '' && $logImage !== 'default_avatar.png'): ?>
+                                            <img src="../../assets/images/uploads/<?= $escape($logImage) ?>" class="table-avatar" alt="">
+                                        <?php else: ?>
                                             <div class="table-avatar no-img"><span class="material-symbols-outlined">person</span></div> 
                                         <?php endif; ?>
-                                        <span><?= $log['name'] ?></span>
+                                        <span><?= $escape($log['First_Name'] . ' ' . $log['Last_Name']) ?></span>
                                     </div>
                                 </td>
-                                <td class="text-regular-sub font-mono"><?= $log['id'] ?></td>
-                                <td><?= $log['time'] ?></td>
+                                <td class="text-regular-sub font-mono"><?= $escape($log['Registration_Number']) ?></td>
+                                <td><?= $escape(date('H:i', strtotime($log['Check_In_Time']))) ?></td>
                                 <td>
                                     <div class="flex-items gap-2" style="width:120px;">
                                         <div class="progress-track flex-1">
-                                            <div class="progress-fill" style="width: <?= $log['life'] ?>%; background-color: <?= $log['color'] ?>;"></div>
+                                            <div class="progress-fill" style="width: <?= $lifePercentage ?>%; background-color: <?= $lifeColor ?>;"></div>
                                         </div>
-                                        <span class="font-mono font-xs" style="color: <?= $log['color'] ?>;"><?= $log['life'] ?>%</span>
+                                        <span class="font-mono font-xs" style="color: <?= $lifeColor ?>;"><?= $lifePercentage ?>%</span>
                                     </div>
                                 </td>
                                 <td class="text-right">
-                                    <?php if($log['status'] == 'Active'): ?>
+                                    <?php if ((int)$log['Active_Status'] === 1): ?>
                                         <span class="badge-status"><div class="status-dot"></div> Active</span>
                                     <?php else: ?>
                                         <span class="badge-pill font-xs">Complete</span>
                                     <?php endif; ?>
                                 </td>
+                                <td>
+                                    <button type="button" class="btn btn-glass btn-sm js-open-penalty"
+                                            data-user-id="<?= (int)$log['User_ID'] ?>"
+                                            data-member-name="<?= $escape($log['First_Name'] . ' ' . $log['Last_Name']) ?>">
+                                        Penalty
+                                    </button>
+                                </td>
                             </tr>
                             <?php endforeach; ?>
+                            <?php if (!$attendance_logs): ?>
+                                <tr><td colspan="6">No attendance records have been recorded yet.</td></tr>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
@@ -196,21 +212,73 @@ $attendance_logs = [
 <div class="wk-modal-overlay hidden" id="manual-entry-modal">
     <div class="glass-card modal-box">
         <div class="modal-header">
-            <h3>Manual Authentication</h3>
+            <h3>Manual Attendance</h3>
             <button class="close-btn" onclick="closeKioskModal('manual-entry-modal')"><span class="material-symbols-outlined">close</span></button>
         </div>
         <div class="modal-body">
-            <div class="form-group mb-3">
-                <label class="form-label">REGISTRATION NUMBER</label>
-                <div class="input-wrapper">
-                    <span class="material-symbols-outlined input-icon">badge</span>
-                    <input type="text" class="form-control" placeholder="e.g. STU-0000">
+            <form id="manual-attendance-form">
+                <input type="hidden" name="csrf_token" value="<?= $escape($csrf_token) ?>">
+                <div class="form-group mb-3">
+                    <label class="form-label" for="manual-reg-no">REGISTRATION NUMBER</label>
+                    <div class="input-wrapper">
+                        <span class="material-symbols-outlined input-icon">badge</span>
+                        <input id="manual-reg-no" name="reg_no" type="text" class="form-control" placeholder="e.g. STU-0000" maxlength="50" required>
+                    </div>
                 </div>
-            </div>
-            <button class="btn btn-primary w-100 mt-4" onclick="closeKioskModal('manual-entry-modal')">Authenticate</button>
+                <div class="form-group mb-3">
+                    <label class="form-label" for="manual-attendance-action">ACTION</label>
+                    <select id="manual-attendance-action" name="action" class="form-control" required>
+                        <option value="manual_checkin">Check in</option>
+                        <option value="manual_checkout">Check out</option>
+                    </select>
+                </div>
+                <div class="form-group mb-3" id="manual-facility-group">
+                    <label class="form-label" for="manual-facility">FACILITY</label>
+                    <select id="manual-facility" name="facility_id" class="form-control" required>
+                        <?php foreach ($facility_options as $facility): ?>
+                            <option value="<?= (int)$facility['Facility_ID'] ?>"><?= $escape($facility['Facility_Name']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <p class="kiosk-feedback" id="manual-attendance-feedback" role="status" aria-live="polite"></p>
+                <button class="btn btn-primary w-100 mt-4" type="submit">Record attendance</button>
+            </form>
         </div>
     </div>
 </div>
+
+<div class="wk-modal-overlay hidden" id="penalty-modal">
+    <div class="glass-card modal-box">
+        <div class="modal-header">
+            <div>
+                <h3>Apply Life-Bar Penalty</h3>
+                <p class="text-regular-sub font-sm" id="penalty-member-label"></p>
+            </div>
+            <button class="close-btn" type="button" onclick="closeKioskModal('penalty-modal')" aria-label="Close penalty form"><span class="material-symbols-outlined">close</span></button>
+        </div>
+        <div class="modal-body">
+            <form id="penalty-form">
+                <input type="hidden" name="csrf_token" value="<?= $escape($csrf_token) ?>">
+                <input type="hidden" name="user_id" id="penalty-user-id">
+                <input type="hidden" name="request_key" id="penalty-request-key">
+                <div class="form-group mb-3">
+                    <label class="form-label" for="penalty-reason">REASON</label>
+                    <textarea id="penalty-reason" name="reason" class="form-control" maxlength="2000" required></textarea>
+                </div>
+                <div class="form-group mb-3">
+                    <label class="form-label" for="penalty-severity">SEVERITY</label>
+                    <input id="penalty-severity" name="severity" type="text" class="form-control" maxlength="30" required>
+                </div>
+                <div class="form-group mb-3">
+                    <label class="form-label" for="penalty-deduction">REQUESTED LIFE DEDUCTION (1–100)</label>
+                    <input id="penalty-deduction" name="requested_life_deduction" type="number" class="form-control" min="1" max="100" required>
+                </div>
+                <p class="kiosk-feedback" id="penalty-feedback" role="status" aria-live="polite"></p>
+                <button class="btn btn-primary w-100 mt-4" type="submit">Apply penalty</button>
+            </form>
+        </div>
+    </div>
+ </div>
 
 <div class="wk-modal-overlay hidden" id="team-checkin-modal">
     <div class="glass-card modal-box" style="max-width: 600px;">

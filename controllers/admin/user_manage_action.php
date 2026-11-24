@@ -12,7 +12,9 @@ if (!isset($_SESSION['user_id']) || strtolower($_SESSION['role'] ?? '') !== 'adm
 }
 
 // CSRF Protection Check
-if (empty($_POST['csrf_token']) || empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+if (!is_string($_SESSION['csrf_token'] ?? null)
+    || !is_string($_POST['csrf_token'] ?? null)
+    || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
     echo json_encode(['success' => false, 'error' => 'Invalid Security Token (CSRF)']);
     exit;
 }
@@ -20,17 +22,25 @@ if (empty($_POST['csrf_token']) || empty($_SESSION['csrf_token']) || !hash_equal
 $action = $_POST['action'] ?? '';
 $userModel = new UserModel($pdo);
 
-// 1. UPDATE STUDENT META (Life % and Exam Date)
+// 1. UPDATE STUDENT META (Exam Date)
 if ($action === 'update_meta') {
-    $user_id = (int)$_POST['user_id'];
-    $life_pct = (int)$_POST['life_percentage'];
+    $user_id = filter_var($_POST['user_id'] ?? null, FILTER_VALIDATE_INT);
     $exam_date = null;
+    if ($user_id === false || $user_id < 1) {
+        echo json_encode(['success' => false, 'error' => 'Invalid member account']);
+        exit;
+    }
 
     // Date validation
-    if (!empty($_POST['final_exam'])) {
-        $d = DateTime::createFromFormat('Y-m-d', $_POST['final_exam']);
-        if ($d && $d->format('Y-m-d') === $_POST['final_exam']) {
-            $exam_date = $_POST['final_exam'];
+    $final_exam = $_POST['final_exam'] ?? '';
+    if ($final_exam !== '' && !is_string($final_exam)) {
+        echo json_encode(['success' => false, 'error' => 'Invalid date format']);
+        exit;
+    }
+    if ($final_exam !== '') {
+        $d = DateTime::createFromFormat('Y-m-d', $final_exam);
+        if ($d && $d->format('Y-m-d') === $final_exam) {
+            $exam_date = $final_exam;
         } else {
             echo json_encode(['success' => false, 'error' => 'Invalid date format']);
             exit;
@@ -38,7 +48,7 @@ if ($action === 'update_meta') {
     }
 
     try {
-        $userModel->updateStudentMeta($user_id, $life_pct, $exam_date);
+        $userModel->updateStudentMeta($user_id, $exam_date);
         echo json_encode(['success' => true]);
     } catch (PDOException $e) {
         echo json_encode(['success' => false, 'error' => $e->getMessage()]);

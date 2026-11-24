@@ -18,7 +18,8 @@ if (empty($_SESSION['user_id'])) {
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     respond(false, 'Invalid request method.', 405);
 }
-if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
+if (empty($_SESSION['csrf_token']) || !is_string($_POST['csrf_token'] ?? null)
+    || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
     respond(false, 'Your session expired. Reload the planner and try again.', 403);
 }
 
@@ -69,6 +70,7 @@ $title = trim($_POST['title'] ?? '');
 $description = trim($_POST['description'] ?? '');
 $duration = filter_var($_POST['duration'] ?? null, FILTER_VALIDATE_INT);
 $exerciseNames = $_POST['exercise_name'] ?? [];
+$exerciseIds = $_POST['exercise_id'] ?? [];
 $exerciseSets = $_POST['exercise_sets'] ?? [];
 $exerciseReps = $_POST['exercise_reps'] ?? [];
 
@@ -81,22 +83,31 @@ if (mb_strlen($description) > 5000) {
 if ($duration === false || $duration < 1 || $duration > 1440) {
     respond(false, 'Enter a workout duration between 1 and 1,440 minutes.', 422);
 }
-if (!is_array($exerciseNames) || !is_array($exerciseSets) || !is_array($exerciseReps)
+if (!is_array($exerciseNames) || !is_array($exerciseIds) || !is_array($exerciseSets) || !is_array($exerciseReps)
     || count($exerciseNames) < 1 || count($exerciseNames) > 40
+    || count($exerciseNames) !== count($exerciseIds)
     || count($exerciseNames) !== count($exerciseSets) || count($exerciseNames) !== count($exerciseReps)) {
     respond(false, 'Add between 1 and 40 complete exercises.', 422);
 }
 
 $exercises = [];
 foreach ($exerciseNames as $index => $exerciseName) {
-    $name = trim((string)$exerciseName);
+    if (!is_string($exerciseName)) {
+        respond(false, 'Each exercise needs a valid name.', 422);
+    }
+    $name = trim($exerciseName);
     $sets = filter_var($exerciseSets[$index] ?? null, FILTER_VALIDATE_INT);
     $reps = filter_var($exerciseReps[$index] ?? null, FILTER_VALIDATE_INT);
     if ($name === '' || mb_strlen($name) > 100 || $sets === false || $sets < 1 || $sets > 1000
         || $reps === false || $reps < 1 || $reps > 1000) {
         respond(false, 'Each exercise needs a name, sets, and reps using valid positive numbers.', 422);
     }
-    $exercises[] = ['name' => $name, 'sets' => $sets, 'reps' => $reps];
+    $exercises[] = [
+        'id' => $exerciseIds[$index],
+        'name' => $name,
+        'sets' => $sets,
+        'reps' => $reps
+    ];
 }
 
 try {

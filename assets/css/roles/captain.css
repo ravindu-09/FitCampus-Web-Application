@@ -497,3 +497,1142 @@
 
 body.member-layout-body { --shared-cal-grid-gap: 12px; }
 .captain-badge-highlight { background: rgba(223, 183, 255, 0.2); }
+
+/* Captain-wide interaction and page layout consistency */
+.member-layout-body :is(a, button, input, select, textarea, summary):focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+
+.member-layout-body :is(button, input, select, textarea) {
+  font: inherit;
+}
+
+.member-layout-body :disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.captain-page-heading,
+.captain-dashboard-heading,
+.captain-section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+}
+
+.captain-page-heading h1,
+.captain-section-heading h2,
+.captain-dashboard-heading h2 {
+  margin: 0;
+  color: var(--on-surface);
+}
+
+.captain-page-heading > div > p:last-child {
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+
+.captain-eyebrow,
+.captain-summary-label {
+  display: block;
+  color: var(--primary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.captain-team-filter {
+  display: grid;
+  gap: 8px;
+  min-width: min(280px, 100%);
+}
+
+.captain-team-icon.active {
+  font-variation-settings: 'FILL' 1;
+}
+
+#captainTeamBtn.mob-nav-item {
+  width: 100%;
+  padding: 6px 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.captain-goal-summary,
+.captain-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.captain-summary-card,
+.captain-dashboard-card {
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  background: linear-gradient(145deg, rgba(42, 42, 42, 0.72), rgba(26, 26, 26, 0.88));
+}
+
+.captain-summary-card strong,
+.captain-dashboard-card > strong {
+  display: block;
+  margin-top: 8px;
+  color: var(--on-surface);
+  font-family: var(--font-mono);
+  font-size: 26px;
+}
+
+.captain-goal-create,
+.captain-goal-card,
+.captain-empty-state {
+  padding: 24px;
+}
+
+.captain-goal-form {
+  display: grid;
+  gap: 16px;
+}
+
+.captain-goal-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.captain-goal-description {
+  min-height: 88px;
+  resize: vertical;
+}
+
+.captain-goal-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  justify-self: start;
+  min-height: 44px;
+  padding: 10px 18px;
+}
+
+.captain-goals-list,
+.captain-dashboard-overview {
+  display: grid;
+  gap: 18px;
+}
+
+.captain-goals-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 18px;
+}
+
+.captain-goal-card {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.captain-goal-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.captain-goal-card-head h3,
+.captain-goal-card-head h4 {
+  margin: 10px 0 0;
+  color: var(--on-surface);
+  font-size: 18px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.captain-goal-date,
+.captain-goal-meta {
+  color: var(--on-surface-variant);
+  font-size: 12px;
+}
+
+.captain-goal-date {
+  flex: 0 0 auto;
+  padding-top: 4px;
+}
+
+.captain-status-badge {
+  display: inline-flex;
+  padding: 5px 9px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.status-active { color: var(--secondary); background: rgba(74, 225, 118, 0.1); border-color: rgba(74, 225, 118, 0.25); }
+.status-completed { color: var(--primary); background: rgba(223, 183, 255, 0.12); border-color: rgba(223, 183, 255, 0.25); }
+.status-cancelled { color: var(--error); background: rgba(255, 180, 171, 0.1); border-color: rgba(255, 180, 171, 0.25); }
+.status-expired { color: var(--tertiary); background: rgba(247, 190, 29, 0.1); border-color: rgba(247, 190, 29, 0.25); }
+
+.captain-goal-copy {
+  margin: -4px 0 0;
+  color: var(--on-surface-variant);
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.captain-goal-numbers,
+.captain-goal-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.captain-goal-numbers strong {
+  color: var(--on-surface);
+  font-family: var(--font-mono);
+  font-size: 20px;
+}
+
+.captain-goal-numbers strong span,
+.captain-goal-numbers > span {
+  color: var(--on-surface-variant);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.captain-progress-track {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.captain-progress-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--primary-container), var(--primary));
+  transition: width 0.35s ease;
+}
+
+.captain-goal-edit,
+.captain-contribution-history {
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  padding-top: 12px;
+}
+
+.captain-goal-edit summary,
+.captain-contribution-history summary {
+  color: var(--primary);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.captain-goal-edit form {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.captain-goal-edit form label {
+  display: grid;
+  gap: 7px;
+}
+
+.captain-edit-description {
+  grid-column: 1 / -1;
+}
+
+.captain-goal-status-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.captain-status-action {
+  min-height: 36px;
+  padding: 7px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--on-surface-variant);
+  cursor: pointer;
+}
+
+.captain-status-action:hover { border-color: var(--primary); color: var(--primary); }
+
+.captain-contribution-history ul,
+.captain-dashboard-card ul {
+  display: grid;
+  gap: 9px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.captain-contribution-history li,
+.captain-dashboard-card li {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  color: var(--on-surface-variant);
+  font-size: 12px;
+}
+
+.captain-contribution-history li > span,
+.captain-dashboard-card li > span:first-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.captain-contribution-history li strong { color: var(--on-surface); white-space: nowrap; }
+.captain-dashboard-card li > span:last-child { color: var(--on-surface); text-align: right; }
+
+.captain-feedback {
+  padding: 13px 16px;
+  border: 1px solid;
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+.captain-feedback-success { color: var(--secondary); background: rgba(74, 225, 118, 0.08); border-color: rgba(74, 225, 118, 0.25); }
+.captain-feedback-error { color: var(--error); background: rgba(255, 180, 171, 0.08); border-color: rgba(255, 180, 171, 0.25); }
+
+.captain-empty-state {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.captain-empty-state > .material-symbols-outlined { color: var(--primary); font-size: 34px; }
+.captain-empty-state h2,
+.captain-empty-state h3 { margin: 0; color: var(--on-surface); }
+.captain-empty-state p { margin: 0; }
+.captain-goal-status-form { margin: 0; }
+
+.captain-dashboard-heading { align-items: center; }
+.captain-dashboard-links { display: flex; flex-wrap: wrap; gap: 9px; }
+.captain-dashboard-link,
+.captain-dashboard-card > a {
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.captain-dashboard-link { padding: 9px 12px; border: 1px solid rgba(223, 183, 255, 0.2); border-radius: 9px; }
+.captain-dashboard-link:hover,
+.captain-dashboard-card > a:hover { background: rgba(223, 183, 255, 0.08); text-decoration: underline; }
+.captain-dashboard-card > a { display: inline-block; margin-top: 16px; }
+.captain-dashboard-card > p { margin: 14px 0 0; font-size: 13px; }
+.captain-dashboard-empty { padding: 18px; }
+.captain-dashboard-empty p { margin: 0; }
+.member-team-goals-grid { grid-template-columns: minmax(0, 1fr); }
+.captain-contribution-form form { padding-top: 2px; }
+.captain-contribution-form form button { min-height: 40px; }
+
+.captain-planner-page { width: 100%; max-width: 1040px; margin: 0 auto; }
+.captain-planner-panel { animation: slideUpFade 0.35s ease-out; }
+.captain-exercise-container { display: grid; gap: 12px; border-radius: 12px; }
+.captain-exercise-card { position: relative; min-width: 0; margin: 0; padding: 18px 16px 14px; border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; background: rgba(0,0,0,0.12); }
+.captain-exercise-card > .form-group-cal { margin: 0 0 14px; padding-right: 42px; }
+.captain-exercise-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start; }
+.captain-exercise-fields .form-group-cal { min-width: 0; margin: 0; }
+.captain-exercise-remove { position: absolute; top: 8px; right: 8px; display: inline-flex; width: 34px; height: 34px; align-items: center; justify-content: center; padding: 0; border: 1px solid rgba(255,180,171,0.18); border-radius: 8px; background: rgba(255,180,171,0.06); color: var(--error); cursor: pointer; transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease; }
+.captain-exercise-remove .material-symbols-outlined { font-size: 18px; }
+.captain-exercise-remove:hover { background: rgba(255,180,171,0.14); border-color: rgba(255,180,171,0.38); transform: translateY(-1px); }
+.captain-exercise-remove:focus-visible,
+.captain-add-exercise:focus-visible,
+.captain-planner-primary:focus-visible,
+.captain-reset-button:focus-visible,
+.planner-workout-icon-button:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+.captain-planner-select-wrap { position: relative; }
+.captain-planner-select { appearance: none; -webkit-appearance: none; padding-right: 46px; }
+.captain-planner-select-arrow { position: absolute; top: 50%; right: 14px; transform: translateY(-50%); color: var(--on-surface-variant); font-size: 20px; line-height: 1; pointer-events: none; }
+.captain-add-exercise { display: flex; width: 100%; min-height: 48px; align-items: center; justify-content: center; gap: 9px; padding: 12px 16px; border: 1px dashed rgba(223,183,255,0.28); border-radius: 9px; background: rgba(255,255,255,0.025); color: var(--on-surface-variant); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; transition: color 0.18s ease, background-color 0.18s ease, border-color 0.18s ease; }
+.captain-add-exercise .material-symbols-outlined { font-size: 20px; }
+.captain-add-exercise:hover { color: var(--primary); border-color: rgba(223,183,255,0.52); background: rgba(223,183,255,0.07); }
+.captain-planner-actions { display: flex; align-items: stretch; gap: 10px; padding: 10px; border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; }
+.captain-planner-primary,
+.captain-reset-button { display: inline-flex; min-height: 46px; flex: 1 1 0; align-items: center; justify-content: center; padding: 12px 18px; border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer; transition: filter 0.18s ease, color 0.18s ease, border-color 0.18s ease, background-color 0.18s ease; }
+.captain-planner-primary:hover { filter: brightness(1.08); }
+.captain-reset-button { background: transparent; border: 1px solid rgba(255,255,255,0.14); color: var(--on-surface-variant); }
+.captain-reset-button:hover { color: var(--on-surface); border-color: rgba(255,255,255,0.28); background: rgba(255,255,255,0.05); }
+.captain-workout-card { padding: 18px 20px; }
+.captain-workout-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.captain-workout-heading { min-width: 0; }
+.captain-workout-name { margin: 0; color: var(--on-surface); font-size: 16px; font-weight: 700; line-height: 1.35; overflow-wrap: anywhere; }
+.captain-workout-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin-top: 7px; color: var(--on-surface-variant); font-size: 11px; }
+.captain-workout-meta-separator { width: 3px; height: 3px; border-radius: 50%; background: var(--primary); }
+.captain-workout-actions { display: flex; flex: 0 0 auto; align-items: center; gap: 6px; }
+.planner-workout-icon-button { display: inline-flex; width: 36px; height: 36px; align-items: center; justify-content: center; padding: 0; border: 1px solid rgba(255,255,255,0.07); border-radius: 9px; transition: color 0.18s ease, background-color 0.18s ease, border-color 0.18s ease; }
+.planner-workout-icon-button .material-symbols-outlined { font-size: 18px; }
+.planner-workout-icon-button:hover { color: var(--primary); border-color: rgba(223,183,255,0.24); background: rgba(223,183,255,0.08); }
+.planner-workout-icon-button.delete-workout-btn:hover { color: var(--error); border-color: rgba(255,180,171,0.28); background: rgba(255,180,171,0.08); }
+.captain-workout-description { margin: 12px 0 0; color: var(--on-surface-variant); font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+.captain-workout-exercises { display: flex; flex-direction: column; gap: 0; margin: 14px 0 0; padding: 6px 12px; border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; background: rgba(0,0,0,0.12); }
+.captain-workout-exercises li { min-width: 0; gap: 16px; padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.captain-workout-exercises li:last-child { border-bottom: 0; }
+.captain-workout-exercises .ex-name { min-width: 0; overflow-wrap: anywhere; }
+.captain-workout-exercises .ex-reps { flex: 0 0 auto; min-width: 60px; text-align: right; white-space: nowrap; }
+.captain-workout-card .wk-exercise-list { margin-bottom: 0; }
+
+@media (max-width: 640px) {
+  .captain-planner-actions { flex-direction: column; }
+  .captain-planner-primary,
+  .captain-reset-button { width: 100%; flex-basis: auto; }
+  .captain-workout-card { padding: 16px; }
+}
+
+@media (max-width: 480px) {
+  .captain-exercise-container { padding: 12px; }
+  .captain-exercise-card { padding: 16px 12px 12px; }
+  .captain-exercise-fields { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+  .captain-exercise-fields .cal-input-field { padding-right: 8px; padding-left: 10px; }
+  .captain-workout-card-header { gap: 10px; }
+  .planner-workout-icon-button { width: 34px; height: 34px; }
+  .captain-workout-exercises { padding-right: 9px; padding-left: 9px; }
+}
+
+.captain-roster-form { margin: 0; }
+.roster-team-switcher { min-width: 250px; }
+.captain-roster-remove { padding: 5px 10px; color: var(--error); }
+.captain-roster-add-icon,
+.booking-calendar-icon { font-size: 20px; }
+.captain-swipe-icon { font-size: 14px; }
+.captain-planner-status { border-radius: 8px; }
+.team-header-icon { font-size: 32px; }
+.team-selection-link { color: inherit; text-decoration: none; }
+
+.team-banner-identity {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 7px 12px;
+}
+
+.team-banner-identity h2 {
+  color: var(--on-surface);
+  line-height: 1.3;
+}
+
+.team-banner-meta {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+}
+
+.team-banner-division {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 3px 8px;
+  border: 1px solid rgba(223, 183, 255, 0.24);
+  border-radius: 999px;
+  background: rgba(223, 183, 255, 0.07);
+  color: var(--primary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.team-banner-sport {
+  color: var(--on-surface-variant);
+  font-size: 12px;
+}
+
+.booking-status-approved { color: var(--secondary); background: rgba(74,225,118,0.1); border-color: rgba(74,225,118,0.3); }
+.booking-status-pending { color: var(--tertiary); background: rgba(247,190,29,0.1); border-color: rgba(247,190,29,0.3); }
+.booking-status-other { color: var(--error); background: rgba(255,180,171,0.1); border-color: rgba(255,180,171,0.3); }
+.booking-action-button { padding: 6px 10px; font-size: 11px; }
+.booking-empty-cell { padding: 24px; color: var(--on-surface-variant); text-align: center; }
+.booking-table-actions { display: flex; justify-content: flex-end; gap: 6px; }
+.booking-textarea { min-height: 80px; }
+.booking-confirmation-modal { z-index: 100; }
+.booking-modal-inner { max-width: 420px; width: 100%; text-align: center; }
+
+@media (max-width: 768px) {
+  .captain-page-heading,
+  .captain-dashboard-heading,
+  .captain-section-heading { align-items: stretch; flex-direction: column; }
+  .captain-page-heading { gap: 14px; }
+  .captain-team-filter { min-width: 0; width: 100%; }
+  .captain-goal-summary { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
+  .captain-summary-card { padding: 14px 12px; }
+  .captain-summary-card strong { font-size: 22px; }
+  .captain-summary-label { font-size: 9px; }
+  .captain-goals-grid,
+  .member-team-goals-grid,
+  .captain-dashboard-grid { grid-template-columns: 1fr; }
+  .captain-goal-form-grid { grid-template-columns: 1fr; gap: 12px; }
+  .captain-goal-create,
+  .captain-goal-card,
+  .captain-empty-state { padding: 18px; }
+  .captain-goal-card-head { flex-direction: column; }
+  .captain-goal-date { padding-top: 0; }
+  .captain-dashboard-links { display: grid; grid-template-columns: 1fr; }
+  .captain-dashboard-link { text-align: center; }
+  .member-team-goals-grid .captain-goal-card { padding: 18px; }
+}
+
+@media (max-width: 400px) {
+  .captain-goal-numbers { align-items: flex-start; flex-direction: column; gap: 4px; }
+  .captain-goal-meta { align-items: flex-start; flex-direction: column; gap: 5px; }
+}
+
+/* Team Goals page refinements */
+.captain-goals-page {
+  gap: 22px;
+}
+
+.captain-team-goals-heading {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.captain-team-goals-heading .settings-main-title {
+  font-size: 26px;
+  letter-spacing: -0.02em;
+}
+
+.captain-team-goal-subtitle {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.captain-team-goal-filter {
+  display: grid;
+  gap: 7px;
+  width: min(280px, 100%);
+  flex: 0 0 auto;
+}
+
+.captain-team-goal-filter .cal-input-field {
+  min-height: 44px;
+}
+
+.captain-goal-feedback {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.captain-goal-feedback .material-symbols-outlined {
+  flex: 0 0 auto;
+  font-size: 19px;
+}
+
+.captain-team-goal-summary {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 12px;
+}
+
+.captain-team-goal-stat {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  min-height: 108px;
+  padding: 18px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  background: rgba(30, 30, 30, 0.7);
+}
+
+.captain-team-goal-stat strong {
+  display: block;
+  margin-top: 7px;
+  color: var(--on-surface);
+  font-family: var(--font-mono);
+  font-size: 25px;
+  line-height: 1.2;
+}
+
+.captain-team-contribution-totals {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 7px 14px;
+  margin-top: 7px;
+}
+
+.captain-team-contribution-totals > span {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.captain-team-contribution-totals > span > strong {
+  margin: 0;
+  font-size: 17px;
+}
+
+.captain-team-contribution-totals small {
+  color: var(--on-surface-variant);
+  font-size: 11px;
+}
+
+.captain-team-goal-create {
+  overflow: hidden;
+}
+
+.captain-goals-page .captain-team-goal-create,
+.captain-goals-page .captain-team-goal-card {
+  min-width: 0;
+}
+
+.captain-team-goal-create > .captain-team-goal-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.captain-team-goal-section-head {
+  gap: 16px;
+}
+
+.captain-team-goal-title {
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.35;
+}
+
+.captain-shared-goal-badge,
+.captain-team-goal-list-heading > .gl-badge {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.captain-team-goal-fields {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.captain-team-goal-fields > :first-child,
+.captain-team-goal-fields > :nth-child(4),
+.captain-team-goal-fields > :nth-child(5) {
+  grid-column: span 2;
+}
+
+.captain-team-goal-fields .cal-input-field,
+.captain-team-goal-description-field .cal-input-field,
+.captain-goal-edit-form .cal-input-field {
+  min-height: 44px;
+}
+
+.captain-team-goal-description-field textarea.cal-input-field,
+.captain-goal-edit-form textarea.cal-input-field {
+  min-height: 88px;
+}
+
+.captain-team-goal-submit {
+  min-width: 190px;
+}
+
+.captain-goal-submit .material-symbols-outlined {
+  font-size: 19px;
+}
+
+.captain-team-goal-list-heading {
+  gap: 16px;
+  align-items: flex-end;
+}
+
+.captain-team-goal-grid {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px;
+}
+
+.captain-team-goal-card {
+  display: grid;
+  align-content: start;
+  grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
+  column-gap: 22px;
+  row-gap: 14px;
+  min-width: 0;
+  padding: 22px 24px;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.captain-team-goal-card > .captain-goal-card-head {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+.captain-team-goal-card .captain-goal-card-head h3 {
+  margin-top: 9px;
+  font-size: 19px;
+  letter-spacing: -0.01em;
+}
+
+.captain-team-goal-card .captain-goal-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.16);
+  white-space: nowrap;
+}
+
+.captain-goal-date .material-symbols-outlined {
+  font-size: 16px;
+  color: var(--primary);
+}
+
+.captain-team-goal-card .captain-status-badge {
+  padding: 5px 10px;
+}
+
+.captain-team-goal-card .captain-goal-copy {
+  margin-top: -3px;
+  line-height: 1.65;
+}
+
+.captain-team-goal-card .captain-goal-timeline {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  margin-top: -8px;
+}
+
+.captain-team-goal-card > .captain-goal-copy {
+  grid-column: 1 / -1;
+  grid-row: 3;
+}
+
+.captain-team-goal-card .captain-goal-numbers {
+  grid-column: 1;
+  grid-row: 4;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.captain-goal-progress-label {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--on-surface-variant);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.captain-team-goal-card .captain-goal-numbers strong {
+  display: block;
+  line-height: 1.25;
+}
+
+.captain-team-goal-card .captain-goal-target {
+  padding-bottom: 2px;
+  text-align: right;
+}
+
+.captain-team-goal-card .captain-progress-track {
+  grid-column: 1;
+  grid-row: 5;
+  display: block;
+  width: 100%;
+  height: 9px;
+  min-height: 9px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.captain-team-goal-card .captain-progress-track > span {
+  display: block;
+  height: 100%;
+  min-width: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--primary-container), var(--primary));
+}
+
+.captain-team-goal-card .captain-goal-meta {
+  grid-column: 1;
+  grid-row: 6;
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-start;
+  gap: 6px;
+  margin-top: -8px;
+}
+
+.captain-team-goal-card .captain-goal-meta > strong {
+  color: var(--primary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.captain-team-goal-card .team-goal-leaderboard {
+  grid-column: 2;
+  grid-row: 4 / span 5;
+  display: grid;
+  gap: 8px;
+  align-self: stretch;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.14);
+}
+
+.captain-team-goal-card .team-goal-leaderboard-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.captain-team-goal-card .team-goal-leaderboard-list li {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr) minmax(0, 42%);
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.captain-team-goal-card .team-goal-leaderboard-list li > .team-goal-rank,
+.captain-team-goal-card .team-goal-leaderboard-list li > .team-goal-contributor-name,
+.captain-team-goal-card .team-goal-leaderboard-list li > strong {
+  min-width: 0;
+}
+
+.captain-team-goal-card .team-goal-contributor-name {
+  overflow-wrap: anywhere;
+}
+
+.captain-team-goal-card .team-goal-leaderboard-list li > strong {
+  display: block;
+  max-width: 100%;
+  color: var(--on-surface);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.captain-team-goal-card > .captain-team-goal-edit {
+  grid-column: 1;
+  grid-row: 7;
+  margin-top: 2px;
+}
+
+.captain-team-goal-card > .captain-team-goal-status-actions {
+  grid-column: 1;
+  grid-row: 8;
+}
+
+.captain-team-goal-card > .captain-team-goal-history {
+  grid-column: 1 / -1;
+  grid-row: 9;
+  margin-top: 2px;
+}
+
+.captain-goal-contribution-count {
+  margin-left: auto;
+}
+
+.captain-team-goal-edit,
+.captain-team-goal-history {
+  padding-top: 14px;
+}
+
+.captain-team-goal-edit summary,
+.captain-team-goal-history summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  list-style: none;
+}
+
+.captain-team-goal-edit summary::-webkit-details-marker,
+.captain-team-goal-history summary::-webkit-details-marker {
+  display: none;
+}
+
+.captain-team-goal-edit summary .material-symbols-outlined,
+.captain-team-goal-history summary .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.captain-team-goal-edit-form {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.captain-team-goal-edit-form > button {
+  justify-self: start;
+  min-height: 40px;
+  padding: 9px 16px;
+}
+
+.captain-team-goal-status-actions {
+  gap: 9px;
+}
+
+.captain-team-goal-status-actions .captain-status-action {
+  min-height: 38px;
+  padding: 8px 13px;
+  border-color: rgba(255, 255, 255, 0.1);
+  font-size: 12px;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.captain-team-goal-status-actions .captain-status-completed:hover {
+  border-color: rgba(74, 225, 118, 0.45);
+  background: rgba(74, 225, 118, 0.08);
+  color: var(--secondary);
+}
+
+.captain-team-goal-status-actions .captain-status-cancelled:hover {
+  border-color: rgba(255, 180, 171, 0.45);
+  background: rgba(255, 180, 171, 0.08);
+  color: var(--error);
+}
+
+.captain-team-goal-history summary .gl-badge {
+  margin-left: auto;
+  padding: 3px 8px;
+  font-size: 10px;
+}
+
+.captain-team-goal-history ul {
+  display: grid;
+  gap: 0;
+  margin-top: 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.captain-team-goal-history li {
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.captain-team-goal-history li:last-child {
+  border-bottom: 0;
+}
+
+.captain-contributor-detail {
+  display: grid;
+  gap: 3px;
+}
+
+.captain-contributor-detail strong {
+  color: var(--on-surface);
+  font-weight: 600;
+}
+
+.captain-contributor-detail time {
+  color: var(--on-surface-variant);
+  font-size: 11px;
+}
+
+.captain-no-contributions {
+  margin: 12px 0 0;
+  font-size: 12px;
+}
+
+.captain-team-goal-empty {
+  min-height: 210px;
+  padding: 30px 24px;
+}
+
+.captain-team-goal-empty h2 {
+  font-size: 19px;
+}
+
+.captain-team-goal-empty h3 {
+  font-size: 16px;
+}
+
+@media (max-width: 900px) {
+  .captain-team-goal-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .captain-team-contribution-stat {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 900px) {
+  .captain-team-goal-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .captain-team-goal-fields > :first-child {
+    grid-column: 1 / -1;
+  }
+
+  .captain-team-goal-fields > :nth-child(4),
+  .captain-team-goal-fields > :nth-child(5) {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .captain-goals-page {
+    gap: 18px;
+  }
+
+  .captain-team-goals-heading {
+    padding: 20px;
+  }
+
+  .captain-team-goals-heading .settings-main-title {
+    font-size: 23px;
+  }
+
+  .captain-team-goal-filter {
+    width: 100%;
+  }
+
+  .captain-team-goal-stat {
+    padding: 14px 12px;
+  }
+
+  .captain-team-goal-stat strong {
+    font-size: 22px;
+  }
+
+  .captain-team-goal-create .captain-goal-form {
+    padding: 20px;
+  }
+
+  .captain-team-goal-card {
+    padding: 20px;
+  }
+
+  .captain-team-goal-card > .captain-goal-card-head {
+    flex-direction: column;
+  }
+
+  .captain-team-goal-card {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 20px;
+  }
+
+  .captain-team-goal-card > .captain-goal-card-head,
+  .captain-team-goal-card > .captain-goal-timeline,
+  .captain-team-goal-card > .captain-goal-copy,
+  .captain-team-goal-card > .captain-goal-numbers,
+  .captain-team-goal-card > .captain-progress-track,
+  .captain-team-goal-card > .captain-goal-meta,
+  .captain-team-goal-card > .captain-team-goal-edit,
+  .captain-team-goal-card > .captain-team-goal-status-actions,
+  .captain-team-goal-card > .team-goal-leaderboard,
+  .captain-team-goal-card > .captain-team-goal-history {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
+
+@media (max-width: 520px) {
+  .captain-team-goal-section-head,
+  .captain-team-goal-list-heading {
+    align-items: flex-start;
+  }
+
+  .captain-team-goal-card .captain-goal-numbers {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .captain-team-goal-card .captain-goal-target {
+    text-align: left;
+  }
+
+  .captain-team-goal-section-head {
+    flex-direction: column;
+  }
+
+  .captain-team-goal-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .captain-team-goal-fields > :first-child,
+  .captain-team-goal-fields > :nth-child(4),
+  .captain-team-goal-fields > :nth-child(5) {
+    grid-column: auto;
+  }
+
+  .captain-team-goal-submit {
+    width: 100%;
+  }
+
+  .captain-team-goal-edit-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .captain-edit-description {
+    grid-column: auto;
+  }
+
+  .captain-team-goal-card .captain-goal-card-head {
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 400px) {
+  .captain-team-goal-summary {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .captain-team-contribution-stat {
+    grid-column: auto;
+  }
+
+  .captain-team-goal-summary {
+    gap: 7px;
+  }
+
+  .captain-team-goal-stat {
+    padding: 12px 9px;
+  }
+
+  .captain-team-goal-stat .captain-summary-label {
+    font-size: 8px;
+    letter-spacing: 0.08em;
+  }
+
+  .captain-team-goal-stat strong {
+    font-size: 20px;
+  }
+
+  .captain-team-goal-card .captain-goal-meta {
+    align-items: center;
+    flex-direction: row;
+  }
+
+  .captain-goal-contribution-count {
+    text-align: right;
+  }
+}

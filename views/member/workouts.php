@@ -1,12 +1,7 @@
 <?php
-// views/member/workouts.php
-
-// Include Page Controller ONLY (No Direct Database Connections)
 require_once '../../controllers/member/workouts_page_controller.php';
-
 require_once '../../includes/headers/header_member.php';
 
-// Load specific Headers and Sidebars dynamically[cite: 19]
 if ($is_captain) {
     require_once '../../includes/sidebars/sidebar_captain.php';
 } else {
@@ -16,248 +11,184 @@ if ($is_captain) {
 
 <div class="member-content-wrapper">
     <main class="dashboard-main-container">
-        
         <section class="wk-hero-banner wk-margin-b-lg">
             <div class="wk-hero-content">
                 <h2 class="wk-hero-title">Elevate Your Performance</h2>
-                <p class="wk-hero-sub">Build custom routines and track every rep. Data-driven fitness for the academic athlete at University of Colombo.</p>
+                <p class="wk-hero-sub">Build your own training routines or follow recommendations from FitCampus instructors.</p>
             </div>
         </section>
 
-        <div id="personal-view-container" class="wk-view-container">
-            
-            <section class="wk-margin-b-xl">
-                <div class="wk-section-head wk-margin-b-md">
-                    <h3 class="monitor-title">Instructor Recommendations</h3>
-                    <span class="wk-badge-verified">Verified Plans</span>
-                </div>
-                
-                <div class="wk-scroll-track custom-scrollbar">
-                    <div class="glass-card wk-card">
-                        <div class="wk-card-icon-header bg-icon-primary">
-                            <span class="material-symbols-outlined">fitness_center</span>
-                        </div>
-                        <div class="wk-card-body">
-                            <h4 class="wk-card-title">Full Body Strength</h4>
-                            <p class="wk-card-meta">3 exercises • 45 mins</p>
-                            <button class="btn btn-glass btn-sm wk-push-bottom wk-btn-auto" onclick="showWorkoutDetails('Full Body Strength', 'Bench Press 3x10, Deadlift 3x8, Pull Ups 3x12', 'High-intensity metabolic conditioning designed by Coach Silva.')">
-                                View
-                            </button>
-                        </div>
-                    </div>
+        <div id="workout-status" class="wk-feedback" role="status" aria-live="polite" hidden></div>
 
-                    <div class="glass-card wk-card">
-                        <div class="wk-card-icon-header bg-icon-secondary">
-                            <span class="material-symbols-outlined">bolt</span>
-                        </div>
-                        <div class="wk-card-body">
-                            <h4 class="wk-card-title">HIIT Cardio Blast</h4>
-                            <p class="wk-card-meta">5 exercises • 20 mins</p>
-                            <button class="btn btn-glass btn-sm wk-push-bottom wk-btn-auto" onclick="showWorkoutDetails('HIIT Cardio Blast', 'Burpees 4x15, Mountain Climbers 4x30', 'Cardio burst for stamina building.')">
-                                View
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="wk-margin-b-lg">
-                <div class="wk-section-head wk-margin-b-md">
-                    <h3 class="monitor-title">My Customized Workout Plans</h3>
-                    <button type="button" class="wk-add-btn" id="btn-open-create-modal" title="Create New">
-                        <span class="material-symbols-outlined">add_box</span>
-                    </button>
-                </div>
-
-                <div class="wk-scroll-track custom-scrollbar">
-                    
-                    <div class="glass-card wk-card">
-                        <div class="wk-card-image-header" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDZhY69mjAh8bJxhlFfPSJXiHkQqFgqMhD2xB-LtFgS3PA_8PcX4rjEWNTfjFYsfjUs_WtfGKHs0X-wqm6n5ZyTiDs6jjLgO2VKZqroboGYOZMVx3x4VSgo3u7jBxrGXoJWwlUB3i1rlvxMP29VPd255kxDPpGXGWctmd5epJtaXeiOZLNvvRJGm9XziuHEGj7uJFfhX1btl9pHMBdv4wwl3cRGjHmGEuPXwAn7Y-VFK36waTyQIJCeFA');">
-                            <div class="wk-image-overlay">
-                                <span class="wk-tag tag-red">High Intensity</span>
-                                <h4 class="wk-card-img-title">Leg Day Heavy</h4>
+        <section class="wk-workout-section wk-margin-b-xl">
+            <div class="wk-section-head wk-margin-b-md">
+                <h3 class="monitor-title">Instructor Recommendations</h3>
+                <span class="wk-badge-verified">Published Plans</span>
+            </div>
+            <?php if (empty($recommendations)): ?>
+                <div class="glass-card wk-empty-state">There are no instructor recommendations yet. Check back soon.</div>
+            <?php else: ?>
+                <div class="wk-workout-grid">
+                    <?php foreach ($recommendations as $workout):
+                        $workoutJson = htmlspecialchars(
+                            json_encode($workout, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP),
+                            ENT_QUOTES,
+                            'UTF-8'
+                        );
+                    ?>
+                        <article class="glass-card wk-card wk-workout-card" data-workout="<?= $workoutJson ?>">
+                            <div class="wk-card-icon-header bg-icon-primary">
+                                <span class="material-symbols-outlined" aria-hidden="true">fitness_center</span>
                             </div>
-                        </div>
-                        <div class="wk-card-body">
-                            <ul class="wk-exercise-list">
-                                <li>
-                                    <div class="ex-name"><span class="ex-dot dot-primary"></span> Back Squats</div>
-                                    <div class="ex-reps">5 x 5</div>
-                                </li>
-                                <li>
-                                    <div class="ex-name"><span class="ex-dot dot-primary"></span> Romanian Deadlift</div>
-                                    <div class="ex-reps">3 x 10</div>
-                                </li>
-                                <li>
-                                    <div class="ex-name"><span class="ex-dot dot-primary"></span> Leg Press</div>
-                                    <div class="ex-reps">4 x 12</div>
-                                </li>
-                            </ul>
-                            <div class="wk-card-footer">
-                                <span class="wk-footer-note">Last completed: 2 days ago</span>
-                                <div class="wk-action-group">
-                                    <button class="action-btn-icon edit-btn" onclick="openEditModal('Leg Day Heavy')"><span class="material-symbols-outlined">edit</span></button>
-                                    <button class="action-btn-icon delete-btn"><span class="material-symbols-outlined">delete</span></button>
+                            <div class="wk-card-body">
+                                <div class="wk-card-topline">
+                                    <span class="wk-tag tag-purple"><?= htmlspecialchars($workout['Workout_Level'] ?? 'General', ENT_QUOTES, 'UTF-8') ?></span>
+                                    <span class="wk-card-meta"><?= $workout['Duration'] !== null ? (int)$workout['Duration'] . ' min' : 'Duration not set' ?></span>
+                                </div>
+                                <h4 class="wk-card-title"><?= htmlspecialchars($workout['Title'], ENT_QUOTES, 'UTF-8') ?></h4>
+                                <p class="wk-card-meta">By <?= htmlspecialchars($workout['Instructor_Name'], ENT_QUOTES, 'UTF-8') ?> · <?= count($workout['Exercises']) ?> exercises</p>
+                                <div class="wk-card-actions wk-card-actions-stack">
+                                    <button type="button" class="btn btn-glass btn-sm wk-view-details">View details</button>
+                                    <div class="wk-card-actions">
+                                        <button type="button" class="btn btn-glass btn-sm wk-save-toggle" data-saved="<?= $workout['Is_Saved'] ? '1' : '0' ?>">
+                                            <?= $workout['Is_Saved'] ? 'Unsave' : 'Save' ?>
+                                        </button>
+                                        <button type="button" class="btn btn-primary btn-sm wk-copy-workout">Copy to my workouts</button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                        </article>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+        </section>
 
-                    <div class="glass-card wk-card">
-                        <div class="wk-card-image-header" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCweaU0a1kO_bvuOP0HH2vavJnMPWXJ5yzgJrf_7_kCjLoSuOrFxrMLJLegap3T5Jo8AuRkSmpoEqgRp3wf9C_aP9t2YJqkVyC458Ley3yRbWeq-7w7cOVK0yCfY2Ftk_UWD7c7QC-q0sJJJrl2i1eIPNtqtIkrxkvfqVLuRrnyuo9zX4SUV0vni8DhXkWiu6A-PoLWNI-5b_CDebr_xUscaqcnKPv1iheSJTG5cjLUjTh0gQAdTVSK5w');">
-                            <div class="wk-image-overlay">
-                                <span class="wk-tag tag-green">Moderate</span>
-                                <h4 class="wk-card-img-title">Push Day (A)</h4>
+        <section class="wk-workout-section wk-margin-b-lg">
+            <div class="wk-section-head wk-margin-b-md">
+                <h3 class="monitor-title">My Personal Workouts</h3>
+                <button type="button" class="btn btn-primary wk-create-workout" id="btn-open-create-modal">
+                    <span class="material-symbols-outlined" aria-hidden="true">add</span>
+                    Create routine
+                </button>
+            </div>
+            <?php if (empty($personal_workouts)): ?>
+                <div class="glass-card wk-empty-state">You have no personal routines yet. Create one or copy an instructor recommendation.</div>
+            <?php else: ?>
+                <div class="wk-workout-grid">
+                    <?php foreach ($personal_workouts as $workout):
+                        $workoutJson = htmlspecialchars(
+                            json_encode($workout, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP),
+                            ENT_QUOTES,
+                            'UTF-8'
+                        );
+                    ?>
+                        <article class="glass-card wk-card wk-workout-card wk-personal-card" data-workout="<?= $workoutJson ?>">
+                            <div class="wk-card-icon-header bg-icon-secondary">
+                                <span class="material-symbols-outlined" aria-hidden="true">exercise</span>
                             </div>
-                        </div>
-                        <div class="wk-card-body">
-                            <ul class="wk-exercise-list">
-                                <li>
-                                    <div class="ex-name"><span class="ex-dot dot-secondary"></span> Flat Bench Press</div>
-                                    <div class="ex-reps">4 x 8</div>
-                                </li>
-                                <li>
-                                    <div class="ex-name"><span class="ex-dot dot-secondary"></span> DB Incline Press</div>
-                                    <div class="ex-reps">3 x 12</div>
-                                </li>
-                                <li>
-                                    <div class="ex-name"><span class="ex-dot dot-secondary"></span> Lateral Raises</div>
-                                    <div class="ex-reps">4 x 15</div>
-                                </li>
-                            </ul>
-                            <div class="wk-card-footer">
-                                <span class="wk-footer-note">Last completed: 4 days ago</span>
-                                <div class="wk-action-group">
-                                    <button class="action-btn-icon edit-btn" onclick="openEditModal('Push Day (A)')"><span class="material-symbols-outlined">edit</span></button>
-                                    <button class="action-btn-icon delete-btn"><span class="material-symbols-outlined">delete</span></button>
+                            <div class="wk-card-body">
+                                <div class="wk-card-topline">
+                                    <span class="wk-tag tag-green">Personal routine</span>
+                                    <span class="wk-card-meta"><?= $workout['Duration'] !== null ? (int)$workout['Duration'] . ' min' : 'Duration not set' ?></span>
+                                </div>
+                                <h4 class="wk-card-title"><?= htmlspecialchars($workout['Title'], ENT_QUOTES, 'UTF-8') ?></h4>
+                                <p class="wk-card-meta"><?= count($workout['Exercises']) ?> exercises</p>
+                                <ul class="wk-exercise-list">
+                                    <?php foreach (array_slice($workout['Exercises'], 0, 3) as $exercise): ?>
+                                        <li>
+                                            <span class="ex-name-plain"><?= htmlspecialchars($exercise['Exercise_Name'], ENT_QUOTES, 'UTF-8') ?></span>
+                                            <span class="ex-reps-plain"><?= (int)$exercise['Sets'] ?> × <?= (int)$exercise['Reps'] ?></span>
+                                        </li>
+                                    <?php endforeach; ?>
+                                </ul>
+                                <div class="wk-card-actions">
+                                    <button type="button" class="btn btn-glass btn-sm wk-view-details">Details</button>
+                                    <button type="button" class="action-btn-icon edit-btn wk-edit-workout" aria-label="Edit <?= htmlspecialchars($workout['Title'], ENT_QUOTES, 'UTF-8') ?>">
+                                        <span class="material-symbols-outlined" aria-hidden="true">edit</span>
+                                    </button>
+                                    <button type="button" class="action-btn-icon delete-btn wk-delete-workout" aria-label="Delete <?= htmlspecialchars($workout['Title'], ENT_QUOTES, 'UTF-8') ?>">
+                                        <span class="material-symbols-outlined" aria-hidden="true">delete</span>
+                                    </button>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-
+                        </article>
+                    <?php endforeach; ?>
                 </div>
-            </section>
-        </div>
-
+            <?php endif; ?>
+        </section>
     </main>
 
-    <?php 
+    <?php
     if ($is_captain) {
         require_once '../../includes/bottombar/bottombar_captain.php';
     } else {
         require_once '../../includes/bottombar/bottombar_member.php';
     }
     ?>
-
-    <?php require_once '../../includes/footers/footer_common.php'; ?>
 </div>
 
-<!-- ==========================================
-     MODALS
-     ========================================== -->
-
-<div class="wk-modal-overlay" id="workout-modal">
-    <div class="wk-modal-box glass-card shadow-2xl">
+<div class="wk-modal-overlay" id="routine-modal" aria-hidden="true">
+    <div class="wk-modal-box glass-card shadow-2xl wk-routine-modal" role="dialog" aria-modal="true" aria-labelledby="routine-modal-title">
         <div class="wk-modal-header">
             <div>
-                <h3 class="wk-modal-title" id="modal-title">Workout Title</h3>
-                <p class="wk-modal-sub" id="modal-desc">Description goes here.</p>
+                <h3 class="wk-modal-title" id="routine-modal-title">Create personal routine</h3>
+                <p class="wk-modal-sub">Configure a routine and its exercises.</p>
             </div>
-            <button class="wk-modal-close" onclick="closeWorkoutModal()"><span class="material-symbols-outlined">close</span></button>
+            <button type="button" class="wk-modal-close" data-close-modal="routine-modal" aria-label="Close">
+                <span class="material-symbols-outlined" aria-hidden="true">close</span>
+            </button>
+        </div>
+        <form id="routine-form">
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8') ?>">
+            <input type="hidden" name="action" value="create">
+            <input type="hidden" name="workout_id" value="">
+            <div class="wk-modal-body custom-scrollbar">
+                <div id="routine-form-status" class="wk-feedback" role="status" aria-live="polite" hidden></div>
+                <div class="form-group-cal">
+                    <label for="routine-title">ROUTINE NAME</label>
+                    <input class="cal-input-field" id="routine-title" name="title" type="text" maxlength="150" required>
+                </div>
+                <div class="form-group-cal">
+                    <label for="routine-duration">TOTAL DURATION (MINUTES)</label>
+                    <input class="cal-input-field" id="routine-duration" name="duration" type="number" min="1" max="1440" step="1" required>
+                </div>
+                <div class="wk-form-section-head">
+                    <h4>Exercises</h4>
+                    <span class="wk-card-meta">Sets and reps are required</span>
+                </div>
+                <div id="routine-exercises" class="wk-exercise-builder"></div>
+                <button type="button" class="wk-add-ex-row-btn" id="add-routine-exercise">
+                    <span class="material-symbols-outlined" aria-hidden="true">add</span>
+                    Add exercise
+                </button>
+            </div>
+            <div class="wk-modal-footer">
+                <button type="button" class="btn btn-glass" data-close-modal="routine-modal">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="routine-submit">Save routine</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="wk-modal-overlay" id="details-modal" aria-hidden="true">
+    <div class="wk-modal-box glass-card shadow-2xl wk-routine-modal" role="dialog" aria-modal="true" aria-labelledby="details-title">
+        <div class="wk-modal-header">
+            <div>
+                <h3 class="wk-modal-title" id="details-title"></h3>
+                <p class="wk-modal-sub" id="details-meta"></p>
+            </div>
+            <button type="button" class="wk-modal-close" data-close-modal="details-modal" aria-label="Close">
+                <span class="material-symbols-outlined" aria-hidden="true">close</span>
+            </button>
         </div>
         <div class="wk-modal-body custom-scrollbar">
-            <ul class="wk-modal-ex-list" id="modal-exercise-list"></ul>
+            <p class="wk-details-description" id="details-description"></p>
+            <ul class="wk-modal-ex-list" id="details-exercises"></ul>
+        </div>
+        <div class="wk-modal-footer">
+            <button type="button" class="btn btn-glass" data-close-modal="details-modal">Close</button>
         </div>
     </div>
 </div>
 
-<div class="wk-modal-overlay" id="create-routine-modal">
-    <div class="wk-modal-box glass-card shadow-2xl" style="max-width: 600px;">
-        <div class="wk-modal-header">
-            <h3 class="wk-modal-title text-color-on-surface">Create New Routine</h3>
-            <button class="wk-modal-close" id="btn-close-create-modal"><span class="material-symbols-outlined">close</span></button>
-        </div>
-        <div class="wk-modal-body custom-scrollbar">
-            <div class="form-group-cal wk-margin-b-lg">
-                <label>ROUTINE NAME</label>
-                <input class="cal-input-field" placeholder="e.g., Full Body Blast" type="text">
-            </div>
-            
-            <label class="wk-lbl-accent">ADD EXERCISES</label>
-            <div class="wk-exercise-builder-box wk-margin-b-md">
-                <div class="form-group-cal wk-margin-b-md">
-                    <label>Exercise Name</label>
-                    <input class="cal-input-field" placeholder="e.g., Bench Press" type="text">
-                </div>
-                <div class="cal-grid-3">
-                    <div class="form-group-cal">
-                        <label>Sets</label>
-                        <input class="cal-input-field" placeholder="0" type="number">
-                    </div>
-                    <div class="form-group-cal">
-                        <label>Reps</label>
-                        <input class="cal-input-field" placeholder="0" type="number">
-                    </div>
-                    <div class="form-group-cal">
-                        <label>Max Duration (min)</label>
-                        <input class="cal-input-field" placeholder="0" type="number">
-                    </div>
-                </div>
-            </div>
-            <button type="button" class="wk-add-ex-row-btn">
-                <span class="material-symbols-outlined">add</span> + Add Another Exercise
-            </button>
-        </div>
-        <div class="wk-modal-footer">
-            <button class="btn btn-glass" id="btn-cancel-create-modal">Cancel</button>
-            <button class="btn btn-primary"><span class="material-symbols-outlined">save</span> Save Routine</button>
-        </div>
-    </div>
-</div>
-
-<div class="wk-modal-overlay" id="edit-routine-modal">
-    <div class="wk-modal-box glass-card shadow-2xl" style="max-width: 600px;">
-        <div class="wk-modal-header">
-            <h3 class="wk-modal-title text-color-primary">Edit Routine</h3>
-            <button class="wk-modal-close" id="btn-close-edit-modal"><span class="material-symbols-outlined">close</span></button>
-        </div>
-        <div class="wk-modal-body custom-scrollbar">
-            <div class="form-group-cal wk-margin-b-lg">
-                <label>ROUTINE NAME</label>
-                <input class="cal-input-field" type="text" id="edit-routine-name" value="Upper Body Power">
-            </div>
-            
-            <label class="wk-lbl-accent">EXERCISES</label>
-            <div class="wk-exercise-builder-box wk-margin-b-md relative-box border-left-primary">
-                <div class="form-group-cal wk-margin-b-md relative-input">
-                    <label>Exercise Name</label>
-                    <input class="cal-input-field" type="text" value="Barbell Bench Press">
-                </div>
-                <div class="cal-grid-3">
-                    <div class="form-group-cal">
-                        <label>Sets</label>
-                        <input class="cal-input-field" type="number" value="4">
-                    </div>
-                    <div class="form-group-cal">
-                        <label>Reps</label>
-                        <input class="cal-input-field" type="number" value="12">
-                    </div>
-                    <div class="form-group-cal">
-                        <label>Duration (min)</label>
-                        <input class="cal-input-field" type="number" value="10">
-                    </div>
-                </div>
-                <div class="wk-txt-right wk-margin-t-sm">
-                    <button class="btn-text-danger"><span class="material-symbols-outlined">delete</span> Remove</button>
-                </div>
-            </div>
-            <button type="button" class="wk-add-ex-row-btn">
-                <span class="material-symbols-outlined">add</span> + Add Another Exercise
-            </button>
-        </div>
-        <div class="wk-modal-footer">
-            <button class="btn btn-glass" id="btn-cancel-edit-modal">Cancel</button>
-            <button class="btn btn-primary"><span class="material-symbols-outlined">save</span> Update Routine</button>
-        </div>
-    </div>
-</div>
+<?php require_once '../../includes/footers/footer_common.php'; ?>

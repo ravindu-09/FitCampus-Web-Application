@@ -9,6 +9,16 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
+if (
+    $_SERVER['REQUEST_METHOD'] !== 'POST' ||
+    empty($_SESSION['csrf_token']) ||
+    !is_string($_POST['csrf_token'] ?? null) ||
+    !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
+) {
+    http_response_code(403);
+    exit('Your session expired. Reload the roster and try again.');
+}
+
 $user_id = $_SESSION['user_id'];
 $rosterModel = new RosterModel($pdo);
 

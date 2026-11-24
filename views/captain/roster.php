@@ -27,7 +27,7 @@ require_once '../../includes/sidebars/sidebar_captain.php';
                         <div class="booking-toggles">
                             <div class="form-group-cal m-0">
                                 <!-- Redirects immediately on change -->
-                                <select class="cal-input-field gl-select" id="team-switcher-select" style="min-width: 250px;" onchange="window.location.href=this.value;">
+                                <select class="cal-input-field gl-select roster-team-switcher" id="team-switcher-select">
                                     <?php foreach ($captain_teams as $t): ?>
                                         <option value="roster.php?team_id=<?= $t['Team_ID'] ?>" <?= ((int)$t['Team_ID'] === (int)$selected_team_id) ? 'selected' : '' ?>>
                                             <?= htmlspecialchars($t['Team_Name']) ?> (<?= htmlspecialchars($t['Sport']) ?>)
@@ -42,21 +42,37 @@ require_once '../../includes/sidebars/sidebar_captain.php';
 
                 <!-- Auto-Dismissing Alerts -->
                 <?php if (!empty($success_message)): ?>
-                    <div class="glass-card bk-card-pad bk-mb-md alert-success" style="background: rgba(74,225,118,0.1); border-color: rgba(74,225,118,0.3);">
+                    <div class="glass-card bk-card-pad bk-mb-md captain-feedback captain-feedback-success" role="status">
                         <p class="txt-green text-sm m-0 font-semibold"><?= htmlspecialchars($success_message) ?></p>
                     </div>
                 <?php endif; ?>
                 <?php if (!empty($error_message)): ?>
-                    <div class="glass-card bk-card-pad bk-mb-md alert-error" style="background: rgba(255,180,171,0.1); border-color: rgba(255,180,171,0.3);">
+                    <div class="glass-card bk-card-pad bk-mb-md captain-feedback captain-feedback-error" role="alert">
                         <p class="txt-error text-sm m-0 font-semibold"><?= htmlspecialchars($error_message) ?></p>
                     </div>
                 <?php endif; ?>
 
-                <?php if (!empty($selected_team_name)): ?>
+                <?php if ($team_access_denied): ?>
+                    <div class="glass-card captain-empty-state" role="alert">
+                        <span class="material-symbols-outlined" aria-hidden="true">lock</span>
+                        <h2 class="settings-main-title">Team unavailable</h2>
+                        <p class="txt-muted">You are not authorized to view that team roster.</p>
+                        <a class="gl-btn-outline" href="roster.php">Return to your teams</a>
+                    </div>
+                <?php elseif (!empty($selected_team_name)): ?>
                     <!-- Team Banner -->
                     <div class="glass-card bk-card-pad bk-mb-lg team-banner-card">
-                        <div class="badge-tag bk-mb-xs"><?= htmlspecialchars($selected_team_gender ?: 'Mixed') ?> DIVISION</div>
-                        <h2 class="settings-main-title text-xl m-0"><?= htmlspecialchars($selected_team_name) ?></h2>
+                        <div class="team-banner-identity">
+                            <h2 class="settings-main-title text-xl m-0"><?= htmlspecialchars($selected_team_name) ?></h2>
+                            <div class="team-banner-meta">
+                                <?php if (!empty($selected_team_gender)): ?>
+                                    <span class="team-banner-division"><?= htmlspecialchars($selected_team_gender, ENT_QUOTES, 'UTF-8') ?></span>
+                                <?php endif; ?>
+                                <?php if (!empty($selected_team_sport)): ?>
+                                    <span class="team-banner-sport"><?= htmlspecialchars($selected_team_sport, ENT_QUOTES, 'UTF-8') ?></span>
+                                <?php endif; ?>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Team Roster Table -->
@@ -96,11 +112,12 @@ require_once '../../includes/sidebars/sidebar_captain.php';
                                             <td class="bk-px-lg bk-py-md">
                                                 <?php if ($member['Role_In_Team'] !== 'Captain'): ?>
                                                     <!-- Action path updated to controllers -->
-                                                    <form action="../../controllers/captain/roster_action.php" method="POST" onsubmit="return confirm('Are you sure you want to remove this member?');" style="margin:0;">
+                                                    <form action="../../controllers/captain/roster_action.php" method="POST" class="roster-remove-form captain-roster-form">
+                                                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8') ?>">
                                                         <input type="hidden" name="action" value="remove_member">
                                                         <input type="hidden" name="team_id" value="<?= $selected_team_id ?>">
                                                         <input type="hidden" name="remove_user_id" value="<?= $member['User_ID'] ?>">
-                                                        <button type="submit" class="toggle-btn" style="color: var(--error); padding: 4px 8px; font-size: 11px;">Remove</button>
+                                                        <button type="submit" class="toggle-btn captain-roster-remove">Remove</button>
                                                     </form>
                                                 <?php else: ?>
                                                     <span class="text-xs txt-muted">N/A</span>
@@ -134,6 +151,7 @@ require_once '../../includes/sidebars/sidebar_captain.php';
                     <?php if (!empty($selected_team_name)): ?>
                         <!-- Action path updated to controllers -->
                         <form action="../../controllers/captain/roster_action.php" method="POST" class="booking-form space-y-md">
+                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8') ?>">
                             <input type="hidden" name="action" value="add_member">
                             <input type="hidden" name="team_id" value="<?= $selected_team_id ?>">
                             
@@ -148,7 +166,7 @@ require_once '../../includes/sidebars/sidebar_captain.php';
                             </div>
 
                             <button type="submit" class="gl-btn-gradient w-full bk-py-md bk-mt-md font-bold text-sm flex-items-center gap-2 justify-center">
-                                <span class="material-symbols-outlined" style="font-size: 20px;">person_add</span>
+                                <span class="material-symbols-outlined captain-roster-add-icon">person_add</span>
                                 <span>Add Member</span>
                             </button>
                         </form>

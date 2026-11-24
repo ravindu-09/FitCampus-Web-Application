@@ -13,13 +13,18 @@ $user_id = $_SESSION['user_id'];
 $page_title = "Team Roster | FitCampus";
 
 $extra_js = [
-    "captain/roster.js"
+    "captain/roaster.js"
 ];
 
 require_once '../../includes/db_connection.php';
 require_once '../../models/captain/RosterModel.php';
 
 $rosterModel = new RosterModel($pdo);
+
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+$csrf_token = $_SESSION['csrf_token'];
 
 $success_message = $_SESSION['success_message'] ?? '';
 $error_message = $_SESSION['error_message'] ?? '';
@@ -40,14 +45,21 @@ $team_members = [];
 $selected_team_name = "";
 $selected_team_sport = "";
 $selected_team_gender = "";
+$team_access_denied = false;
 
 if ($selected_team_id > 0) {
-    $team_info = $rosterModel->getTeamInfo($selected_team_id);
-    if ($team_info) {
-        $selected_team_name = $team_info['Team_Name'];
-        $selected_team_sport = $team_info['Sport'];
-        $selected_team_gender = $team_info['Sport_Gender'];
+    $authorized_team_ids = array_map('intval', array_column($captain_teams, 'Team_ID'));
+    if (!in_array($selected_team_id, $authorized_team_ids, true)) {
+        $team_access_denied = true;
+        http_response_code(404);
+    } else {
+        $team_info = $rosterModel->getTeamInfo($selected_team_id);
+        if ($team_info) {
+            $selected_team_name = $team_info['Team_Name'];
+            $selected_team_sport = $team_info['Sport'];
+            $selected_team_gender = $team_info['Sport_Gender'];
+        }
+        $team_members = $rosterModel->getTeamMembers($selected_team_id);
     }
-    $team_members = $rosterModel->getTeamMembers($selected_team_id);
 }
 ?>

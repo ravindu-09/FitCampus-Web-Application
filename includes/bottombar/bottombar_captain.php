@@ -1,7 +1,7 @@
 <?php
 // includes/bottombar/bottombar_captain.php
 $current_page = basename($_SERVER['PHP_SELF']);
-$team_pages = ['facilities.php', 'booking.php', 'roster.php', 'planner.php', 'teams.php'];
+$team_pages = ['facilities.php', 'booking.php', 'roster.php', 'planner.php', 'teams.php', 'team_goals.php'];
 $is_team_active = in_array($current_page, $team_pages);
 
 $current_dir = basename(dirname($_SERVER['PHP_SELF']));
@@ -37,8 +37,8 @@ $captain_prefix = ($current_dir === 'member' || $current_dir === 'common') ? '..
 
     <!-- Team / Captain Actions Dropdown -->
     <div class="mob-nav-item-group" id="captainTeamGroup">
-        <button class="mob-nav-item <?php echo $is_team_active ? 'active' : ''; ?>" id="captainTeamBtn" style="border: none; background: transparent; width: 100%; padding: 6px 0;" type="button">
-            <span class="material-symbols-outlined" <?php echo $is_team_active ? 'style="font-variation-settings: \'FILL\' 1;"' : ''; ?>>groups</span>
+        <button class="mob-nav-item <?php echo $is_team_active ? 'active' : ''; ?>" id="captainTeamBtn" aria-controls="captainTeamMenu" aria-expanded="false" type="button">
+            <span class="material-symbols-outlined captain-team-icon <?= $is_team_active ? 'active' : '' ?>">groups</span>
             <span>Team</span>
         </button>
 
@@ -56,27 +56,9 @@ $captain_prefix = ($current_dir === 'member' || $current_dir === 'common') ? '..
             <a href="<?php echo $captain_prefix; ?>planner.php" class="capt-drop-item <?php echo ($current_page === 'planner.php') ? 'active' : ''; ?>">
                 <span class="material-symbols-outlined">event_available</span> Planner
             </a>
+            <a href="<?php echo $captain_prefix; ?>team_goals.php" class="capt-drop-item <?php echo ($current_page === 'team_goals.php') ? 'active' : ''; ?>">
+                <span class="material-symbols-outlined">flag</span> Team Goals
+            </a>
         </div>
     </div>
 </nav>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const teamBtn = document.getElementById('captainTeamBtn');
-        const teamMenu = document.getElementById('captainTeamMenu');
-
-        if(teamBtn && teamMenu) {
-            teamBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                teamMenu.classList.toggle('show');
-            });
-
-            document.addEventListener('click', function(e) {
-                if (!teamMenu.contains(e.target) && !teamBtn.contains(e.target)) {
-                    teamMenu.classList.remove('show');
-                }
-            });
-        }
-    });
-</script>

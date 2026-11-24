@@ -3,9 +3,12 @@
 
 class PlannerModel {
     private $pdo;
+    private WorkoutExerciseModel $exerciseModel;
 
     public function __construct($dbConnection) {
         $this->pdo = $dbConnection;
+        require_once __DIR__ . '/../common/WorkoutExerciseModel.php';
+        $this->exerciseModel = new WorkoutExerciseModel($dbConnection);
     }
 
     public function getCaptainTeams($user_id) {
@@ -161,27 +164,19 @@ class PlannerModel {
     }
 
     private function insertExercises($workout_id, array $exercises) {
-        $findExercise = $this->pdo->prepare(
-            'SELECT Exercise_ID FROM exercise WHERE Exercise_Name = ? LIMIT 1 FOR UPDATE'
-        );
-        $createExercise = $this->pdo->prepare(
-            'INSERT INTO exercise (Exercise_Name) VALUES (?)'
+        $resolvedExercises = $this->exerciseModel->resolveSubmittedExercises(
+            array_column($exercises, 'id'),
+            array_column($exercises, 'name'),
+            array_column($exercises, 'sets'),
+            array_column($exercises, 'reps')
         );
         $linkExercise = $this->pdo->prepare(
             'INSERT INTO team_workout_exercise (Workout_ID, Exercise_ID, Sets, Reps) VALUES (?, ?, ?, ?)'
         );
         $linkedExerciseIds = [];
 
-        foreach ($exercises as $exercise) {
-            $exerciseName = preg_replace('/\s+/', ' ', trim($exercise['name']));
-            $findExercise->execute([$exerciseName]);
-            $exercise_id = $findExercise->fetchColumn();
-            if ($exercise_id === false) {
-                $createExercise->execute([$exerciseName]);
-                $exercise_id = (int)$this->pdo->lastInsertId();
-            } else {
-                $exercise_id = (int)$exercise_id;
-            }
+        foreach ($resolvedExercises as $exercise) {
+            $exercise_id = $exercise['Exercise_ID'];
 
             if (isset($linkedExerciseIds[$exercise_id])) {
                 throw new InvalidArgumentException('An exercise can only appear once in a workout.');
@@ -190,8 +185,8 @@ class PlannerModel {
             $linkExercise->execute([
                 $workout_id,
                 $exercise_id,
-                $exercise['sets'],
-                $exercise['reps']
+                $exercise['Sets'],
+                $exercise['Reps']
             ]);
         }
     }
