@@ -368,6 +368,8 @@
 .kiosk-table th { padding: 16px 24px; font-family: var(--font-mono); font-size: 11px; color: var(--on-surface-variant); text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.2); }
 .kiosk-table td { padding: 16px 24px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
 .kiosk-table tr:hover { background: rgba(255,255,255,0.02); }
+.kiosk-feedback { min-height: 1.25em; margin: 12px 0 0; color: var(--secondary); font-size: 13px; }
+.kiosk-feedback.is-error { color: var(--error); }
 .table-avatar { width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.1); object-fit: cover; }
 .table-avatar.no-img { background: var(--surface-highest); display: flex; align-items: center; justify-content: center; color: var(--on-surface-variant); }
 .dummy-placeholder { background: rgba(0,0,0,0.3); border: 1px dashed rgba(255,255,255,0.2); border-radius: 12px; color: var(--on-surface-variant); font-family: var(--font-mono); font-size: 12px; }

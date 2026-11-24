@@ -2217,6 +2217,7 @@
 }
 .ld-tab {
   flex: 1; padding: 10px 16px; border-radius: 8px; border: none; background: transparent;
+  display: block; text-align: center; text-decoration: none;
   color: var(--on-surface-variant); font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s;
 }
 .ld-tab:hover:not(.active) { color: var(--on-surface); }
@@ -2266,6 +2267,22 @@
 .ld-standing-card { padding: 32px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; }
 .ld-big-rank { font-size: 64px; font-weight: 800; color: var(--primary); line-height: 1; margin: 8px 0; }
 .ld-watermark { position: absolute; right: -20px; bottom: -20px; font-size: 160px; opacity: 0.05; transform: rotate(15deg); pointer-events: none; }
+.ld-avatar-initials { display: flex; align-items: center; justify-content: center; }
+.ld-empty-state { padding: 24px; color: var(--on-surface-variant); }
+.ld-faculty-filter { display: flex; align-items: center; gap: 12px; max-width: 440px; margin: -8px 0 20px; }
+.ld-faculty-filter label { color: var(--on-surface-variant); font-size: 13px; font-weight: 600; }
+.ld-faculty-filter select { min-width: 0; }
+.ld-penalty-card { padding: 24px; }
+.ld-life-value { margin: 8px 0 12px; color: var(--primary); font: 700 28px var(--font-mono); }
+.ld-penalty-heading { margin: 24px 0 12px; color: var(--on-surface); font-size: 15px; }
+.ld-penalty-list { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+.ld-penalty-list li { padding: 12px; border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; background: rgba(255,255,255,0.025); }
+.ld-penalty-list strong { color: var(--primary); font-size: 13px; }
+.ld-penalty-list p { margin: 5px 0; color: var(--on-surface); font-size: 13px; overflow-wrap: anywhere; }
+.ld-penalty-list small { color: var(--on-surface-variant); font-size: 11px; }
+@media (max-width: 520px) {
+  .ld-faculty-filter { align-items: stretch; flex-direction: column; }
+}
 
 .ld-trend-box { display: flex; align-items: center; gap: 8px; margin-top: 16px; color: var(--secondary); font-size: 14px; font-weight: bold; }
 

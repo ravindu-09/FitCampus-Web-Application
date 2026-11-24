@@ -39,9 +39,11 @@ class UserModel {
     }
 
     // Update Student Meta (Life % and Exam Date)
-    public function updateStudentMeta($user_id, $life_pct,$exam_date) {
-        $stmt =$this->pdo->prepare("UPDATE university_student SET Life_Percentage = ?, Date_of_Final_Exam = ? WHERE User_ID = ?");
-        return $stmt->execute([$life_pct, $exam_date,$user_id]);
+    public function updateStudentMeta(int $userId, ?string $examDate): bool {
+        $stmt = $this->pdo->prepare(
+            'UPDATE university_student SET Date_of_Final_Exam = ? WHERE User_ID = ?'
+        );
+        return $stmt->execute([$examDate, $userId]);
     }
 
     // Promote user to Team Captain

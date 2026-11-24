@@ -172,13 +172,38 @@ require_once '../../includes/headers/header_admin.php';
             <input type="hidden" id="v-userid">
             <div class="flex gap-3 bk-mb-md">
                 <div class="flex-1">
-                    <label class="gl-lbl-accent">Life Percentage (%)</label>
-                    <input type="number" id="v-life" class="cal-input-field" min="0" max="100">
+                    <label class="gl-lbl-accent">Current Life Bar</label>
+                    <div id="v-life" class="txt-white font-bold"></div>
                 </div>
                 <div class="flex-1">
                     <label class="gl-lbl-accent">Final Exam Date</label>
                     <input type="date" id="v-exam" class="cal-input-field">
                 </div>
+            </div>
+
+            <div class="border-t-dim pt-4 bk-mb-md">
+                <h4 class="txt-white m-0 bk-mb-sm">Apply Auditable Penalty</h4>
+                <form id="admin-penalty-form">
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
+                    <input type="hidden" name="user_id" id="admin-penalty-user-id">
+                    <input type="hidden" name="request_key" id="admin-penalty-request-key">
+                    <div class="bk-mb-sm">
+                        <label class="gl-lbl-accent" for="admin-penalty-reason">Reason</label>
+                        <textarea id="admin-penalty-reason" name="reason" class="cal-input-field" maxlength="2000" required></textarea>
+                    </div>
+                    <div class="flex gap-3 bk-mb-sm">
+                        <div class="flex-1">
+                            <label class="gl-lbl-accent" for="admin-penalty-severity">Severity</label>
+                            <input id="admin-penalty-severity" name="severity" type="text" class="cal-input-field" maxlength="30" required>
+                        </div>
+                        <div class="flex-1">
+                            <label class="gl-lbl-accent" for="admin-penalty-deduction">Requested Life points (1–100)</label>
+                            <input id="admin-penalty-deduction" name="requested_life_deduction" type="number" class="cal-input-field" min="1" max="100" required>
+                        </div>
+                    </div>
+                    <p id="admin-penalty-feedback" class="text-sm txt-muted" role="status" aria-live="polite"></p>
+                    <button class="btn btn-glass w-full" type="submit">Apply penalty</button>
+                </form>
             </div>
             
             <div class="flex gap-2">

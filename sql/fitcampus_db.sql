@@ -72,6 +72,22 @@ CREATE TABLE `attendance` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `attendance_visit_points`
+--
+
+CREATE TABLE `attendance_visit_points` (
+  `Attendance_ID` int(10) UNSIGNED NOT NULL,
+  `Points` tinyint(3) UNSIGNED NOT NULL,
+  `Visit_Minutes` int(10) UNSIGNED NOT NULL,
+  `Awarded_At` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`Attendance_ID`),
+  CONSTRAINT `chk_visit_points_positive` CHECK (`Points` > 0),
+  CONSTRAINT `chk_visit_points_minimum_duration` CHECK (`Visit_Minutes` >= 30)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `booking`
 --
 
@@ -431,9 +447,19 @@ CREATE TABLE `penalty` (
   `User_ID` int(10) UNSIGNED NOT NULL,
   `Team_ID` int(10) UNSIGNED DEFAULT NULL,
   `Instructor_ID` int(10) UNSIGNED DEFAULT NULL,
+  `Issuer_User_ID` int(10) UNSIGNED DEFAULT NULL,
+  `Issuer_Type` enum('admin','instructor','system') DEFAULT NULL,
   `Description` text NOT NULL,
   `Date` date NOT NULL,
-  `Severity` varchar(30) DEFAULT NULL
+  `Created_At` datetime DEFAULT NULL,
+  `Severity` varchar(30) DEFAULT NULL,
+  `Requested_Life_Deduction` tinyint(3) UNSIGNED DEFAULT NULL,
+  `Life_Deduction` tinyint(3) UNSIGNED DEFAULT NULL,
+  `Source_Attendance_ID` int(10) UNSIGNED DEFAULT NULL,
+  `Request_Key` char(32) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,
+  CONSTRAINT `chk_penalty_requested_life_deduction` CHECK (`Requested_Life_Deduction` IS NULL OR `Requested_Life_Deduction` BETWEEN 1 AND 100),
+  CONSTRAINT `chk_penalty_life_deduction` CHECK (`Life_Deduction` IS NULL OR `Life_Deduction` BETWEEN 0 AND 100),
+  CONSTRAINT `chk_penalty_actual_not_above_requested` CHECK (`Life_Deduction` IS NULL OR `Requested_Life_Deduction` IS NULL OR `Life_Deduction` <= `Requested_Life_Deduction`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -686,7 +712,8 @@ ALTER TABLE `announcement`
 ALTER TABLE `attendance`
   ADD PRIMARY KEY (`Attendance_ID`),
   ADD KEY `fk_attendance_user` (`User_ID`),
-  ADD KEY `fk_attendance_facility` (`Facility_ID`);
+  ADD KEY `fk_attendance_facility` (`Facility_ID`),
+  ADD KEY `idx_attendance_user_active_checkout` (`User_ID`,`Active_Status`,`Check_Out_Time`);
 
 --
 -- Indexes for table `booking`
@@ -838,7 +865,11 @@ ALTER TABLE `penalty`
   ADD PRIMARY KEY (`Penalty_ID`),
   ADD KEY `fk_penalty_user` (`User_ID`),
   ADD KEY `fk_penalty_team` (`Team_ID`),
-  ADD KEY `fk_penalty_instructor` (`Instructor_ID`);
+  ADD KEY `fk_penalty_instructor` (`Instructor_ID`),
+  ADD KEY `fk_penalty_issuer_user` (`Issuer_User_ID`),
+  ADD UNIQUE KEY `uq_penalty_source_attendance` (`Source_Attendance_ID`),
+  ADD UNIQUE KEY `uq_penalty_request_key` (`Request_Key`),
+  ADD KEY `idx_penalty_user_created` (`User_ID`,`Created_At`);
 
 --
 -- Indexes for table `personal_workout`
@@ -1080,6 +1111,12 @@ ALTER TABLE `attendance`
   ADD CONSTRAINT `fk_attendance_user` FOREIGN KEY (`User_ID`) REFERENCES `user` (`User_ID`) ON UPDATE CASCADE;
 
 --
+-- Constraints for table `attendance_visit_points`
+--
+ALTER TABLE `attendance_visit_points`
+  ADD CONSTRAINT `fk_visit_points_attendance` FOREIGN KEY (`Attendance_ID`) REFERENCES `attendance` (`Attendance_ID`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+--
 -- Constraints for table `booking`
 --
 ALTER TABLE `booking`
@@ -1197,7 +1234,9 @@ ALTER TABLE `notification`
 ALTER TABLE `penalty`
   ADD CONSTRAINT `fk_penalty_instructor` FOREIGN KEY (`Instructor_ID`) REFERENCES `instructor` (`Instructor_ID`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_penalty_team` FOREIGN KEY (`Team_ID`) REFERENCES `team` (`Team_ID`) ON DELETE SET NULL ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_penalty_user` FOREIGN KEY (`User_ID`) REFERENCES `user` (`User_ID`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `fk_penalty_user` FOREIGN KEY (`User_ID`) REFERENCES `user` (`User_ID`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_penalty_issuer_user` FOREIGN KEY (`Issuer_User_ID`) REFERENCES `user` (`User_ID`) ON DELETE RESTRICT ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_penalty_source_attendance` FOREIGN KEY (`Source_Attendance_ID`) REFERENCES `attendance` (`Attendance_ID`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 --
 -- Constraints for table `personal_workout`

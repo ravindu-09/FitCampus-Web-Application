@@ -58,6 +58,87 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const feedback = (element, message, isError = false) => {
+        if (!element) return;
+        element.textContent = message;
+        element.classList.toggle('is-error', isError);
+    };
+
+    const manualAction = document.getElementById('manual-attendance-action');
+    const facilityGroup = document.getElementById('manual-facility-group');
+    const facilitySelect = document.getElementById('manual-facility');
+    manualAction?.addEventListener('change', () => {
+        const checkingIn = manualAction.value === 'manual_checkin';
+        facilityGroup?.classList.toggle('hidden', !checkingIn);
+        if (facilitySelect) facilitySelect.required = checkingIn;
+    });
+
+    document.getElementById('manual-attendance-form')?.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const form = event.currentTarget;
+        const status = document.getElementById('manual-attendance-feedback');
+        const submit = form.querySelector('[type="submit"]');
+        submit.disabled = true;
+        feedback(status, 'Recording attendance…');
+        try {
+            const response = await fetch('../../controllers/instructor/kiosk_action.php', {
+                method: 'POST',
+                body: new FormData(form),
+                headers: { Accept: 'application/json' }
+            });
+            const result = await response.json();
+            if (!response.ok || !result.success) throw new Error(result.message || 'Attendance could not be recorded.');
+            feedback(status, result.message);
+            window.setTimeout(() => window.location.reload(), 900);
+        } catch (error) {
+            feedback(status, error.message || 'Attendance could not be recorded. Please try again.', true);
+        } finally {
+            submit.disabled = false;
+        }
+    });
+
+    const newRequestKey = () => {
+        if (window.crypto?.randomUUID) return window.crypto.randomUUID().replace(/-/g, '');
+        const bytes = new Uint8Array(16);
+        window.crypto.getRandomValues(bytes);
+        return Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
+    };
+
+    document.querySelectorAll('.js-open-penalty').forEach(button => {
+        button.addEventListener('click', () => {
+            document.getElementById('penalty-user-id').value = button.dataset.userId || '';
+            document.getElementById('penalty-member-label').textContent =
+                `For ${button.dataset.memberName || 'selected member'}`;
+            document.getElementById('penalty-request-key').value = newRequestKey();
+            feedback(document.getElementById('penalty-feedback'), '');
+            openKioskModal('penalty-modal');
+        });
+    });
+
+    document.getElementById('penalty-form')?.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const form = event.currentTarget;
+        const status = document.getElementById('penalty-feedback');
+        const submit = form.querySelector('[type="submit"]');
+        submit.disabled = true;
+        feedback(status, 'Applying penalty…');
+        try {
+            const response = await fetch('../../controllers/common/penalty_action.php', {
+                method: 'POST',
+                body: new FormData(form),
+                headers: { Accept: 'application/json' }
+            });
+            const result = await response.json();
+            if (!response.ok || !result.success) throw new Error(result.message || 'Penalty could not be recorded.');
+            feedback(status, `${result.message} Remaining Life Bar: ${result.life_balance}%.`);
+            window.setTimeout(() => window.location.reload(), 1100);
+        } catch (error) {
+            feedback(status, error.message || 'Penalty could not be recorded. Please try again.', true);
+        } finally {
+            submit.disabled = false;
+        }
+    });
+
     // 6. Headcount Plus / Minus Counter Logic
     const btnPlus = document.getElementById('btn-plus');
     const btnMinus = document.getElementById('btn-minus');

@@ -25,4 +25,10 @@ $kioskModel = new KioskModel($pdo);
 // Fetch required data for the kiosk view
 $occupancy_data = $kioskModel->getLiveOccupancy();
 $attendance_logs = $kioskModel->getRecentAttendance();
+$facility_options = $kioskModel->getFacilities();
+
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+$csrf_token = $_SESSION['csrf_token'];
 ?>
